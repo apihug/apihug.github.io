@@ -42,6 +42,9 @@ export const documentationNav = {
     {title: 'Spring Security', href: '/docs/framework/spring-security'},
     {title: 'Widget Authority', href: '/docs/framework/widget/authority'},
   ],
+  "Tester": [
+    {title: 'Kola Intro', href: '/docs/kola'},
+  ],
   "Tool Chain": [
     {title: 'Intro', href: '/docs/tool'},
     {title: 'Wire', href: '/docs/tool/gradle-wire'},

@@ -42,6 +42,9 @@ export const documentationNav = {
     {title: 'Spring 安全库', href: '/zhCN-docs/framework/spring-security'},
     {title: '权限工具', href: '/zhCN-docs/framework/widget/authority'},
   ],
+  "Tester": [
+    {title: 'Kola Intro', href: '/zhCN-docs/kola'},
+  ],
   "Tool Chain": [
     {title: '介绍', href: '/zhCN-docs/tool'},
     {title: 'Wire', href: '/zhCN-docs/tool/gradle-wire'},

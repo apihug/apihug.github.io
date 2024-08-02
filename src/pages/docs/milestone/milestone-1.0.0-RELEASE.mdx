@@ -1,0 +1,102 @@
+---
+title: Milestone 1.0.0-RELEASE
+description: With SDK [1.0.0-RELEASE]
+---
+
+import {TipGood} from '@/components/Tip'
+
+<TipGood>
+  1.0.0-RELEASE is a new milestone for ApiHug, and the final ApiHug solution now includes the testing part!
+</TipGood>
+
+😆 Guide：
+
+1. [ApiHug101-Bilibili](https://space.bilibili.com/666522636)
+2. [ApiHug101 Youtube](https://youtube.com/@ApiHug?si=C1yw0poHA01zbmyj)
+
+<a target="_blank" href="https://search.maven.org/artifact/com.apihug/it-bom"><img
+  src="https://img.shields.io/maven-central/v/com.apihug/it-bom.svg?label=Maven%20Central"/></a>
+
+[ApiHug - API design Copilot](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
+
+## ApiHug [1.0.0-RELEASE] -  2024-08-02
+
+### SDK Features
+
+- DSL style BDD definition, follow consumer driven test - Contract test principle
+- introduce new task `kolaTest` during wire proto
+- Seamlessly integrates all existing testing solutions (JUnit5, AssertJ, etc.)
+
+### Upgrade steps
+
+Refer [apihug-demo/libs.versions.toml](https://github.com/apihug/apihug-demo/blob/main/gradle/libs.versions.toml)
+
+1. Upgrade ApiHug SDK: `{PROJECT_ROOT}/gradle/libs.versions.toml`  find  `apihug = "1.0.0-RELEASE"`  please upgrade to  `1.0.0-RELEASE`+
+2. Add new lib reference:  `springBootDependencies = { group = "org.springframework.boot", name = "spring-boot-dependencies", version.ref = "springBoot" }`
+
+Now by default, kola flag default as false, you need switch @ [build.gradle](https://github.com/apihug/apihug-demo/blob/main/apihug-demo-proto/build.gradle):
+
+```groovy
+hopeWire {
+    // others...
+    kola = true
+}
+```
+
+### Sample
+
+You can walk through the sample of [apihug-demo//apihug-demo-proto](https://github.com/apihug/apihug-demo/tree/main/apihug-demo-proto/src)
+
+```groovy
+package contracts
+
+import hope.kola.contract.Feature
+
+Feature.make {
+    priority 100
+    name("Customer login place order and check balance logic")
+    description("""Never judge the boss, as you may the real fool""")
+    Scenario "001 Try login ", {
+        Given {
+            api("UserService", "Login")
+        }
+        When {
+            json("""
+                    
+            """)
+            body {
+                set('name', "same")
+                set('student.name', "blue")
+                set('student.age', 22)
+                set('student.weight', 123.3d)
+                set('student.friends', "jake", "blue", "yellow")
+                set('student.bigBaby', {
+                    addStatement('res.setAge(12)')
+                    addStatement('res.setBlogs($T.asList($S,$S))', Arrays.class, 'jake', 'same')
+                })
+                set('student.soreList', 12, 123, 45, Mocker.numberBetween(12, 34))
+                set('json', Mocker.chineseName().name(), Mocker.cat().name(), Mocker.ip4(), regular("[a-z]"))
+            }
+        }
+        And {
+            stringAssert("user.address.zipCode", {
+                isEqualTo("jake")
+                isBase64()
+                isAlphabetic()
+                startsWithIgnoringCase("json")
+            })
+            bigDecimalAssert("user.salary", {
+                isCloseTo(ofBigDecimal("1112.22"), offset(12))
+                isGreaterThanOrEqualTo(ofBigDecimal("231312"))
+            })
+            booleanAssert("user.live", {
+                isTrue()
+            })
+
+        }
+
+    }
+    Scenario "002 Place a order", {}
+    Scenario "003 Check balance", {}
+}
+```
