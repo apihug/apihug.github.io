@@ -5,6 +5,56 @@ description: Kola background, Kola a consumer driver tester framework
 
 ⚠️TBD⚠️
 
+## Configuration
+
+Use DSL to define environment also `{WIRE_MODULE}/src/test/resources/config/kola.groovy`:
+
+1. common: base configuration
+2. different env overwrite configuration property
+3. active env base on the passed env flag: `-Dtags=qa,dev`
+
+```groovy
+import com.test.bigger.example.Student
+import static hope.kola.contract.Configuration.*
+
+var big = 1123
+
+[
+        common {
+            baseURI("https://qa.example.com")
+            port(9527)
+            p("date", ofDate("2022-12-12"))
+            rest {
+                log {
+                    enablePrettyPrinting()
+                    logBodyDetailIfValidationFails()
+                }
+            }
+
+        },
+
+        env("qa", {
+
+            baseURI("https://qa.example.com")
+            port(big)
+
+        }),
+
+        env("prod", {
+
+            baseURI("https://prod.example.com")
+            p("date", nowDayOfMonth())
+            p("bigStudent", new Student().setName("jake").setAge(19))
+            rest {
+                closeIdleConnectionsAfterEachResponse(12l, second())
+                log {
+                    logAllDetailIfValidationFails()
+                }
+            }
+        })
+]
+```
+
 ## BDD
 
 ### Given
