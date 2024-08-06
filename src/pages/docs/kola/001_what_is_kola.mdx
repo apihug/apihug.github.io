@@ -1,0 +1,81 @@
+---
+title: What's ApiHug Kola
+description: Kola background, why we create kola, about Kola
+---
+
+## Summary
+
+Kola is a testing framework and tool, primarily serving the entire Apihug ecosystem, and is still under active development and enhancement (as of 2024/08).
+
+Kola inherits the design principles of ApiHug:
+
+1. Unified language, DSL, and reduced divergence
+2. Relying on existing technologies, maximizing the utilization of existing assets
+3. Extremely low learning cost
+4. Single source of truth, with version control management
+
+## Why
+
+### Existing Challenges
+
+1. Testing often requires either high expertise (programming skills) or is too loosely structured
+2. Multiple tool stacks and lack of context switching between different roles
+3. Lack of design planning upfront
+4. Rigorous version management
+5. Native Collaboration
+
+
+###  Existing Concepts
+
+1. TDD: Test Driven Development
+2. BDD: Behavior-Driven Development
+3. CDC: Consumer Driven Contracts
+
+### So
+
+Among the many testing solutions available, each has its own pros and cons, leading to a lack of overall convenience and completeness in most integrated solutions.
+
+Some deficiencies are difficult to satisfy in the current paradigm, such as enabling all stakeholders (product manager, front-end, back-end, testing, etc.) to understand and write the tests, and providing a centralized and unified testing management.
+
+Within the constrained environment of ApiHug, Kola provides a relatively optimal solution:
+
+1. Follows the BDD naming convention: `Given`/`When`/`Then`/`And`, intuitive and simple
+2. DSL, based on the declarative groovy syntax
+3. Strong validation: static checking (groovy) + compilation processing
+4. More `"sugar"`, enabling user habit migration: `junit`, `junit5`, `assertj`, `jsonpath`, `rest-assured`
+5. ApiHug integration
+6. IDE support
+7. Collaboration
+
+Eventually, on **2024-08-02**, the first version of Kola, **1.0.0-RELEASE** was with the latest SDK bom.
+
+⚠️TBD⚠️
+
+## Next
+
+1. Multipart file support
+2. Customized report
+3. Debug tool
+4. Dependencies import
+5. Event driven support
+6. Stub side
+7. performance test
+
+
+## Refer
+
+1. spring test [spring-framework/spring-test](https://github.com/spring-projects/spring-framework/tree/main/spring-test)
+2. spring test doc [spring-framework/reference/testing](https://docs.spring.io/spring-framework/reference/testing.html)
+3. spring boot test [spring-boot-test](https://github.com/spring-projects/spring-boot/tree/main/spring-boot-project/spring-boot-test)
+4. spring boot test doc [spring-boot/testing](https://docs.spring.io/spring-boot/reference/testing/index.html)
+5. spring contract [spring-cloud-contract](https://github.com/spring-cloud/spring-cloud-contract)
+6. spring contract doc [spring-cloud-contract reference](https://docs.spring.io/spring-cloud-contract/reference/)
+7. cucumber [Behaviour-Driven Development](https://cucumber.io/docs/bdd/)
+8. Spock: [Spock Framework](https://spockframework.org/)
+9. [karate](https://karatelabs.github.io/karate/) Test Automation Made Simple
+10. [Contract Test](https://martinfowler.com/bliki/ContractTest.html) Martin Fowler
+11. [PactFlow](https://pactflow.io/) SmartBear Consumer Driven
+12. [Contract Testing Vs Integration Testing](https://pactflow.io/blog/contract-testing-vs-integration-testing/) from PactFlow
+13. [Consumer-Driven Contracts: A Service Evolution Pattern](https://martinfowler.com/articles/consumerDrivenContracts.html)
+
+⚠️TBD⚠️

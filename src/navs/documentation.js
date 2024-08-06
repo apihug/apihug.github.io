@@ -42,8 +42,13 @@ export const documentationNav = {
     {title: 'Spring Security', href: '/docs/framework/spring-security'},
     {title: 'Widget Authority', href: '/docs/framework/widget/authority'},
   ],
-  "Tester": [
-    {title: 'Kola Intro', href: '/docs/kola'},
+  "Kola": [
+    {title: 'Intro', href: '/docs/kola'},
+    {title: 'What is Kola', href: '/docs/kola/001_what_is_kola'},
+    {title: 'Design of Kola', href: '/docs/kola/002_design_of_kola'},
+    {title: 'Kola Contract', href: '/docs/kola/003_dsl_contract'},
+    {title: 'Kola Principle', href: '/docs/kola/004_principle'},
+    {title: 'Tool Chain', href: '/docs/kola/005_tool_chain'},
   ],
   "Tool Chain": [
     {title: 'Intro', href: '/docs/tool'},

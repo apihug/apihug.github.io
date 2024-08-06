@@ -1,0 +1,80 @@
+---
+title: What's ApiHug Kola, 关于 Kola
+description: Kola background, why we create kola, about kola
+---
+
+⚠️TBD⚠️
+
+## Summary
+
+Kola 是一个测试 框架+工具， 主要为Apihug 整个生态服务， 还在持续的开发和丰富中(2024/08).
+
+Kola一脉相承 ApiHug 的设计原则：
+
+1. 统一语言，DSL，减少分歧
+2. 依托现有技术，最大化利用现有资产
+3. 极低学习成本
+4. 单一信任源，版本划管理
+
+## Why
+
+### 现有困境
+
+1. 测试或需要要很专业(编程技能)，或很松散(结构不严谨)
+2. 多工具栈，多角色之间切换上下文缺失
+3. 缺乏设计规划先行
+4. 严谨的版本管理
+5. Native Collaboration
+
+
+### 现有概念
+
+1. TDD: Test driven development
+2. BDD: Behaviour-Driven Development
+3. CDC: Consumer Driven Contracts
+
+### So
+
+在现有众多的测试解决方案里， 每种方案都有自己的优缺点， 这也导致绝大部分集成方案，在使用便利性和整体完整性都有欠缺。 
+
+部分缺陷在当下模式下是难以满足， 比如要让所有人:产品，前后端，测试等角色都能理解，都写书写; 集中统一的测试管理。 
+
+Kola 在限定环境 - ApiHug, 提供了限定范围内较优解：
+
+1. 遵循BDD 命名方式， Given/When/Then/And，直观又简单
+2. DSL, 基于 `groovy` 声明式语法
+3. 强校验：静态检查(groovy)+编译处理 
+4. 更多的糖, 用户习惯迁移: junit, junit5，assertj，jsonpath,rest-assured
+5. ApiHug集成
+6. IDE 支持
+7. Collaboration
+
+最终在 **2024-08-02** 里程碑 **1.0.0-RELEASE**  随着整个ApiHug SDK 发行了Kola 第一个版本; [Kola Index](/zhCN-docs/kola)。
+
+## Next
+
+1. Multipart file support
+2. Customized report
+3. Debug tool
+4. Dependencies import
+5. Event driven support
+6. Stub side
+7. performance test
+
+
+## 参考
+
+1. spring test [spring-framework/spring-test](https://github.com/spring-projects/spring-framework/tree/main/spring-test)
+2. spring test doc [spring-framework/reference/testing](https://docs.spring.io/spring-framework/reference/testing.html)
+3. spring boot test [spring-boot-test](https://github.com/spring-projects/spring-boot/tree/main/spring-boot-project/spring-boot-test)
+4. spring boot test doc [spring-boot/testing](https://docs.spring.io/spring-boot/reference/testing/index.html)
+5. spring contract [spring-cloud-contract](https://github.com/spring-cloud/spring-cloud-contract)
+6. spring contract doc [spring-cloud-contract reference](https://docs.spring.io/spring-cloud-contract/reference/)
+7. cucumber [Behaviour-Driven Development](https://cucumber.io/docs/bdd/)
+8. Spock: [Spock Framework](https://spockframework.org/)
+9. [karate](https://karatelabs.github.io/karate/) Test Automation Made Simple
+10. [Contract Test](https://martinfowler.com/bliki/ContractTest.html) Martin Fowler
+11. [PactFlow](https://pactflow.io/) SmartBear Consumer Driven
+12. [Contract Testing Vs Integration Testing](https://pactflow.io/blog/contract-testing-vs-integration-testing/) from PactFlow
+13. [Consumer-Driven Contracts: A Service Evolution Pattern](https://martinfowler.com/articles/consumerDrivenContracts.html)
+

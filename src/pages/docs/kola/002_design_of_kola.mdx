@@ -1,0 +1,48 @@
+---
+title: How we design Kola
+description: Kola background, Kola a consumer driver tester framework
+---
+
+How we design the Kola
+
+⚠️TBD⚠️
+
+## BDD
+
+BDD is a way for software teams to work that closes the gap between business people and technical people by:
+
+1. Encouraging collaboration across roles to build shared understanding of the problem to be solved
+2. Working in rapid, small iterations to increase feedback and the flow of value
+3. Producing system documentation that is automatically checked against the system’s behaviour
+
+We do this by focusing collaborative work around concrete, real-world examples that illustrate how we want the system to behave. 
+
+We use those examples to guide us from concept through to implementation, in a process of continuous collaboration.
+
+## Groovy
+
+1. DSL
+2. Dynamic language
+3. Straightforward 
+
+## Dependencies
+
+Kola leverages a robust foundation of established, best-in-class third-party libraries and frameworks to deliver a comprehensive testing solution.
+
+| Library                                 | Scope           | Comment                                                |
+|-----------------------------------------|-----------------|--------------------------------------------------------|
+| `org.springframework:spring-core`       | API Transparent | Spring Core                                            |
+| `org.springframework:spring-context`    | API Transparent | Spring Core                                            |
+| `org.springframework:spring-test`       | API Transparent | Spring Core                                            |
+| `org.junit.jupiter:junit-jupiter-api`   | API Transparent | junit5 Core                                            |
+| `org.junit.jupiter:junit-jupiter`       | API Transparent | junit5                                                 |
+| `org.assertj:assertj-core`              | API Transparent | Fluent assertions                                      |
+| `org.mockito:mockito-core`              | API Transparent | mock                                                   |
+| `com.jayway.jsonpath:json-path`         | API Transparent | Xpath JSON                                             |
+| `org.skyscreamer:jsonassert`            | API Transparent | Assertion JSON                                         |
+| `org.hamcrest:hamcrest`                 | API Transparent | declarative assertions                                 |
+| `org.awaitility:awaitility`             | API Transparent | Java DSL for synchronizing asynchronous operations     |
+| `org.xmlunit:xmlunit-core`              | API Transparent | [XMLUnit](https://github.com/xmlunit/xmlunit) for Java |
+| `jakarta.xml.bind:jakarta.xml.bind-api` | API Transparent | Jakarta XML Binding API                                |
+| `io.rest-assured:rest-assured`          | API Transparent | -                                                      |
+| `org.junit.jupiter:junit-jupiter-api`   | Not yet         | -                                                      |

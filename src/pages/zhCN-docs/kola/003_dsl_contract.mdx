@@ -1,0 +1,108 @@
+---
+title: How we design Kola
+description: Kola background, Kola a consumer driver tester framework
+---
+
+⚠️TBD⚠️
+
+## BDD
+
+### Given
+### When
+### And
+
+## Script Support
+
+## Environment
+
+## Assert
+
+### Trivial
+
+1. header
+2. cookie
+
+### Body
+
+1. json path
+2. `Assertj` Fluent assertions
+
+## Junit
+
+Consumer Driven Contracts, What's Kola's domain language looks like?
+
+How it easy to understand and get hand in.  you will love it.
+
+## Sample
+
+```groovy
+import hope.kola.contract.Feature
+import org.assertj.core.data.Offset
+
+Feature.make {
+    priority 100
+    name("Customer login place order and check balance logic")
+    description("""Never judge the boss, as you may the real fool""")
+    Scenario "001 Try login ", {
+        preScript {
+            //Define prepare logic here
+        }
+        Given {
+            service("UserService")
+            action("Login")
+        }
+        When {
+            json("""
+                    
+            """)
+            body {
+                set('name', "same")
+                set('student.name', "blue")
+                set('student.age', 22)
+                set('student.weight', 123.3d)
+                set('student.friends', "jake", "blue", "yellow")
+                set('student.bigBaby', {
+                    addStatement('res.setAge(12)')
+                    addStatement('res.setBlogs($T.asList($S,$S))', Arrays.class, 'jake', 'same')
+                })
+                fromGlobal("student.country", "country")
+            }
+            queries {
+                pageable {
+                    page(0)
+                    size(12)
+                }
+                fromGlobal("userName", "jake")
+            }
+            paths {
+                fromGlobal("user-id", "userId")
+            }
+        }
+        And {
+            stringAssert("user.address.zipCode", {
+                isEqualTo("jake")
+                isBase64()
+                isAlphabetic()
+                startsWithIgnoringCase("json")
+            })
+            bigDecimalAssert("user.salary", {
+                isCloseTo(new BigDecimal("1112.22"), Offset.offset(12))
+                isGreaterThanOrEqualTo(new BigDecimal("231312"))
+            })
+            booleanAssert("user.live", {
+                isTrue()
+            })
+
+        }
+        postScript {
+            {
+                headSet("age", 1234)
+                globalSet("same", "blue")
+            }
+        }
+
+    }
+    Scenario "002 Place a order", {}
+    Scenario "003 Check balance", {}
+}
+```

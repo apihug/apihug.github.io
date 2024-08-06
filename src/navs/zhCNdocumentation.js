@@ -42,8 +42,13 @@ export const documentationNav = {
     {title: 'Spring 安全库', href: '/zhCN-docs/framework/spring-security'},
     {title: '权限工具', href: '/zhCN-docs/framework/widget/authority'},
   ],
-  "Tester": [
-    {title: 'Kola Intro', href: '/zhCN-docs/kola'},
+  "Kola": [
+    {title: '介绍', href: '/zhCN-docs/kola'},
+    {title: 'Kola是什么', href: '/zhCN-docs/kola/001_what_is_kola'},
+    {title: 'Kola设计', href: '/zhCN-docs/kola/002_design_of_kola'},
+    {title: 'Kola协议', href: '/zhCN-docs/kola/003_dsl_contract'},
+    {title: 'Kola原则', href: '/zhCN-docs/kola/004_principle'},
+    {title: '工具链', href: '/zhCN-docs/kola/005_tool_chain'},
   ],
   "Tool Chain": [
     {title: '介绍', href: '/zhCN-docs/tool'},
@@ -54,12 +59,12 @@ export const documentationNav = {
     {title: '文件上传', href: '/zhCN-docs/how/001_support_upload_file'},
     {title: '更新 Header & Cookie', href: '/zhCN-docs/how/002_update_header_cookie'},
   ],
-  Milestone:[
+  Milestone: [
     {title: 'Index', href: '/zhCN-docs/milestone'},
     {title: '里程碑-20240510', href: '/zhCN-docs/milestone/milestone-20240510'},
     {title: '里程碑-20240222', href: '/zhCN-docs/milestone/milestone-20240222'},
   ],
-  "ChangeLog":[
+  "ChangeLog": [
     {title: 'Index', href: '/zhCN-docs/changelog'},
     {title: 'SDK', href: '/zhCN-docs/changelog/sdk'},
     {title: 'Plugin', href: '/zhCN-docs/changelog/plugin'},

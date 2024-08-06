@@ -1,0 +1,47 @@
+---
+title: How we design Kola
+description: Kola background, Kola a consumer driver tester framework
+---
+
+⚠️TBD⚠️
+
+## BDD
+
+行为驱动开发(`BDD`)是一种软件团队工作方式,可以缩小业务人员和技术人员之间的差距:
+
+1. 鼓励跨角色协作,建立对需要解决的问题的共同理解
+2. 采用快速、小规模的迭代,增加反馈和价值流转
+3. 生成自动检查系统行为的系统文档
+
+我们通过将协作工作集中在具体的、贴近实际的示例上来实现这一点,这些示例阐述了我们希望系统的行为方式。
+
+我们使用这些示例作为指引,从概念到实现,进行持续的协作。
+
+## Groovy
+
+1. DSL
+2. Dynamic language
+3. Straightforward
+
+
+## Dependencies
+
+Kola 依托一系列成熟、优秀的第三方库和框架,构建起了强大的基础设施,从而提供了一套完整的测试解决方案。
+
+| 框架                                      | 引入      | 备注                                                     |
+|-----------------------------------------|---------|--------------------------------------------------------|
+| `org.springframework:spring-core`       | API依赖引入 | Spring核心                                               |
+| `org.springframework:spring-context`    | API依赖引入 | Spring核心                                               |
+| `org.springframework:spring-test`       | API依赖引入 | Spring核心                                               |
+| `org.junit.jupiter:junit-jupiter-api`   | API依赖引入 | junit5                                                 |
+| `org.junit.jupiter:junit-jupiter`       | API依赖引入 | junit5                                                 |
+| `org.assertj:assertj-core`              | API依赖引入 | 流式调用                                                   |
+| `org.mockito:mockito-core`              | API依赖引入 | mock                                                   |
+| `com.jayway.jsonpath:json-path`         | API依赖引入 | Xpath JSON                                             |
+| `org.skyscreamer:jsonassert`            | API依赖引入 | Assertion JSON                                         |
+| `org.hamcrest:hamcrest`                 | API依赖引入 | 匹配帮助                                                   |
+| `org.awaitility:awaitility`             | API依赖引入 | 异步测试                                                   |
+| `org.xmlunit:xmlunit-core`              | API依赖引入 | [XMLUnit](https://github.com/xmlunit/xmlunit) for Java |
+| `jakarta.xml.bind:jakarta.xml.bind-api` | API依赖引入 | Jakarta XML Binding API                                |
+| `io.rest-assured:rest-assured`          | API依赖引入 | -                                                      |
+| `org.junit.jupiter:junit-jupiter-api`   | 未依赖     | -                                                      |
