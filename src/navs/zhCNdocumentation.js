@@ -44,10 +44,10 @@ export const documentationNav = {
   ],
   "Kola": [
     {title: '介绍', href: '/zhCN-docs/kola'},
-    {title: 'Kola是什么', href: '/zhCN-docs/kola/001_what_is_kola'},
-    {title: 'Kola设计', href: '/zhCN-docs/kola/002_design_of_kola'},
-    {title: 'Kola协议', href: '/zhCN-docs/kola/003_dsl_contract'},
-    {title: 'Kola原则', href: '/zhCN-docs/kola/004_principle'},
+    {title: 'Kola 是什么', href: '/zhCN-docs/kola/001_what_is_kola'},
+    {title: 'Kola 设计', href: '/zhCN-docs/kola/002_design_of_kola'},
+    {title: 'Kola 协议', href: '/zhCN-docs/kola/003_dsl_contract'},
+    {title: 'Kola 原则', href: '/zhCN-docs/kola/004_principle'},
     {title: '工具链', href: '/zhCN-docs/kola/005_tool_chain'},
   ],
   "Tool Chain": [
