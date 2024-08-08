@@ -1,7 +1,256 @@
 ---
-title: How we design Kola
+title: DSL domain specific language of Kola
 description: Kola background, Kola a consumer driver tester framework
 ---
+
+## Concept
+
+Previous summary of  [What's Kola](/docs/kola/001_what_is_kola), The Kola framework and tools are designed to provide a collaborative environment for all relevant stakeholders to comprehend and contribute to the testing process.
+
+Kola is built upon industry-proven practices and methodologies, combining the convenience of engineering practices with the rigor of well-defined processes. Kola's approach is primarily inspired by three mainstream testing philosophies.
+
+1. TDD: Test driven development
+2. BDD: Behaviour-Driven Development
+3. CDC: Consumer Driven Contracts
+
+In engineering practices, Kola has drawn significant references and inspirations from its predecessors like SmartBear's PactFlow, Spring cloud Contract, Spock, and Karate.
+
+Not to mention, Kola also builds upon the foundational testing frameworks such as JUnit5, TestNG, and AssertJ, which are cornerstones of the testing community.
+
+Kola has consistently adhered to the principles of software development, striking a balance between learning curve, engineering practices, and team collaboration, to make the entire testing process more seamless and user-friendly.
+
+> Kola make your test life happier and colourful
+
+The choice of a **BDD** (Behavior-Driven Development) style as the primary approach in Kola is intentional. While Kola does not utilize mainstream BDD frameworks like Cucumber as its foundation, the BDD style of expression is particularly well-suited for Kola's purposes.
+
+The BDD approach provides an excellent balance between the structured nature of the programming world and the easily understandable language for non-technical stakeholders. This makes it an ideal medium for expressing user stories and use cases, bridging the gap between the program's behavior and the users' requirements.
+
+By adopting the BDD style, Kola aims to facilitate seamless communication and collaboration among all stakeholders, ensuring that the testing process aligns with the user's perspective and the program's intended behavior.
+
+```shell
+Feature: Explaining ApiHug
+  In order to gain an understanding of the ApiHug testing system
+  As a non-programmer
+  I want to have an overview of ApiHug that is understandable by non-geeks
+
+  Scenario: A worker seeks an overview of ApiHug 
+    Given I have a coworker who knows a lot about ApiHug
+    When I ask my coworker to give an overview of how ApiHug works
+    And I listen to their explanation
+    Then I should have a basic understanding of ApiHug
+```
+
+That's a great point about Kola's approach to BDD. The standard BDD definition format is largely retained in Kola, except for the `And` step being omitted.
+
+This is because Kola's typical use case involves verifying API requests and responses, where the `And` step would essentially be the act of making the request, and the `Then` step would directly validate the response.
+
+Kola utilizes the `hope.kola.contract.Feature` import, which allows for the use of `Groovy` syntax in defining the protocols and test cases. This Groovy-based approach helps to streamline and enhance the overall experience of writing test cases.
+
+👍 tip about the potential IDE recognition issue for the Feature Groovy files. Reloading the Gradle project in the IDE can often resolve this and ensure the IDE properly recognizes and supports the Kola-specific Groovy syntax.
+
+
+## Background
+
+> A Background allows you to add some context to the scenarios that follow it. It can contain one or more Given steps, which are run before each scenario, but after any Before hooks.
+
+## Feature
+
+> The purpose of the Feature keyword is to provide a high-level description of a software feature, and to group related scenarios.
+
+## Scenario
+
+> a written description of your product’s behavior from one or more users’ perspectives
+
+### Given
+
+> Given steps are used to describe the initial context of the system - the scene of the scenario. It is typically something that happened in the past.
+
+
+In the context of ApiHug, the `Given` step represents the API environment, which can be imported from either ApiHug or a standalone API environment.
+
+#### ApiHug API
+
+This is the most direct way:
+
+```groovy
+    Given {
+        api("UserService", "Login")
+    }
+```
+
+1. `UserService` For the ApiHug service, it is best to import using the full package path, as this will be validated during compilation. Relative paths can also be used, but you must ensure there are no duplicates. The IDE (e.g. IDEA) provides tools to automate this process.
+2. `Login` Method name, must be included in this service's definition
+
+Directly using the APIs in the context of ApiHug can provide richer context, including definitions for the request, response, path, parameters, and validation rules.
+
+supply request body pre-mock, no need to write the body from very begin manually.
+
+This is kola recommend way!
+
+#### Raw API
+
+If it's a third-party API for which we don't have the metadata, we can only define it manually.
+
+```groovy
+    Given {
+        get("https://github.com")
+    }
+```
+
+### When
+
+> When steps are used to describe an event, or an action. This can be a person interacting with the system, or it can be an event triggered by another system.
+
+In the definition of ApiHug, the `When` step is used to assemble the context of the request.
+
+| method      | usage                                   |
+|-------------|-----------------------------------------|
+| `json`      | raw json                                |
+| `body`      | update json body according to json path |
+| `multipart` | attachment files                        |
+| `cookies`   | cookie info                             |
+| `headers`   | header info                             |
+| `queries`   | query parameters                        |
+| `paths`     | path parameters                         |
+
+#### Request Body
+
+**JSON** definition:
+
+```groovy
+    json("""
+{
+   "name": "jake",
+   "age": 18,
+   "address": {
+     "country": "$V('key')",
+     "zip": 200021
+   }
+}
+""")
+```
+
+1. standard json
+2. dynamic properties `$V('key')` , inject from environment context through the expression language, this sample will pick `key` value from the context；
+
+**body** manipulate:
+
+If the request definition within the `json` method is still not sufficient to meet the requirements, you can further modify the request by using JSON path expressions in the body section to update and override the original values.
+
+```groovy
+  body {
+      set('name', "same")
+      set('student.name', "blue")
+      set('student.age', 22)
+      set('student.weight', 123.3d)
+      set('student.friends', "jake", "blue", "yellow")
+      fromGlobal("student.country", "country")
+  }
+```
+
+Eventually assemble a suitable request body.
+
+#### multipart
+
+```groovy
+  multipart {
+      file{
+        fromClassPath("hello.txt")
+      }
+  }
+```
+
+#### cookies
+
+```groovy
+    cookies {
+        //Possible Bear + {jwt}
+        fromGlobal(authorization(), "jwt")
+    }
+```
+
+#### headers
+
+#### queries
+
+```groovy
+  queries {
+      pageable {
+          page(0)
+          size(12)
+      }
+      fromGlobal("userName", "jake")
+  }
+```
+
+#### paths
+
+```groovy
+  paths {
+      fromGlobal("user-id", "userId")
+  }
+```
+
+
+### Then
+
+> Then steps are used to describe an expected outcome, or result.
+
+#### **status**
+
+```groovy
+  Then {
+      isOk()
+      status 200
+  }
+```
+
+#### **body**
+
+```groovy
+    stringAssert("user.address.zipCode", {
+        isEqualTo("jake")
+        isBase64()
+        isAlphabetic()
+        startsWithIgnoringCase("json")
+    })
+    bigDecimalAssert("user.salary", {
+        isCloseTo(new BigDecimal("1112.22"), Offset.offset(12))
+        isGreaterThanOrEqualTo(new BigDecimal("231312"))
+    })
+    booleanAssert("user.live", {
+        isTrue()
+    })
+```
+
+1. base on JSON path;
+2. bridge all feature from Assertj Assertions, Fluent assertions;
+3. Declarative validation: write it all in one go, in one continuous flow;
+
+## Script Support
+
+### Pre Script
+
+### Post Script
+
+```groovy
+    postScript {
+        {
+            headSet("age", 1234)
+            globalSet("same", "blue")
+        }
+    }
+```
+
+## Junit
+
+Consumer Driven Contracts, What's Kola's domain language looks like?
+
+How it easy to understand and get hand in.  you will love it.
+
+Default Extension, lifecycle management.
+
+
 ## Configuration
 
 Use DSL to define environment also `{WIRE_MODULE}/src/test/resources/config/kola.groovy`:
@@ -52,37 +301,8 @@ var big = 1123
 ]
 ```
 
-## BDD
 
-### Given
-### When
-### And
-
-## Script Support
-
-## Environment
-
-## Assert
-
-### Trivial
-
-1. header
-2. cookie
-
-### Body
-
-1. json path
-2. `Assertj` Fluent assertions
-
-## Junit
-
-Consumer Driven Contracts, What's Kola's domain language looks like? 
-
-How it easy to understand and get hand in.  you will love it.
-
-⚠️TBD⚠️
-
-## Sample
+## Full Feature Sample
 
 ```groovy
 import hope.kola.contract.Feature
@@ -97,8 +317,7 @@ Feature.make {
             //Define prepare logic here
         }
         Given {
-            service("UserService")
-            action("Login")
+            api("UserService", "Login")
         }
         When {
             json("""
@@ -110,10 +329,6 @@ Feature.make {
                 set('student.age', 22)
                 set('student.weight', 123.3d)
                 set('student.friends', "jake", "blue", "yellow")
-                set('student.bigBaby', {
-                    addStatement('res.setAge(12)')
-                    addStatement('res.setBlogs($T.asList($S,$S))', Arrays.class, 'jake', 'same')
-                })
                 fromGlobal("student.country", "country")
             }
             queries {
@@ -155,3 +370,20 @@ Feature.make {
     Scenario "003 Check balance", {}
 }
 ```
+
+
+## 参考
+
+1. spring test [spring-framework/spring-test](https://github.com/spring-projects/spring-framework/tree/main/spring-test)
+2. spring test doc [spring-framework/reference/testing](https://docs.spring.io/spring-framework/reference/testing.html)
+3. spring boot test [spring-boot-test](https://github.com/spring-projects/spring-boot/tree/main/spring-boot-project/spring-boot-test)
+4. spring boot test doc [spring-boot/testing](https://docs.spring.io/spring-boot/reference/testing/index.html)
+5. spring contract [spring-cloud-contract](https://github.com/spring-cloud/spring-cloud-contract)
+6. spring contract doc [spring-cloud-contract reference](https://docs.spring.io/spring-cloud-contract/reference/)
+7. cucumber [Behaviour-Driven Development](https://cucumber.io/docs/bdd/)
+8. Spock: [Spock Framework](https://spockframework.org/)
+9. [karate](https://karatelabs.github.io/karate/) Test Automation Made Simple
+10. [Contract Test](https://martinfowler.com/bliki/ContractTest.html) Martin Fowler
+11. [PactFlow](https://pactflow.io/) SmartBear Consumer Driven
+12. [Contract Testing Vs Integration Testing](https://pactflow.io/blog/contract-testing-vs-integration-testing/) from PactFlow
+13. [Consumer-Driven Contracts: A Service Evolution Pattern](https://martinfowler.com/articles/consumerDrivenContracts.html)
