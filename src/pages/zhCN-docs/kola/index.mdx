@@ -7,8 +7,12 @@ Sine **ApiHug [1.0.0-RELEASE] -  2024-08-02**
 
 ## Latest
 
+**SDK Version**
+
 <a target="_blank" href="https://search.maven.org/artifact/com.apihug/it-bom"><img
   src="https://img.shields.io/maven-central/v/com.apihug/it-bom.svg?label=Maven%20Central"/></a>
+
+**Plugin Version**
 
 <div>
   <iframe
@@ -46,7 +50,34 @@ hopeWire {
 }
 ```
 
-### Sample
+### Example
+
+### 目录
+
+文件模块 `{your_project}/{proto_module}` 目录 `src/test/resourcs`:
+
+```shell
+
+├────────
+│  junit-platform.properties ①
+│
+├─config
+│      kola.groovy ②
+│
+└─kola
+    └─com
+        └─apihug
+            └─sample
+                    test.groovy ③
+
+```
+
+1. junit-platform.properties  junit 配置文件
+2. kola.groovy  配置文件
+3. test.groovy 测试文件
+
+
+完整 **例子**：
 
 ```groovy
 package contracts
@@ -80,13 +111,13 @@ Feature.make {
             }
         }
         And {
-            stringAssert("user.address.zipCode", {
+            stringAssert("$.user.address.zipCode", {
                 isEqualTo("jake")
                 isBase64()
                 isAlphabetic()
                 startsWithIgnoringCase("json")
             })
-            bigDecimalAssert("user.salary", {
+            bigDecimalAssert("$.user.salary", {
                 isCloseTo(ofBigDecimal("1112.22"), offset(12))
                 isGreaterThanOrEqualTo(ofBigDecimal("231312"))
             })
@@ -100,4 +131,14 @@ Feature.make {
     Scenario "002 Place a order", {}
     Scenario "003 Check balance", {}
 }
+```
+
+### Task
+
+Kick `kolaTest` task, 测试：
+
+```shell
+
+./gradlwebat {proto_module}:kolaTest --stacktrace
+
 ```
