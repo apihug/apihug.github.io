@@ -122,17 +122,17 @@ request body 预 mock, 无须自己写 body, 只需稍微调整就可以。
      "zip": 200021
    }
 }
-    """)
+""")
 ```
 
 1. 标准 json 定义方式
 2. 动态环境变量 `$V('from')` 运行时会通过 expression 从环境中获取  `from` 参数值；
 
-**body** 修正:
+**body** 修改:
 
-定义完成后如果还不能满足需求， 可以继续通过 body 进行修改, 修改和覆盖原来值;
+定义完成后如果还不能满足需求，可以继续通过 body 进行 json path 进一步修改, 修改和覆盖原来值;
 
-```goovy
+```groovy
   body {
       set('name', "same")
       set('student.name', "blue")
@@ -147,7 +147,7 @@ request body 预 mock, 无须自己写 body, 只需稍微调整就可以。
 
 #### multipart
 
-```goovy
+```groovy
   multipart {
       file{
         fromClassPath("hello.txt")
@@ -193,7 +193,7 @@ request body 预 mock, 无须自己写 body, 只需稍微调整就可以。
 
 #### **status**
 
-```goovy
+```groovy
   Then {
       isOk()
       status 200
