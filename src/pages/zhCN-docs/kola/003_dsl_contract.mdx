@@ -3,7 +3,239 @@ title: How we design Kola
 description: Kola background, Kola a consumer driver tester framework
 ---
 
-⚠️TBD⚠️
+## Concept
+
+在 Kola 定位中 [Kola 是什么](/zhCN-docs/kola/001_what_is_kola), 是致力于提供一个让相关各方都能够理解共同创造的测试框架和工具。
+
+同时 Kola 是建立于业界成熟的实践和方法论上，综合工程实践的便利和流程的严谨性， 在主流的测试思想中，这三种 Kola 深受启发：
+
+1. TDD: Test driven development
+2. BDD: Behaviour-Driven Development
+3. CDC: Consumer Driven Contracts
+
+在工程实践中; Kola 从 SmartBear 的 PactFlow, Spring clout Contract, Spock, Karate 等前辈上得到很多参考；
+
+更不用说， 在测试界的基石: Junit5, TestNG, AssertJ 等；
+
+Kola 一如既往遵循软件开发的开闭原则， 在学习成本、工程实践、团队协同上做综合的调和， 让整个测试过程更丝滑，更人性化:
+
+> Kola make your test life happier and colourful
+
+为什么 **BDD** 风格声明为首选？ 虽然我们没有使用主流 BDD 实践框架比如 Cucumber, 作为底座；
+
+但是 BDD 的表达方式，真的是太好了，兼顾程序世界的结构化，和非程序世界的通俗易懂；所以用他来表达用户用例(故事)再好不过啦！
+
+```shell
+Feature: Explaining ApiHug
+  In order to gain an understanding of the ApiHug testing system
+  As a non-programmer
+  I want to have an overview of ApiHug that is understandable by non-geeks
+
+  Scenario: A worker seeks an overview of ApiHug 
+    Given I have a coworker who knows a lot about ApiHug
+    When I ask my coworker to give an overview of how ApiHug works
+    And I listen to their explanation
+    Then I should have a basic understanding of ApiHug
+```
+
+这个来自官方的标准BDD 定义方式， 在 Kola 概念基本暴利， 除了 `And` 被省掉；
+
+因为一般我们是 request, response 方式验证API, `And` 就是发送请求， `Then` 直接对结果验证。
+
+Kola, 协议定义在: `import hope.kola.contract.Feature` 使用 groovy 语法， 让整体的用例书写更轻松。
+
+👍 如果你的 Feature Groovy 不能识别， 在更新版本后， reload gradle自动识别。
+
+### Given
+
+> Given steps are used to describe the initial context of the system - the scene of the scenario. It is typically something that happened in the past.
+
+在 ApiHug 上下文， `Given` 就是 API 环境， 可以从 ApiHug 或者独立的API 环境引入：
+
+#### ApiHug API
+
+这个是最直接的方式：
+
+```groovy
+    Given {
+        api("UserService", "Login")
+    }
+```
+
+1. `UserService` ApiHug 服务, 最好全路径引入， 编译时会校验， 相对路径也可以， 但是保证无重复， IDEA 提供工具自动化完成
+2. `Login` 方法名， 在此服务内必须包含
+
+直接用 ApiHug 上下文的 api 可以有更丰富的上下文， 关于request, response 的定义， path, 参数， 校验规则。
+
+request body 预 mock, 无须自己写 body, 只需稍微调整就可以。
+
+是 kola 首推的方式！
+
+#### Raw API
+
+如果第三方的API， 我们没有的元信息，只能通过手动写：
+
+```groovy
+    Given {
+        get("https://github.com")
+    }
+```
+
+## Background
+
+
+### When
+
+> When steps are used to describe an event, or an action. This can be a person interacting with the system, or it can be an event triggered by another system.
+
+在 ApiHug 的定义中， When 用来组装 request 的上下文：
+
+| 类型          | 备注                          |
+|-------------|-----------------------------|
+| `body`      | 请求体，可以通过json, 然后通过生命式语法动态声明 |
+| `multipart` | 附件                          |
+| `cookies`   | cookie 信息                   |
+| `headers`   | header 信息                   |
+| `queries`   | 请求参数(动态)                    |
+| `paths`     | 路径参数(动态)                    |
+
+#### 请求体
+
+**JSON** 定义:
+
+```groovy
+    json("""
+{
+   "name": "jake",
+   "age": 18,
+   "address": {
+     "country": "$V('from')",
+     "zip": 200021
+   }
+}
+    """)
+```
+
+1. 标准 json 定义方式
+2. 动态环境变量 `$V('from')` 运行时会通过 expression 从环境中获取  `from` 参数值；
+
+**body** 修正:
+
+定义完成后如果还不能满足需求， 可以继续通过 body 进行修改, 修改和覆盖原来值;
+
+```goovy
+  body {
+      set('name', "same")
+      set('student.name', "blue")
+      set('student.age', 22)
+      set('student.weight', 123.3d)
+      set('student.friends', "jake", "blue", "yellow")
+      fromGlobal("student.country", "country")
+  }
+```
+
+最终组装成一个合适的请求体；
+
+#### multipart
+
+```goovy
+  multipart {
+      file{
+        fromClassPath("hello.txt")
+      }
+  }
+```
+
+#### cookies
+
+```groovy
+    cookies {
+        //Possible Bear + {jwt}
+        fromGlobal(authorization(), "jwt")
+    }
+```
+
+#### headers
+
+#### queries
+
+```groovy
+  queries {
+      pageable {
+          page(0)
+          size(12)
+      }
+      fromGlobal("userName", "jake")
+  }
+```
+
+#### paths
+
+```groovy
+  paths {
+      fromGlobal("user-id", "userId")
+  }
+```
+
+
+### Then
+
+> Then steps are used to describe an expected outcome, or result.
+
+#### **status**
+
+```goovy
+  Then {
+      isOk()
+      status 200
+  }
+```
+
+#### **body**
+
+```groovy
+    stringAssert("user.address.zipCode", {
+        isEqualTo("jake")
+        isBase64()
+        isAlphabetic()
+        startsWithIgnoringCase("json")
+    })
+    bigDecimalAssert("user.salary", {
+        isCloseTo(new BigDecimal("1112.22"), Offset.offset(12))
+        isGreaterThanOrEqualTo(new BigDecimal("231312"))
+    })
+    booleanAssert("user.live", {
+        isTrue()
+    })
+```
+
+1. 基于 json path
+2. Assertj Assertions 全部 bridge, Fluent assertions
+3. 声明式校验，一写到底，一气呵成
+
+## Script Support
+
+### Pre Script
+
+### Post Script
+
+```groovy
+    postScript {
+        {
+            headSet("age", 1234)
+            globalSet("same", "blue")
+        }
+    }
+```
+
+## Junit
+
+Consumer Driven Contracts, What's Kola's domain language looks like?
+
+How it easy to understand and get hand in.  you will love it.
+
+Default Extension, lifecycle management.
+
 
 ## Configuration
 
@@ -55,33 +287,6 @@ var big = 1123
 ]
 ```
 
-## BDD
-
-### Given
-### When
-### And
-
-## Script Support
-
-## Environment
-
-## Assert
-
-### Trivial
-
-1. header
-2. cookie
-
-### Body
-
-1. json path
-2. `Assertj` Fluent assertions
-
-## Junit
-
-Consumer Driven Contracts, What's Kola's domain language looks like?
-
-How it easy to understand and get hand in.  you will love it.
 
 ## Sample
 
@@ -98,8 +303,7 @@ Feature.make {
             //Define prepare logic here
         }
         Given {
-            service("UserService")
-            action("Login")
+            api("UserService", "Login")
         }
         When {
             json("""
@@ -111,10 +315,6 @@ Feature.make {
                 set('student.age', 22)
                 set('student.weight', 123.3d)
                 set('student.friends', "jake", "blue", "yellow")
-                set('student.bigBaby', {
-                    addStatement('res.setAge(12)')
-                    addStatement('res.setBlogs($T.asList($S,$S))', Arrays.class, 'jake', 'same')
-                })
                 fromGlobal("student.country", "country")
             }
             queries {
@@ -156,3 +356,20 @@ Feature.make {
     Scenario "003 Check balance", {}
 }
 ```
+
+
+## 参考
+
+1. spring test [spring-framework/spring-test](https://github.com/spring-projects/spring-framework/tree/main/spring-test)
+2. spring test doc [spring-framework/reference/testing](https://docs.spring.io/spring-framework/reference/testing.html)
+3. spring boot test [spring-boot-test](https://github.com/spring-projects/spring-boot/tree/main/spring-boot-project/spring-boot-test)
+4. spring boot test doc [spring-boot/testing](https://docs.spring.io/spring-boot/reference/testing/index.html)
+5. spring contract [spring-cloud-contract](https://github.com/spring-cloud/spring-cloud-contract)
+6. spring contract doc [spring-cloud-contract reference](https://docs.spring.io/spring-cloud-contract/reference/)
+7. cucumber [Behaviour-Driven Development](https://cucumber.io/docs/bdd/)
+8. Spock: [Spock Framework](https://spockframework.org/)
+9. [karate](https://karatelabs.github.io/karate/) Test Automation Made Simple
+10. [Contract Test](https://martinfowler.com/bliki/ContractTest.html) Martin Fowler
+11. [PactFlow](https://pactflow.io/) SmartBear Consumer Driven
+12. [Contract Testing Vs Integration Testing](https://pactflow.io/blog/contract-testing-vs-integration-testing/) from PactFlow
+13. [Consumer-Driven Contracts: A Service Evolution Pattern](https://martinfowler.com/articles/consumerDrivenContracts.html)

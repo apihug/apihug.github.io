@@ -3,9 +3,9 @@ title: ApiHug Testing Framework Kola
 description: Kola make your test life happier and colourful
 ---
 
-Sine **ApiHug [1.0.0-RELEASE] -  2024-08-02**
-
 ## Latest
+
+⚠️请及时更新 SDK + IDEA插件保持先进⚠️
 
 **SDK Version**
 
@@ -28,6 +28,8 @@ Sine **ApiHug [1.0.0-RELEASE] -  2024-08-02**
 
 ## ApiHug [1.0.0-RELEASE] -  2024-08-02
 
+Sine **ApiHug [1.0.0-RELEASE] -  2024-08-02**
+
 ### SDK Features
 
 - 全面支持DSL,类BDD, Contract 定义测试
@@ -38,10 +40,12 @@ Sine **ApiHug [1.0.0-RELEASE] -  2024-08-02**
 
 参考 [apihug-demo/libs.versions.toml](https://github.com/apihug/apihug-demo/blob/main/gradle/libs.versions.toml)
 
-1. 升级版本： `{PROJECT_ROOT}/gradle/libs.versions.toml` 修改： `apihug = "1.0.0-RELEASE"`  到 `1.0.0-RELEASE`+ 版本
+1. 升级版本： `{your_project}/gradle/libs.versions.toml` 修改： `apihug = "xxx"`  到 `1.0.0-RELEASE`+ 版本
 2. 添加 lib:  `springBootDependencies = { group = "org.springframework.boot", name = "spring-boot-dependencies", version.ref = "springBoot" }`
 
-由于尚在测验版本， 默认 kola 没有打开， 参考 [build.gradle](https://github.com/apihug/apihug-demo/blob/main/apihug-demo-proto/build.gradle):
+⚠️ `springBootDependencies` 为测试环境依赖 spring context, 由于不准备引入强依赖，所以走项目的 lib 配置，得额外加上, 否则找不到包！
+
+⚠️ 由于尚在测验版本， 默认 Kola 没有打开，你得修改 proto 模块的 build,  参考 [build.gradle](https://github.com/apihug/apihug-demo/blob/main/apihug-demo-proto/build.gradle):
 
 ```groovy
 hopeWire {
@@ -50,7 +54,9 @@ hopeWire {
 }
 ```
 
-### Example
+## Quick Starter
+
+升级完SDK + Plugin 后(可能需要重启IDEA), Kola 是基于协议层的测试，所以和 proto 模块在一起；
 
 ### 目录
 
@@ -72,12 +78,11 @@ hopeWire {
 
 ```
 
-1. junit-platform.properties  junit 配置文件
-2. kola.groovy  配置文件
-3. test.groovy 测试文件
+1. `junit-platform.properties`  junit 配置文件 ①
+2. `kola.groovy`  环境配置文件 ②
+3. `test.groovy` 测试用例文件 ③
 
-
-完整 **例子**：
+完整 **例子**:
 
 ```groovy
 package contracts
@@ -101,11 +106,6 @@ Feature.make {
                 set('student.name', "blue")
                 set('student.age', 22)
                 set('student.weight', 123.3d)
-                set('student.friends', "jake", "blue", "yellow")
-                set('student.bigBaby', {
-                    addStatement('res.setAge(12)')
-                    addStatement('res.setBlogs($T.asList($S,$S))', Arrays.class, 'jake', 'same')
-                })
                 set('student.soreList', 12, 123, 45, Mocker.numberBetween(12, 34))
                 set('json', Mocker.chineseName().name(), Mocker.cat().name(), Mocker.ip4(), regular("[a-z]"))
             }
@@ -121,7 +121,7 @@ Feature.make {
                 isCloseTo(ofBigDecimal("1112.22"), offset(12))
                 isGreaterThanOrEqualTo(ofBigDecimal("231312"))
             })
-            booleanAssert("user.live", {
+            booleanAssert("$.user.live", {
                 isTrue()
             })
 
@@ -142,3 +142,6 @@ Kick `kolaTest` task, 测试：
 ./gradlwebat {proto_module}:kolaTest --stacktrace
 
 ```
+
+1. `groovy` feature 编译成测试用例
+2. 运行测试用例， 输出测试报告

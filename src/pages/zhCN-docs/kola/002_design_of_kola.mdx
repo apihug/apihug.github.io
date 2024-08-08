@@ -3,8 +3,6 @@ title: How we design Kola
 description: Kola background, Kola a consumer driver tester framework
 ---
 
-⚠️TBD⚠️
-
 ## BDD
 
 行为驱动开发(`BDD`)是一种软件团队工作方式,可以缩小业务人员和技术人员之间的差距:
@@ -45,3 +43,13 @@ Kola 依托一系列成熟、优秀的第三方库和框架,构建起了强大�
 | `jakarta.xml.bind:jakarta.xml.bind-api` | API依赖引入 | Jakarta XML Binding API                                |
 | `io.rest-assured:rest-assured`          | API依赖引入 | -                                                      |
 | `org.junit.jupiter:junit-jupiter-api`   | 未依赖     | -                                                      |
+
+## ApiHug
+
+Kola 专为ApiHug 测试而设定，如果您的测试范围都在 ApiHug 风格API 那么测试将会非常简单直接;
+
+但是如果你使用任何已存在或者三方的API， Kola 也能测试， 只是失去了部分灵活和便捷， 比如无法自动帮你mock 一个请求体;
+
+当然这些附加的好处，手动做起来也毫不费力！
+
+至于生成的测试代码， 那个完全是 java 写的 Junit5 代码， 使用的三方辅助包，都是耳熟能详的，你应该没有任何的学习和理解成本。
