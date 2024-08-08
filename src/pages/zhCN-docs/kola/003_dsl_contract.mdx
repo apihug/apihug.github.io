@@ -13,9 +13,9 @@ description: Kola background, Kola a consumer driver tester framework
 2. BDD: Behaviour-Driven Development
 3. CDC: Consumer Driven Contracts
 
-在工程实践中; Kola 从 SmartBear 的 PactFlow, Spring clout Contract, Spock, Karate 等前辈上得到很多参考；
+在工程实践中; Kola 从 SmartBear 的 PactFlow, Spring clout Contract, Spock, Karate 等前辈上得到很多参考和灵感；
 
-更不用说， 在测试界的基石: Junit5, TestNG, AssertJ 等；
+更不用说， 测试界的基石: Junit5, TestNG, AssertJ 等基础框架；
 
 Kola 一如既往遵循软件开发的开闭原则， 在学习成本、工程实践、团队协同上做综合的调和， 让整个测试过程更丝滑，更人性化:
 
@@ -23,7 +23,7 @@ Kola 一如既往遵循软件开发的开闭原则， 在学习成本、工程�
 
 为什么 **BDD** 风格声明为首选？ 虽然我们没有使用主流 BDD 实践框架比如 Cucumber, 作为底座；
 
-但是 BDD 的表达方式，真的是太好了，兼顾程序世界的结构化，和非程序世界的通俗易懂；所以用他来表达用户用例(故事)再好不过啦！
+但是 BDD 的表达方式，真的是太好了，兼顾程序世界的结构化，和非程序世界的通俗易懂；所以用他来表达用户用例(故事)再好不过！
 
 ```shell
 Feature: Explaining ApiHug
@@ -42,15 +42,21 @@ Feature: Explaining ApiHug
 
 因为一般我们是 request, response 方式验证API, `And` 就是发送请求， `Then` 直接对结果验证。
 
-Kola, 协议定义在: `import hope.kola.contract.Feature` 使用 groovy 语法， 让整体的用例书写更轻松。
+Kola, 协议定义在: `import hope.kola.contract.Feature` 使用 groovy 语法， 让整体的用例书写更轻松和愉悦。
 
-👍 如果你的 Feature Groovy 不能识别， 在更新版本后， reload gradle自动识别。
+👍 如果你的 Feature Groovy 在IDE未能识别， 在更新版本后尝试 Reload gradle 以让IDE刷新识别。
 
 ## Background
 
+> A Background allows you to add some context to the scenarios that follow it. It can contain one or more Given steps, which are run before each scenario, but after any Before hooks.
+
 ## Feature
 
+> The purpose of the Feature keyword is to provide a high-level description of a software feature, and to group related scenarios.
+
 ## Scenario
+
+> a written description of your product’s behavior from one or more users’ perspectives
 
 ### Given
 
