@@ -5,9 +5,9 @@ description: Kola make your test life happier and colourful
 
 [About Kola](/docs/kola/001_what_is_kola)
 
-Sine **ApiHug [1.0.0-RELEASE] -  2024-08-02**
-
 ## Latest
+
+⚠️Always keep your SDK & IDEA to latest version⚠️
 
 <a target="_blank" href="https://search.maven.org/artifact/com.apihug/it-bom"><img
   src="https://img.shields.io/maven-central/v/com.apihug/it-bom.svg?label=Maven%20Central"/></a>
@@ -22,9 +22,11 @@ Sine **ApiHug [1.0.0-RELEASE] -  2024-08-02**
   ></iframe>
 </div>
 
-## ApiHug [1.0.0-RELEASE] -  2024-08-02
+## Timeline
 
-### SDK Features
+Sine **ApiHug [1.0.0-RELEASE] -  2024-08-02**
+
+### Features
 
 - DSL style BDD definition, follow consumer driven test - Contract test principle
 - introduce new task `kolaTest` during wire proto
@@ -34,8 +36,14 @@ Sine **ApiHug [1.0.0-RELEASE] -  2024-08-02**
 
 Refer [apihug-demo/libs.versions.toml](https://github.com/apihug/apihug-demo/blob/main/gradle/libs.versions.toml)
 
-1. Upgrade ApiHug SDK: `{PROJECT_ROOT}/gradle/libs.versions.toml`  find  `apihug = "1.0.0-RELEASE"`  please upgrade to  `1.0.0-RELEASE`+
+1. Upgrade ApiHug SDK: `{PROJECT_ROOT}/gradle/libs.versions.toml`  find  `apihug = "xxx"`  please upgrade to  `1.0.0-RELEASE`+
 2. Add new lib reference:  `springBootDependencies = { group = "org.springframework.boot", name = "spring-boot-dependencies", version.ref = "springBoot" }`
+
+⚠️ Add of `springBootDependencies` is **MUST**, otherwise the wire compile may report:
+
+```shell
+Could not get unknown property 'springBootDependencies' for extension 'libs' of type org.gradle.accessors.dm.LibrariesForLibs.
+```
 
 Now by default, kola flag default as false, you need switch @ [build.gradle](https://github.com/apihug/apihug-demo/blob/main/apihug-demo-proto/build.gradle):
 

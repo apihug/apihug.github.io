@@ -24,13 +24,11 @@ description: Kola make your test life happier and colourful
   ></iframe>
 </div>
 
-[关于Kola](/zhCN-docs/kola/001_what_is_kola)
+## Timeline
 
-## ApiHug [1.0.0-RELEASE] -  2024-08-02
+Sine **ApiHug [1.0.0-RELEASE] -  2024-08-02** [关于Kola](/zhCN-docs/kola/001_what_is_kola)
 
-Sine **ApiHug [1.0.0-RELEASE] -  2024-08-02**
-
-### SDK Features
+### Features
 
 - 全面支持DSL,类BDD, Contract 定义测试
 - 引入 wire 端 `kolaTest` 测试任务
@@ -43,7 +41,11 @@ Sine **ApiHug [1.0.0-RELEASE] -  2024-08-02**
 1. 升级版本： `{your_project}/gradle/libs.versions.toml` 修改： `apihug = "xxx"`  到 `1.0.0-RELEASE`+ 版本
 2. 添加 lib:  `springBootDependencies = { group = "org.springframework.boot", name = "spring-boot-dependencies", version.ref = "springBoot" }`
 
-⚠️ `springBootDependencies` 为测试环境依赖 spring context, 由于不准备引入强依赖，所以走项目的 lib 配置，得额外加上, 否则找不到包！
+⚠️ `springBootDependencies` **必须**配置，否则 wire 编译会报错:
+
+```shell
+Could not get unknown property 'springBootDependencies' for extension 'libs' of type org.gradle.accessors.dm.LibrariesForLibs.
+```
 
 ⚠️ 由于尚在测验版本， 默认 Kola 没有打开，你得修改 proto 模块的 build,  参考 [build.gradle](https://github.com/apihug/apihug-demo/blob/main/apihug-demo-proto/build.gradle):
 
