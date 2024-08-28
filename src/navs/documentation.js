@@ -52,6 +52,7 @@ export const documentationNav = {
   ],
   "Tool Chain": [
     {title: 'Intro', href: '/docs/tool'},
+    {title: 'Lint', href: '/docs/tool/apihug-lint'},
     {title: 'Wire', href: '/docs/tool/gradle-wire'},
     {title: 'Stub', href: '/docs/tool/gradle-stub'},
   ],

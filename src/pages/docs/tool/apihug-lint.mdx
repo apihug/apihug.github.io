@@ -1,0 +1,162 @@
+---
+title: ApiHug Lint Check Report
+description: Apihug quality lint tools to check api design violations
+---
+
+Updated **2024-08-28**
+
+import { TipInfo } from '@/components/Tip'
+
+<TipInfo>LLM Oriented Programming</TipInfo>
+
+## LLMOP
+
+LLM Oriented Programming (`LLMOP`) represents a paradigm shift in how we conceive and design APIs. 
+
+This approach aims to create APIs that are not only functional for applications but are also comprehensible to both humans and large language models (LLMs): 
+
+1. **Readable APIs**: `LLMOP` ensures APIs are easy to understand with clear naming and documentation, aiding developer onboarding and team efficiency.
+2. **OpenAPI Integration**: `LLMOP` aligns with OpenAPI for automated API generation and validation, ensuring standardized documentation and tools.
+3. **User-Centric Design**: `LLMOP` focuses on user needs and business goals for APIs that are both technically sound and user-friendly.
+4. **Interactive APIs**: `LLMOP` enables real-time feedback within APIs, boosting developer productivity through LLM-assisted interactions.
+5. **Multimodal Support**: `LLMOP` designs APIs for diverse inputs, including text, voice, and visuals, broadening accessibility and usability.
+
+In summary, `LLMOP` transforms API development by making it more inclusive for both humans and machines. 
+
+By prioritizing readability, leveraging standards like OpenAPI, focusing on thoughtful design, enhancing interactivity, and supporting multimodal interactions, 
+
+we can create APIs that are not only powerful but also intuitive and easy to use. 
+
+This approach paves the way for a future where APIs are integral to both software applications and human understanding.
+
+## Summary 
+
+With the rise of large language models (LLMs), we face new opportunities and challenges in integrating existing APIs and data.
+
+To navigate this integration, we propose two strategies:
+
+1. **Greenfield Approach**: Rebuild from scratch, suitable for independent businesses despite high risk.
+2. **Bridging and Adapting**: Gradually incorporate existing assets with adapters, allowing for new ideas while ensuring continuity.
+
+In API development, adopting a top-down strategy is crucial. Key practices include:
+
+1. **Standards Enforcement**: Implement a comprehensive style guide.
+2. **Lint Compliance Checks**: Use lint tools to correct style issues.
+3. **CI Pipeline Integration**: Automate compliance checks in the CI process.
+4. **Developer Education**: Emphasize the value of style guides and linting.
+
+These methods ensure API integrity and foster a disciplined environment, resulting in robust, scalable APIs.
+
+## ApiHug
+
+After SDK 1.0.8-RELEASE, we introduced a simple Lint tool that uses a few basic configuration rules to check your API design standards (more rules can be added in the future).
+
+<a target="_blank" href="https://search.maven.org/artifact/com.apihug/it-bom"><img
+  src="https://img.shields.io/maven-central/v/com.apihug/it-bom.svg?label=Maven%20Central"/></a>
+
+
+In terms of API design standards, the industry has [Stoplight Style](https://apistylebook.stoplight.io/) and the open-source Spectral tool to help companies design and refine their API design guidelines. These standards cover aspects such as URL design and naming conventions (for example, using snake_case versus camelCase). Since ApiHug's Swagger documentation is generated through DSL compilation, this part is relatively easy to manage.
+
+So, ApiHug's control over API design is relatively straightforward:
+
+1. Descriptions are in place, including API descriptions, field descriptions, and constant descriptions, which can limit the richness of expression (currently, it is not possible to determine whether the expression is adequate—some may be written haphazardly to meet a word count).
+2. [RAFT](https://gorilla.cs.berkeley.edu/) RAFT contains a few-shot example of API descriptions (questions) such as:
+
+```json
+{
+  "api_name": "Gmail API - Users.getProfile",
+  "api_call": "service.users().getProfile(userId='me').execute()",
+  "api_version": "1.0",
+  "api_arguments": {
+    "userId": "The user's email address. The special value 'me' can be used to indicate the authenticated user."
+  },
+  "functionality": "Gets the current user's Gmail profile.",
+  "env_requirements": [
+    "google-auth",
+    "google-auth-oauthlib",
+    "google-auth-httplib2",
+    "google-api-python-client"
+  ],
+  "example_code": "from googleapiclient.discovery import build \n from oauth2client import file, client, tools \n store = file.Storage('token.json') \n creds = store.get() \n service = build('gmail', 'v1', credentials=creds) \n results = service.users().getProfile(userId='me').execute()",
+  "meta_data": {
+    "description": "The Users.getProfile method of Gmail API allows for retrieving basic profile information of a user, such as the email address and account ID.",
+    "documentation_link": "https://developers.google.com/gmail/api/reference/rest/v1/users/getProfile"
+  },
+  "questions": [
+    "How can I fetch my Gmail account's email address?",
+    "How can I obtain the total messages in my gmail inbox."
+  ]
+}
+```
+
+Of course, there is still a long way to go before we can seamlessly integrate with the future and the world of Large Language Models (LLMs). For now, we are laying a solid foundation to prepare for future connectivity.
+
+### Configuration
+
+upgrade steps:
+
+1. SDK Version:  `{your_project}/gradle/libs.versions.toml` upgrade `apihug = "xxx"`  to latest `1.0.8-RELEASE`+ refer [apihug-demo/libs.versions.toml](https://github.com/apihug/apihug-demo/blob/main/gradle/libs.versions.toml)
+2. lint Configuration: `.apihuglint.properties`  sample from: [apihug-demo-proto](https://github.com/apihug/apihug-demo/tree/main/apihug-demo-proto)
+
+<a target="_blank" href="https://search.maven.org/artifact/com.apihug/it-bom"><img
+  src="https://img.shields.io/maven-central/v/com.apihug/it-bom.svg?label=Maven%20Central"/></a>
+
+After a successful compilation of your proto module, whether through build or an independent wire, 
+
+you will find two additional files in the build directory of your proto module at `{PROTO_MODULE}/build/reports/api-lint/`:
+
+1. `report.html` - The generated report in HTML format.
+2. `report.json` - The report in JSON format.
+
+
+| Property                           | Sample  | Comment                                           |
+|------------------------------------|---------|---------------------------------------------------|
+| `violation.limit`                  | `20`    | if violation count exceed this, stop the compiler |
+| `service.name.length`              | `5`     | min service name length                           |
+| `service.description.length`       | `5`     | min service description length                    |
+| `service.api.name.length`          | `5`     | min api name length                               |
+| `service.api.description.length`   | `20`    | min api description length                        |
+| `service.api.questions.size`       | `2`     | min api questions list size                       |
+| `service.api.question.length`      | `5`     | min each api question description length          |
+| `message.name.length`              | `5`     | min message name length                           |
+| `message.description.length`       | `5`     | min message description length                    |
+| `message.field.name.length`        | `3`     | min message field name length                     |
+| `message.field.description.length` | `10`    | min message field description length              |
+| `entity.name.length`               | `5`     | min entity name length                            |
+| `entity.description.length`        | `5`     | min entity description length                     |
+| `entity.column.length`             | `5`     | min entity column length                          |
+| `entity.column.description.length` | `5`     | min entity column description length              |
+| `entity.table.explicit`            | `false` | Table name should set explicitly                  |
+| `entity.column.explicit`           | `false` | Table name should set explicitly                  |
+| `eum.name.length`                  | `5`     | min Enum name length                              |
+| `eum.description.length`           | `5`     | min Enum description length                       |
+| `eum.item.name.length`             | `5`     | min Enum item name length                         |
+| `eum.item.description.length`      | `5`     | min Enum item description length                  |
+
+
+### Report
+
+**HTML**
+
+<img src={require('@/img/tool/lint-report.png').default.src} alt="ApiHug lint report sample" width={1251} height={392} className="rounded-lg" />
+
+**Json**
+
+```json
+[
+{
+  "proto" : "com/apihug/sample/proto/api/demo001/api.proto", 
+  "kind" : "Service", 
+  "target" : "VIPService#GetMeSth", 
+  "rule" : "Service method description too short", 
+  "description" : "Given [Get me something] expect >= 20"
+}
+]
+```
+
+
+## Refer
+
+1. [stoplight-spectral](https://stoplight.io/open-source/spectral)
+2. [real-world-rulesets](https://github.com/stoplightio/spectral?tab=readme-ov-file#-real-world-rulesets)
+3. [gorilla RAFT](https://gorilla.cs.berkeley.edu/)

@@ -1,0 +1,163 @@
+---
+title: ApiHug Lint Check Report
+description: Apihug quality lint tools to check api design violations
+---
+
+Updated **2024-08-28**
+
+import { TipInfo } from '@/components/Tip'
+
+<TipInfo>LLM Oriented Programming</TipInfo>
+
+## LLMOP
+
+面向LLM编程（LLMOP）代表了我们构思和设计API的范式转变。该方法旨在创建不仅对应用程序有效，而且对人类和大型语言模型（LLM）都可理解的API：
+
+
+1. **易读性API**: `LLMOP`框架下的API设计注重人类可读性，采用清晰、描述性强的命名和文档，便于开发者和利益相关者理解API功能和目的，促进团队协作。
+2. **OpenAPI规范整合**: `LLMOP`与OpenAPI规范结合，实现API的标准化生成和验证，确保文档和工具的一致性和易用性。
+3. **重点API设计**: `LLMOP`将API设计视为软件开发的关键环节，更多关注用户需求和业务目标，打造易于使用、维护和演进的API。
+4. **交互性和反馈循环**: `LLMOP`设计的API融入交互功能，利用LLM为开发者提供实时反馈和建议，创造动态的开发体验，提升生产力和创新性。
+5. **多模态交互支持**: `LLMOP` API支持多种交互方式，包括文本、语音和视觉输入，提高API的可访问性和用户友好度。
+
+
+总之，`LLMOP`通过使API开发更具包容性，改变了API开发的方式。通过优先考虑可读性、利用OpenAPI等标准、关注深思熟虑的设计、增强交互性和支持多模态交互，我们可以创建不仅强大而且直观易用的API。
+
+这种方法为未来铺平了道路，使API在软件应用和人类理解中都发挥重要作用。
+
+
+## Summary 
+
+随着大型语言模型（LLM）的兴起，我们站在了技术革新的前沿。
+
+这些模型不仅为组织带来了前所未有的机遇，也带来了整合现有资产的挑战。
+
+现有API和数据积累，在LLM的辅助下，可以转化为推动创新和增长的强大动力。
+
+然而，整合这些资产并非易事。在融合过程充满挑战，我们对LLM的潜力和边界尚未完全理解，同时现有资产中也存在质量不一的问题。面对这些难题，我们提出了两种策略：
+
+1. **绿地重建**：一种彻底的重建策略，适合独立或低耦合业务，尽管需要大量投资且风险较高，但能实现快速转型。
+2. **渐进整合**：通过适配器和桥接技术逐步整合现有资产，保持业务连续性，同时引入新技术，为多数业务提供灵活且风险可控的方案。
+
+通过精心设计的整合计划，可以确保在LLM时代中，组织能够有效地转化并优化其资产，实现持续的创新和发展。
+
+在API开发领域，采取自顶向下的策略，强化API风格指南的执行和严格的lint工具集成，保持API描述的有序性和清晰性，确保它们易于管理且一致：
+
+1. **标准强化**：实施全面API风格指南，采用自顶向下方式，确保编码约定和设计原则的统一性。
+2. **Lint合规性检查**：利用lint工具自动识别并纠正风格偏差，预防错误并维护代码质量。
+3. **CI流水线集成**：将lint集成到CI流水线中，确保新代码在集成前自动经过标准合规性审查。
+4. **开发者教育**：强调遵守API风格指南的重要性和lint的优势,+ 简单易学!
+
+这些方法不仅维护了API的完整性，而且培养了一个纪律严明、高标准的开发环境，从而形成了坚固、可扩展且可靠的API，这些API构成了我们软件架构的基础。
+
+## ApiHug
+
+在 SDK **1.0.8-RELEASE** 后我们引入了简单**Lint** 工具， 使用简单的几个 配置 rule，检查你的API设计规范(未来可以持续添加)。
+
+<a target="_blank" href="https://search.maven.org/artifact/com.apihug/it-bom"><img
+  src="https://img.shields.io/maven-central/v/com.apihug/it-bom.svg?label=Maven%20Central"/></a>
+
+在API 设计规范上，其实业界有 [stoplight style](https://apistylebook.stoplight.io/) 开源 spectral来设计和调整自己公司的API设计行为规范。 
+这里面包含如 url 如何设计，命名用那种风格(比如羊肉串还是驼峰?)；由于ApiHug的swagger 文档是通过DSL 编译后生成， 这部分尚比较容易控制；
+
+所以 ApiHug 对于 API 设计的控制比较简单：
+
+1. 描述的有，API 描述， 字段描述， 常量的描述， 可以限制丰富程度(目前尚不能判断表达是否达意--瞎写凑字的)
+2. [RAFT](https://gorilla.cs.berkeley.edu/) RAFT里面关于API 描述(questions) few-shot 例子如：
+
+```json
+{
+  "api_name": "Gmail API - Users.getProfile",
+  "api_call": "service.users().getProfile(userId='me').execute()",
+  "api_version": "1.0",
+  "api_arguments": {
+    "userId": "The user's email address. The special value 'me' can be used to indicate the authenticated user."
+  },
+  "functionality": "Gets the current user's Gmail profile.",
+  "env_requirements": [
+    "google-auth",
+    "google-auth-oauthlib",
+    "google-auth-httplib2",
+    "google-api-python-client"
+  ],
+  "example_code": "from googleapiclient.discovery import build \n from oauth2client import file, client, tools \n store = file.Storage('token.json') \n creds = store.get() \n service = build('gmail', 'v1', credentials=creds) \n results = service.users().getProfile(userId='me').execute()",
+  "meta_data": {
+    "description": "The Users.getProfile method of Gmail API allows for retrieving basic profile information of a user, such as the email address and account ID.",
+    "documentation_link": "https://developers.google.com/gmail/api/reference/rest/v1/users/getProfile"
+  },
+  "questions": [
+    "How can I fetch my Gmail account's email address?",
+    "How can I obtain the total messages in my gmail inbox."
+  ]
+}
+```
+
+当然这个离未来和LLM 世界无缝打通还有很长的路要走， 现在是打好基础为未来联通做好储备。 
+
+### Configuration
+
+升级步骤：
+
+1. SDK版本： `{your_project}/gradle/libs.versions.toml` 修改： `apihug = "xxx"`  到 `1.0.8-RELEASE`+ 版本；参考 [apihug-demo/libs.versions.toml](https://github.com/apihug/apihug-demo/blob/main/gradle/libs.versions.toml)
+2. lint 配置： `.apihuglint.properties` 来自： [apihug-demo-proto](https://github.com/apihug/apihug-demo/tree/main/apihug-demo-proto)
+
+<a target="_blank" href="https://search.maven.org/artifact/com.apihug/it-bom"><img
+  src="https://img.shields.io/maven-central/v/com.apihug/it-bom.svg?label=Maven%20Central"/></a>
+
+在proto模块正常编译(build 或者独立 wire )完成后, 在您proto模块build(`{PROTO_MODULE}/build/reports/api-lint/`) 目录下会多出来两个文件:
+
+1. `report.html` 报告生成
+2. `report.json` 报告json版本
+
+
+| 参数                                 | 列子      | 备注                                                |
+|------------------------------------|---------|---------------------------------------------------|
+| `violation.limit`                  | `20`    | if violation count exceed this, stop the compiler |
+| `service.name.length`              | `5`     | min service name length                           |
+| `service.description.length`       | `5`     | min service description length                    |
+| `service.api.name.length`          | `5`     | min api name length                               |
+| `service.api.description.length`   | `20`    | min api description length                        |
+| `service.api.questions.size`       | `2`     | min api questions list size                       |
+| `service.api.question.length`      | `5`     | min each api question description length          |
+| `message.name.length`              | `5`     | min message name length                           |
+| `message.description.length`       | `5`     | min message description length                    |
+| `message.field.name.length`        | `3`     | min message field name length                     |
+| `message.field.description.length` | `10`    | min message field description length              |
+| `entity.name.length`               | `5`     | min entity name length                            |
+| `entity.description.length`        | `5`     | min entity description length                     |
+| `entity.column.length`             | `5`     | min entity column length                          |
+| `entity.column.description.length` | `5`     | min entity column description length              |
+| `entity.table.explicit`            | `false` | Table name should set explicitly                  |
+| `entity.column.explicit`           | `false` | Table name should set explicitly                  |
+| `eum.name.length`                  | `5`     | min Enum name length                              |
+| `eum.description.length`           | `5`     | min Enum description length                       |
+| `eum.item.name.length`             | `5`     | min Enum item name length                         |
+| `eum.item.description.length`      | `5`     | min Enum item description length                  |
+
+
+### Report
+
+**HTML**
+
+<img src={require('@/img/tool/lint-report.png').default.src} alt="ApiHug lint report sample" width={1251} height={392} className="rounded-lg" />
+
+**Json**
+
+```json
+[
+{
+  "proto" : "com/apihug/sample/proto/api/demo001/api.proto", 
+  "kind" : "Service", 
+  "target" : "VIPService#GetMeSth", 
+  "rule" : "Service method description too short", 
+  "description" : "Given [Get me something] expect >= 20"
+}
+]
+```
+
+
+## Refer
+
+1. [stoplight-spectral](https://stoplight.io/open-source/spectral)
+2. [real-world-rulesets](https://github.com/stoplightio/spectral?tab=readme-ov-file#-real-world-rulesets)
+3. [gorilla RAFT](https://gorilla.cs.berkeley.edu/)
