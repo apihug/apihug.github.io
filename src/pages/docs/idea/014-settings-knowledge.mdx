@@ -3,8 +3,55 @@ title: 014 Knowledge Settings
 description: how to set knowledge configuration ApiHug Api design Copilot.
 ---
 
-How to configure team-shared knowledge for domain with ApiHug Api design Copilot
+How to configure team-shared knowledge for domain with ApiHug Api design Copilot.
 
+## What is Team knowledge base
+
+🎁 **Team-Shared Design Standards Consensus**
+
+1. Design Standards
+2. Domain Knowledge
+3. Team Consensus
+
+
+## 0.5.4 upgrade
+
+Since IDEA Plugin `0.5.4`+  we move maintain of the knowledge as Project framework metadata, so you:
+
+1. need to keep it in project source code to leverage the version control;
+2. each module(domain) will have its own domain knowledge base;
+
+The knowledge base configuration will host `{WIRE_MODULE}/src/main/resources/hope-knowledge.json`, please refer to this [sample](https://github.com/apihug/apihug-demo/blob/main/apihug-demo-proto/src/main/resources/hope-knowledge.json).
+
+```json
+{
+  "knowledge" : [ {
+    "name" : "user_name",
+    "description" : "name of user",
+    "attributeType" : "STRING",
+    "notNull" : false,
+    "notEmpty" : false,
+    "notBlank" : true,
+    "pattern" : "",
+    "minLength" : 1,
+    "maxLength" : 64,
+    "sample" : "jake",
+    "trackId" : "04b01f17-dc5b-44ce-b7ad-da7744dae723",
+    "usage" : "BOTH"
+  } ],
+  "name" : "apihug-demo-proto",
+  "application" : "apihug-demo",
+  "packageName" : "com.apihug.sample",
+  "domain" : "sample",
+  "identifier" : "apihug-demo-proto",
+  "module" : "apihug-demo-proto"
+}
+```
+
+All other behavior keep same!
+
+
+## Old Way
 
 1. open `ApiHug > Settings`
 2. choice `Knowledge` tab
