@@ -3,7 +3,7 @@ title: 014 Knowledge Settings
 description: how to set knowledge configuration ApiHug Api design Copilot.
 ---
 
-How to configure team-shared knowledge for domain with ApiHug Api design Copilot
+如何在ApiHug Api design Copilot配置团队知识库。
 
 ## 什么是知识库
 
@@ -16,12 +16,14 @@ How to configure team-shared knowledge for domain with ApiHug Api design Copilot
 
 ## 0.5.4 upgrade
 
-Since IDEA Plugin `0.5.4`+  we move maintain of the knowledge as Project framework metadata, so you:
+⚠️0.5.4后这个配置菜单取消了⚠️
 
-1. need to keep it in project source code to leverage the version control;
-2. each module(domain) will have its own domain knowledge base;
+自 IDEA 插件 `0.5.4`+ 我们将知识库的管理移到项目内，而不是IDEA 环境:
 
-The knowledge base configuration will host `{WIRE_MODULE}/src/main/resources/hope-knowledge.json`, please refer to this [sample](https://github.com/apihug/apihug-demo/blob/main/apihug-demo-proto/src/main/resources/hope-knowledge.json).
+1. 这样就可以纳入项目的源码管理，便于版本和协同管理;
+2. 每个模块(领域) 都有自己的领域知识库;
+
+模块的知识库配置在`wire`模块 `{WIRE_MODULE}/src/main/resources/hope-knowledge.json`, 参考 [例子](https://github.com/apihug/apihug-demo/blob/main/apihug-demo-proto/src/main/resources/hope-knowledge.json).
 
 ```json
 {
@@ -48,7 +50,7 @@ The knowledge base configuration will host `{WIRE_MODULE}/src/main/resources/hop
 }
 ```
 
-All other behavior keep same!
+配置方式基本一致，不过不在全局IDEA settings 中，而是在每个项目模块内！
 
 
 ## Old Way
