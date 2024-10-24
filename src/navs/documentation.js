@@ -56,6 +56,9 @@ export const documentationNav = {
     {title: 'Wire', href: '/docs/tool/gradle-wire'},
     {title: 'Stub', href: '/docs/tool/gradle-stub'},
   ],
+  "Copilot": [
+    {title: 'Intro', href: '/docs/copilot'},
+  ],
   "How": [
     {title: 'Upload File', href: '/docs/how/001_support_upload_file'},
     {title: 'Update Header & Cookie', href: '/docs/how/002_update_header_cookie'},

@@ -56,6 +56,9 @@ export const documentationNav = {
     {title: 'Wire', href: '/zhCN-docs/tool/gradle-wire'},
     {title: 'Stub', href: '/zhCN-docs/tool/gradle-stub'},
   ],
+  "Copilot": [
+    {title: 'Intro', href: '/zhCN-docs/copilot'},
+  ],
   "How": [
     {title: '文件上传', href: '/zhCN-docs/how/001_support_upload_file'},
     {title: '更新 Header & Cookie', href: '/zhCN-docs/how/002_update_header_cookie'},
