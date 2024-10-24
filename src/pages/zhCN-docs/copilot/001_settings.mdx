@@ -1,0 +1,115 @@
+---
+title: ApiSmart Support Vendors
+description: ApiSmart Support Vendors
+---
+
+ApiHug's ApiSmart leverage the [Langchain4j](https://github.com/langchain4j/langchain4j/) to talk to the LLM vendors; so basically any Langchain4j support vendor can be support by ApiSmart;
+
+But now as limitation of our capacity; we need to add and test one by one; this will take some time;
+
+Eventually all of them can be in our support list.
+
+## Settings
+
+Common LLM runtime settings, all of them has default value, no need to specify if keep default.
+
+| Name              | Comment                                                                                                                                                                                                                                        | Mandatory |
+|-------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
+| Chat Memory Size  | Memory window size, default 10                                                                                                                                                                                                                 | Y         |
+| Top-P             | Top-P is a text generation method that focuses on the most likely tokens until a cumulative probability threshold is reached. It helps balance diversity and certainty in generated text. Use it with care, adjusting it for desired outcomes. | Y         |
+| Max Output Tokens | Maximum attempts                                                                                                                                                                                                                               | Y         |
+| Timeout(s)        | Time out in second                                                                                                                                                                                                                             | Y         |
+| Max Attempts      | Max attempts                                                                                                                                                                                                                                   | Y         |
+| Temperature       | What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.                                                           | Y         |
+| Stream            | Support stream                                                                                                                                                                                                                                 | Y         |
+| System Prompt     | System prompt                                                                                                                                                                                                                                  | Y         |
+| Show Detail       | Show time or token cost etc                                                                                                                                                                                                                    | Y         |
+
+
+## Vendors
+
+In theory [language-models](https://docs.langchain4j.dev/category/language-models) is the full list;
+
+ApiSmart support you configure multiple instance for one LLM vendor, like for different env;
+
+so each setting will have a specific name and description, you should make them straightforward for example `Openai-test-env` will be a good sample.
+
+
+| Name        | Comment                               | Mandatory |
+|-------------|---------------------------------------|-----------|
+| Name        | Name of this LLM configuration        | Y         |
+| Description | Description of this LLM configuration | N         |
+
+
+
+### OpenAI
+
+| Name         | Comment                              | Mandatory |
+|--------------|--------------------------------------|-----------|
+| URL          | `https://api.openai.com/` as default | N         |
+| Api Key      | Key for the API                      | Y         |
+| Project Id   | Not used yet                         | N         |
+| Organization | Not used yet                         | N         |
+
+
+### Azure AI
+
+| Name         | Comment                                                         | Mandatory |
+|--------------|-----------------------------------------------------------------|-----------|
+| URL          | `https://***.openai.azure.com/` like endpoint                   | Y         |
+| Api Key      | Key for the API                                                 | Y         |
+| Model        | Default Model name(deployment), you can put manually on runtime | N         |
+
+
+### LLM Studio
+
+| Name         | Comment                                                         | Mandatory |
+|--------------|-----------------------------------------------------------------|-----------|
+| URL          | `http://localhost:1234/v/1/` default local URL                  | Y         |
+
+[lmstudio](https://lmstudio.ai/) Discover, download, and run local LLMs
+
+[Local LLM Server](https://lmstudio.ai/docs/basics/server), You can serve local LLMs from LM Studio's Developer tab, either on localhost or on the network.
+
+### Jan
+
+| Name         | Comment                                                         | Mandatory |
+|--------------|-----------------------------------------------------------------|-----------|
+| URL          | `https://***.openai.azure.com/` like endpoint                   | Y         |
+
+[Enable the Jan API Server](https://jan.ai/integrations/coding/continue-dev#step-2-enable-the-jan-api-server)
+
+### OpenRouter
+
+**TBD**
+
+| Name         | Comment                                                         | Mandatory |
+|--------------|-----------------------------------------------------------------|-----------|
+| URL          | `https://***.openai.azure.com/` like endpoint                   | Y         |
+| Api Key      | Key for the API                                                 | Y         |
+| Model        | Default Model name(deployment), you can put manually on runtime | N         |
+
+
+### Qianfan
+
+| Name       | Comment                                              | Mandatory |
+|------------|------------------------------------------------------|-----------|
+| Api Key    | Key for the API                                      | Y         |
+| Secret Key | Secret Key for the API                               | Y         |
+| Model      | default model, you can input manually during runtime | Y         |
+
+[百度智能云千帆大模型](https://console.bce.baidu.com/qianfan/ais/console/applicationConsole/application)
+
+BTW `Yi-34B-Chat` is free;
+
+### TBD
+
+1. Google
+2. ...
+
+## Prompt
+
+| Name   | Comment                                                                       | Mandatory |
+|--------|-------------------------------------------------------------------------------|-----------|
+| name   | shortcut style, can be refer `/{name}` when ask, `/explain` is a good example | Y         |
+| prompt | body of the prompt                                                            | Y         |

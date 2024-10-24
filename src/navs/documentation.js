@@ -58,6 +58,7 @@ export const documentationNav = {
   ],
   "Copilot": [
     {title: 'Intro', href: '/docs/copilot'},
+    {title: 'Settings', href: '/docs/copilot/001_settings'},
   ],
   "How": [
     {title: 'Upload File', href: '/docs/how/001_support_upload_file'},
