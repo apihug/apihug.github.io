@@ -58,7 +58,7 @@ export const documentationNav = {
   ],
   "Copilot": [
     {title: '介绍', href: '/zhCN-docs/copilot'},
-    {title: '配置', href: '/docs/copilot/001_settings'},
+    {title: '配置', href: '/zhCN-docs/copilot/001_settings'},
   ],
   "How": [
     {title: '文件上传', href: '/zhCN-docs/how/001_support_upload_file'},
