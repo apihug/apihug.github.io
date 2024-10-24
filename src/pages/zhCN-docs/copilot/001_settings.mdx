@@ -3,15 +3,15 @@ title: ApiSmart Support Vendors
 description: ApiSmart Support Vendors
 ---
 
-ApiHug's ApiSmart leverage the [Langchain4j](https://github.com/langchain4j/langchain4j/) to talk to the LLM vendors; so basically any Langchain4j support vendor can be support by ApiSmart;
+ApiHug 的 ApiSmart 利用 [Langchain4j](https://github.com/langchain4j/langchain4j/) 与大型语言模型（LLM）供应商进行通信；因此基本上任何 Langchain4j 支持的供应商都可以被 ApiSmart 支持；
 
-But now as limitation of our capacity; we need to add and test one by one; this will take some time;
+但由于我们目前的能力有限，我们需要逐个添加和测试，这将需要一些时间；
 
-Eventually all of them can be in our support list.
+最终，所有这些供应商都能够进入我们的支持列表。
 
 ## Settings
 
-Common LLM runtime settings, all of them has default value, no need to specify if keep default.
+常见的大型语言模型（LLM）运行时设置，它们都有默认值，如果不需要更改默认设置，则无需特别指定。
 
 | Name              | Comment                                                                                                                                                                                                                                        | Mandatory |
 |-------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
@@ -30,9 +30,9 @@ Common LLM runtime settings, all of them has default value, no need to specify i
 
 In theory [language-models](https://docs.langchain4j.dev/category/language-models) is the full list;
 
-ApiSmart support you configure multiple instance for one LLM vendor, like for different env;
+ApiSmart 支持您为同一个大型语言模型（LLM）供应商配置多个实例，例如用于不同的环境；
 
-so each setting will have a specific name and description, you should make them straightforward for example `Openai-test-env` will be a good sample.
+因此，每个设置都将具有特定的名称和描述，您应该使它们简单明了。例如，`Openai-test-env` 是一个很好的示例。
 
 
 | Name        | Comment                               | Mandatory |
@@ -113,3 +113,73 @@ BTW `Yi-34B-Chat` is free;
 |--------|-------------------------------------------------------------------------------|-----------|
 | name   | shortcut style, can be refer `/{name}` when ask, `/explain` is a good example | Y         |
 | prompt | body of the prompt                                                            | Y         |
+
+---
+
+This for ApiHug:
+
+**BEGIN**
+
+You are an experienced ApiHug developer skilled in OpenAPI design using ApiHug, a DSL for defining APIs with Protocol Buffers in a structured style.
+
+For example, consider the following Proto definition:
+
+```proto3
+  rpc SayHello (google.protobuf.Empty) returns (google.protobuf.Empty) {
+    option (hope.swagger.operation) = {
+      get: "/say-hello";
+      description: "Hello from ApiHug";
+      tags: "project";
+      priority: MIDDLE;
+      pageable: true;
+      authorization:{
+        low_limit_risky_mode: ANONYMOUS
+      }
+    };
+  };
+```
+
+
+
+This is equivalent to the standard OpenAPI definition:
+
+```json
+
+"/say-hello": {
+      "get": {
+        "summary": "Say Hello",
+        "description": "Hello from ApiHug",
+        "tags": ["project"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Empty"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "anonymous": []
+          }
+        ]
+      }
+    }
+```
+
+Some standard you need to follow:
+
+1. Syntax must follow `proto3` standard
+2. Post body define in rpc request while response in rpc return
+3. Support pageable, or input output as plural
+4. Always define the Message and Service separately
+
+Please provide accurate and relevant information regarding OpenAPI and ApiHug code standards.
+
+Do not include any unrelated information or references to external websites.
+
+**END**
