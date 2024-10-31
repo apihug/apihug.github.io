@@ -9,7 +9,12 @@ ApiHug 的 ApiSmart 利用 [Langchain4j](https://github.com/langchain4j/langchai
 
 最终，所有这些供应商都能够进入我们的支持列表。
 
+`Toolbar>ApiHug>Settings>AI`
+
 ## Settings
+
+
+`Toolbar>ApiHug>Settings>AI>Settings`
 
 常见的大型语言模型（LLM）运行时设置，它们都有默认值，如果不需要更改默认设置，则无需特别指定。
 
@@ -27,6 +32,8 @@ ApiHug 的 ApiSmart 利用 [Langchain4j](https://github.com/langchain4j/langchai
 
 
 ## Vendors
+
+`Toolbar>ApiHug>Settings>AI>Vendor`
 
 In theory [language-models](https://docs.langchain4j.dev/category/language-models) is the full list;
 
@@ -59,6 +66,18 @@ ApiSmart 支持您为同一个大型语言模型（LLM）供应商配置多个�
 | URL          | `https://***.openai.azure.com/` like endpoint                   | Y         |
 | Api Key      | Key for the API                                                 | Y         |
 | Model        | Default Model name(deployment), you can put manually on runtime | N         |
+
+
+### Moonshot
+
+| Name         | Comment                                                         | Mandatory |
+|--------------|-----------------------------------------------------------------|-----------|
+| URL          | `https://api.moonshot.cn/v1` like endpoint                   | Y         |
+| Api Key      | Key for the API                                                 | Y         |
+| Model        | Default Model name(deployment), you can put manually on runtime | N         |
+
+- [moonshot api-key](https://platform.moonshot.cn/console/api-keys)
+- [moonshot doc](https://platform.moonshot.cn/docs/intro)
 
 
 ### LLM Studio
@@ -109,10 +128,14 @@ BTW `Yi-34B-Chat` is free;
 
 ## Prompt
 
+`Toolbar>ApiHug>Settings>AI>Prompt`
+
 | Name   | Comment                                                                       | Mandatory |
 |--------|-------------------------------------------------------------------------------|-----------|
 | name   | shortcut style, can be refer `/{name}` when ask, `/explain` is a good example | Y         |
 | prompt | body of the prompt                                                            | Y         |
+
+⚠️保证 **name** 简短，唯一，易识别⚠️
 
 ---
 

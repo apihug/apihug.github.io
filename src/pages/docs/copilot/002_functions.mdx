@@ -1,0 +1,81 @@
+---
+title: ApiSmart Feature Demonstration
+description: ApiSmart Feature Demonstration
+---
+
+ApiHug's ApiSmart communicates with large language model (LLM) vendors using [Langchain4j](https://github.com/langchain4j/langchain4j/); therefore, essentially any vendor supported by Langchain4j can be supported by ApiSmart;
+
+However, due to our current limited capabilities, we need to add and test them one by one, which will take some time;
+
+Ultimately, all these vendors will be able to enter our support list.
+
+[Plugin Release Note](/docs/changelog/plugin)
+
+Latest **0.5.6 2024-10-31**
+
+<div>
+  <iframe
+    src="https://plugins.jetbrains.com/embeddable/install/23534"
+    border="0"
+    height={'48px'}
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
+
+## Settings
+
+[ApiSmart Settings](/docs/copilot/001_settings); including:
+
+1. Add a vendor
+2. Add a prompt
+
+## Editor
+
+<img src={require('@/img/editor/051_api_smart_auto.gif').default.src} alt="Apismart Autocomplete" width={2378} height={1612}
+     className="rounded-lg"/>
+
+The ApiSmart editor (input box) has extended the functionality of `Markdown`:
+
+- Supports `/` to trigger prompt autocompletion with one click; such as built-in: `/explain`, `/api`, etc.
+- `file:` opens the file selector;
+- ...
+
+
+## Toolwindow
+
+The Toolwindow on the right side can be opened or closed at any time and includes three parts:
+
+- The top toolbar button menu: Restart session, open configuration, open standalone panel
+- Service provider and model list selection
+- Main dialogue chat panel
+- Input box and send button
+
+## Dialogue Panel
+
+The dialogue panel follows the mainstream chat mode, where users ask questions and AI responds:
+
+- Supports markdown rendering
+- Project file links
+- Prompt links and view collapse method
+- Code snippet custom operations
+- Copy to clipboard
+- Insert into the current editor position (automatically ignored if no file is open)
+- Delete conversation
+
+## Main Editor
+
+If you find the Toolwindow too cramped, you can choose to open a standalone window from the toolbar at the top of the Toolwindow;
+
+It has the exact same functionality as the Toolwindow, but with a more spacious interface.
+
+
+## Editor Menu
+
+<img src={require('@/img/editor/052_api_smart_ask.gif').default.src} alt="ApiSmart Menu" width={2378} height={1612}
+     className="rounded-lg"/>
+
+In any editor, right-clicking the menu will invoke the `Ask` feature to send your query to the Toolwindow, allowing you to continue your enjoyable AI conversation.
+
+

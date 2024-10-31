@@ -1,0 +1,83 @@
+---
+title: ApiSmart 功能演示
+description: ApiSmart 功能演示
+---
+
+ApiHug 的 ApiSmart 利用 [Langchain4j](https://github.com/langchain4j/langchain4j/) 与大型语言模型（LLM）供应商进行通信；因此基本上任何 Langchain4j 支持的供应商都可以被 ApiSmart 支持；
+
+但由于我们目前的能力有限，我们需要逐个添加和测试，这将需要一些时间；
+
+最终，所有这些供应商都能够进入我们的支持列表。
+
+[Plugin Release Note](/zhCN-docs/changelog/plugin)
+
+Latest **0.5.6 2024-10-31**
+
+**Plugin Version**
+
+<div>
+  <iframe
+    src="https://plugins.jetbrains.com/embeddable/install/23534"
+    border="0"
+    height={'48px'}
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
+
+## 配置
+
+[ApiSmart 配置](/zhCN-docs/copilot/001_settings)
+
+1. 添加供应商
+2. 添加 prompt
+
+## Editor
+
+<img src={require('@/img/editor/051_api_smart_auto.gif').default.src} alt="Apismart Autocomplete" width={2378} height={1612}
+     className="rounded-lg"/>
+
+ApiSmart 编辑器(输入框)， 在 `Markdown` 上做了扩展：
+
+-  支持 `/` 一键触发 prompt 自动完成；如内置： `/explain`, `/api` etc
+-  `file:` 打开文件选择器;
+-  ....
+
+## Toolwindow
+
+右侧栏的 Toolwindow 可以随时打开或者关闭包含三部分：
+
+- 上方 toolbar 按钮菜单： 重启会话，打开配置， 打开独立面板
+- 服务供应商，和模型列表选择
+- 对话聊天主面板
+- 输入框和发送按钮
+
+
+## 对话面板
+
+对话面板遵循主流对话聊天模式， 用户提问， AI 回答模式：
+
+- 支持 markdown 渲染
+- 项目文件链接
+- prompt链接和查看 collapse 方式
+- 代码快定制操作
+   - 复制到粘贴板
+   - 插入到当前编辑器位置(无打开文件自动忽略)
+- 删除对话
+
+
+## Main Editor
+
+如果你觉得 Toolwindow 太局促， 在 Toolwindow 顶上的 toolbar 中选择打开独立窗口就可以；
+
+和 toolwindow 一模一样的功能， 只不过界面更宽裕
+
+
+## Editor Menu
+
+<img src={require('@/img/editor/052_api_smart_ask.gif').default.src} alt="ApiSmart Menu" width={2378} height={1612}
+     className="rounded-lg"/>
+
+任何编辑器右击菜单唤起 `Ask` 发送到 toolwindow 继续愉快 AI 对话；
+
