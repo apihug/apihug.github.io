@@ -2,6 +2,7 @@
 title: ApiSmart Feature Demonstration
 description: ApiSmart Feature Demonstration
 ---
+import { TipInfo } from '@/components/Tip'
 
 ApiHug's ApiSmart communicates with large language model (LLM) vendors using [Langchain4j](https://github.com/langchain4j/langchain4j/); therefore, essentially any vendor supported by Langchain4j can be supported by ApiSmart;
 
@@ -41,6 +42,12 @@ The ApiSmart editor (input box) has extended the functionality of `Markdown`:
 - Supports `/` to trigger prompt autocompletion with one click; such as built-in: `/explain`, `/api`, etc.
 - `file:` opens the file selector;
 - ...
+
+<TipInfo>
+  When you input '/', the system will automatically prompt. 
+  Pressing enter will create a new line. 
+  If the system does not match to any command, the instruction will be invalid and will be treated as regular text!
+</TipInfo>
 
 
 ## Toolwindow

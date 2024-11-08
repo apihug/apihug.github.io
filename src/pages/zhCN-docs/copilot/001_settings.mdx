@@ -2,6 +2,7 @@
 title: ApiSmart 配置
 description: ApiSmart 配置和支持的LLM供应商
 ---
+import { TipInfo } from '@/components/Tip'
 
 ApiHug 的 ApiSmart 利用 [Langchain4j](https://github.com/langchain4j/langchain4j/) 与大型语言模型（LLM）供应商进行通信；因此基本上任何 Langchain4j 支持的供应商都可以被 ApiSmart 支持；
 
@@ -152,15 +153,21 @@ BTW `Yi-34B-Chat` is free;
 | name   | shortcut style, can be refer `/{name}` when ask, `/explain` is a good example | Y         |
 | prompt | body of the prompt                                                            | Y         |
 
-⚠️保证 **name** 简短，唯一，易识别⚠️
+⚠️Ensure **name** is short, unique, and easily recognizable⚠️
 
-[Prompt-Engineering-Guide-git](https://github.com/dair-ai/Prompt-Engineering-Guide)
+<TipInfo>
+  The quality of prompt words directly affects the effectiveness of the answers produced by large models; 
+  this is a task that requires patience and experience!
+  If you don't ask good questions, of course, you won't get good answers.
+</TipInfo>
+
+[Prompt-Engineering-Guide-git](https://github.com/dair-ai/Prompt-Engineering-Guide)  &  [promptingguide - web](https://www.promptingguide.ai/zh/)
 
 提示工程（Prompt Engineering）是一门较新的学科，关注提示词开发和优化，帮助用户将大语言模型（Large Language Model, LLM）用于各场景和研究领域。 
 
 掌握了提示工程相关技能将有助于用户更好地了解大型语言模型的能力和局限性。
 
-部分罗列这里: [apismart prompts](https://github.com/apihug/apismart-prompts/)
+部分罗列这里: [apismart prompts](https://github.com/apihug/apismart-prompts/) ; [提示工程-Bigmodel](https://www.bigmodel.cn/dev/howuse/prompt)
 
 ---
 

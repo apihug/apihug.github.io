@@ -2,6 +2,8 @@
 title: ApiSmart 功能演示
 description: ApiSmart 功能演示
 ---
+import { TipInfo } from '@/components/Tip'
+
 
 ApiHug 的 ApiSmart 利用 [Langchain4j](https://github.com/langchain4j/langchain4j/) 与大型语言模型（LLM）供应商进行通信；因此基本上任何 Langchain4j 支持的供应商都可以被 ApiSmart 支持；
 
@@ -43,6 +45,10 @@ ApiSmart 编辑器(输入框)， 在 `Markdown` 上做了扩展：
 -  支持 `/` 一键触发 prompt 自动完成；如内置： `/explain`, `/api` etc
 -  `file:` 打开文件选择器;
 -  ....
+
+<TipInfo>
+  '/' 输入后系统会自动提示，回车换行，如果系统没有匹配到， 这个指令无效，会作为普通文本处理！
+</TipInfo>
 
 ## Toolwindow
 
