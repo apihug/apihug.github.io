@@ -157,7 +157,7 @@ export function NavItems() {
     <>
       <li>
         <Link href="/zhCN" className="hover:text-sky-500 dark:hover:text-sky-400" title={'中文主页'}>
-          CN
+          中文
         </Link>
       </li>
       <li>
@@ -166,14 +166,14 @@ export function NavItems() {
         </Link>
       </li>
       <li>
-        <Link href="/docs/idea" className="hover:text-sky-500 dark:hover:text-sky-400">
+        <Link href="/docs/idea" className="hover:text-sky-500 dark:hover:text-sky-400" title={'IDEA Plugin'}>
           Editor
         </Link>
       </li>
 
       <li>
         <Link href="/docs/copilot" className="hover:text-sky-500 dark:hover:text-sky-400" title={'Api Smart(AI)'}>
-          Smart
+          AI
         </Link>
       </li>
 
