@@ -70,6 +70,26 @@ import { SnippetGroup } from '@/components/SnippetGroup'
 
 <img src={require('@/img/editor/003_project_settings.gif').default.src} alt="ApiHug Project Settings" width={2316} height={1768} className="rounded-lg" />
 
+
+<TipGood>
+
+  第一次，最好完全按照默认指令和配置进行!
+
+</TipGood>
+
+```
+├─order <1>
+    ├─order-app <2>
+    │  
+    └─order-app-proto<3>
+```
+
+一般项目结构
+
+1. `<1>` 项目名称
+2. `<2>` 应用模块：实现与服务
+3. `<3>` 协议模块：定义API，应用名称加`-proto`后缀
+
 ### 03-Spring设置
 
 Spring 配置，等同 [Start Spring](https://start.spring.io/) 习惯:
