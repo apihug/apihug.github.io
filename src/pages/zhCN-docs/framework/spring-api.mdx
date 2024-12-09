@@ -1,0 +1,42 @@
+---
+title: ApiHug Spring API Extension
+description: ApiHug SDK spring API 扩展
+---
+
+import { TipInfo } from '@/components/Tip'
+
+
+## Api
+
+包含API资源信息：
+
+1.  swagger 文档 `/v3/api-docs`
+2.  api meta 信息 `/hope/meta/errors|dictionaries|authorities`
+
+
+
+1. `hope.open.api.path` 配置文档目录， 默认 `/v3/api-docs`
+2.  `hope.open.api.enable` 是否暴露 swagger 文档信息
+3.  `hope.open.api.showMeta` 是否暴露 API meta 信息
+
+项目启动后，查看命令行，可看到类似信息：
+
+```
+Application 'demo-app' is running! Access URLs:
+
+Local                             http://localhost:18089/
+External                          http://192.168.0.115:18089/
+OAS                               http://192.168.0.115:18089/v3/api-docs
+Actuator                          http://192.168.0.115:18089/management
+Api-Errors                        http://192.168.0.115:18089/hope/meta/errors
+Api-Dictionaries                  http://192.168.0.115:18089/hope/meta/dictionaries
+Api-Authorities                   http://192.168.0.115:18089/hope/meta/authorities
+Profile(s)                        dev
+```
+
+
+所有这些 **资源** 信息都是由 `wire` 模块生成，非运行时代码反射扫描所得，API+API元信息均在设计阶段已经固定，运行时不能修改！
+
+如需要修改，需要重新 编译&发布你的 `wire` 模块！
+
+<TipInfo>建议在生产环境关闭此类信息接口</TipInfo>

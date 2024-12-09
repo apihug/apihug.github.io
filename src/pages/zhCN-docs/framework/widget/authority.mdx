@@ -1,6 +1,6 @@
 ---
-title: Authentication & Authorization
-description: Authentication & Authorization, JWT, RBAC
+title: 极简 Authentication & Authorization
+description: Hope 实现Authentication & Authorization, JWT, RBAC
 ---
 
 ## Authentication
@@ -9,20 +9,20 @@ description: Authentication & Authorization, JWT, RBAC
 
 ## Authorization
 
-How to check the authorities of a login account， you need 3 steps:
+要检查登录账户的权限，您需要三个步骤：
 
-1. define a resource(API path)'s authorization properties
-2. login account security context customization
-3. setup the account and authorities mapping
+1. 定义资源（API路径）的授权属性
+2. 登录账户安全上下文自定义
+3. 设置账户和权限的映射
 
 ### Define resource authorization
 
-check [Milestone 20240510](/zhCN-docs/milestone/milestone-20240510#rbac) `rbac `part:
+检查 [Milestone 20240510](/zhCN-docs/milestone/milestone-20240510#rbac) `rbac `部分:
 
 <img src={require('@/img/framework/authorization.png').default.src} alt="domain design" width={2408} height={886} className="rounded-lg" />
 
 
-#### **1.** Setup the authority enum
+#### **1.** 设置权限枚举
 
 ```protobuf
 enum  BookAuthorityEnum {
@@ -38,7 +38,7 @@ enum  BookAuthorityEnum {
 }
 ```
 
-#### **2.** update the `hope-wire.json` of the proto module
+#### **2.** 添加枚举到 `hope-wire.json` 配置
 
 ```json
   "authority" : {
@@ -47,7 +47,7 @@ enum  BookAuthorityEnum {
   }
 ```
 
-#### **3.** protect your resource
+#### **3.** 包含你的资源
 
 ```protobuf
 
@@ -68,11 +68,11 @@ enum  BookAuthorityEnum {
   }
 ```
 
-#### **4.** runtime configuration
+#### **4.** 运行时配置
 
-Those configuration will happen on your application module instead of the proto module:
+这些配置将在您的应用程序模块中进行，而不是在proto模块中：
 
-find the auto generated code template at your application project's package : `${PKG}.infra.security` (domain as `Book` example):
+在您的应用程序项目的包中找到自动生成的代码模板：`${PKG}.infra.security`（以`Book`为例，域为`Book`）：
 
 ```shell
     1. AnonymousBookCustomer.java       
@@ -83,26 +83,27 @@ find the auto generated code template at your application project's package : `$
     6. BookSecurityCustomizer.java
 ```
 
-| Class                                   | Usage                                                 | Comment                                                                                                                                                              |
-|-----------------------------------------|-------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Anonymous`Book`Customer                 | Anonymous Customer definition                         | usually no need to update                                                                                                                                            |
-| `Book`Customer                          | Customer used in the security context                 | extend for additional fields for dynamically loaded, like authorities, usually `Book`SecurityCustomerContextCustomizer response for init and wrapper it, need extend |
-| `Book`JWTPicker                         | Where to pick the JWT                                 | usually from header, but you can pick from session or cookies                                                                                                        |
-| `Book`QuickCustomerRoleChecker          | Quick Platform\Tenant role checker                    | usually need to extend                                                                                                                                               |
-| `Book`SecurityCustomerContextCustomizer | response for Security context customer initialization | more detail info to/from token, create new Customer like delegate authorities/role fetcher                                                                           |
-| `Book`SecurityCustomizer                | Security configuration customize                      | change global security strategy: like default access check, or specific rule for specific path                                                                       |
+| Class                                   | Usage         | Comment                                                                       |
+|-----------------------------------------|---------------|-------------------------------------------------------------------------------|
+| Anonymous`Book`Customer                 | 匿名顾客定义        | 通常无需更新                                                                        |
+| `Book`Customer                          | 在安全上下文中使用的顾客  | 扩展以便动态加载附加字段，如权限，通常是`Book`SecurityCustomerContextCustomizer的响应，用于初始化并进行包装，需扩展 |
+| `Book`JWTPicker                         | 获取JWT的位置      | 通常从头部获取，但也可以从会话或cookies中获取                                                    |
+| `Book`QuickCustomerRoleChecker          | 快速平台/租户角色检查器  | 通常需要扩展                                                                        |
+| `Book`SecurityCustomerContextCustomizer | 安全上下文顾客初始化的响应 | 从token获取更多详细信息，创建新的顾客，如委托权限/角色获取器                                             |
+| `Book`SecurityCustomizer                | 安全配置定制        | 更改全局安全策略：如默认访问检查，或特定路径的特定规则                                                   |
 
-#### **5.** Last piece
 
-This is not what the framework can supply as this depend on your business logic: how to set up your account relationship with the authorities list.
+#### **5.** 最后部分
 
-Best practice is to follow the role based access control that is **RBAC**.
+这不是框架所能提供的，因为这依赖于您的业务逻辑：如何设置您与权限列表的账户关系。
 
-SO you may leverage the Authority Enum for example `BookAuthorityEnum`'s message pattern to organize your authorities hierarchy:
+最佳实践是遵循基于角色的访问控制，即 **RBAC**。
 
-Take this book application as example:
+因此，您可以利用权限枚举，例如 `BookAuthorityEnum` 的消息模式来组织您的权限层次结构：
 
-```protobuf
+以这个书籍应用程序为例：
+
+```
 
 BOOK_ADD: book:add
 BOOK_DELETE: book:delete
@@ -114,7 +115,7 @@ ORDER_MODIFY:order:modify
 
 ```
 
-so the hierarchy may looks like:
+因此，层次结构可能如下所示：
 
 ```shell
 

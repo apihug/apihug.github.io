@@ -38,9 +38,12 @@ export const documentationNav = {
     {title: '框架介绍', href: '/zhCN-docs/framework'},
     {title: 'Spring 公用库', href: '/zhCN-docs/framework/spring-common'},
     {title: 'Spring 核心库', href: '/zhCN-docs/framework/spring-core'},
+    {title: 'Spring 缓存库', href: '/zhCN-docs/framework/spring-cache'},
+    {title: 'Spring API库', href: '/zhCN-docs/framework/spring-api'},
     {title: 'Spring 数据库', href: '/zhCN-docs/framework/spring-data'},
     {title: 'Spring 安全库', href: '/zhCN-docs/framework/spring-security'},
-    {title: '权限工具', href: '/zhCN-docs/framework/widget/authority'},
+    {title: 'Spring Mock库', href: '/zhCN-docs/framework/spring-mock'},
+    {title: 'Spring 极简RBAC', href: '/zhCN-docs/framework/widget/authority'},
   ],
   "Kola": [
     {title: '介绍', href: '/zhCN-docs/kola'},
