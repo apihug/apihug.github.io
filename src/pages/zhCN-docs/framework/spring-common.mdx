@@ -34,11 +34,12 @@ ResponseEntity builder 包含:
 
 支持Pageable ResponseEntity  builder, 结果预封装成 `Pageable` 对象，包含：
 
-1. page size
-2. page index
-3. total count
-4. total page
-5. payload: data list
+1. pageIndex： 当前页码
+2. pageSize： 本页对象数量
+3. totalCount： 总数
+4. totalPage： 总页数
+5. data：对象列表
+
 
 
 #### RuntimeContextInitializer
@@ -70,9 +71,10 @@ ResponseEntity builder 包含:
 
 和安全相关， 获取 Audit 上下文， 包括： `Identify` 上下文账号信息，    `Tenant`上下文租户信息，一般从 `HopeContextHolder`衍生出来；
 
-| 类名          | 备注      |
-| `AuditContext`     | 获取账户和租户上下文信息 |
-| `AuditContextSupplier`     | Supplier 定制扩展点 |
+| 类名                     | 备注             |
+|------------------------|----------------|
+| `AuditContext`         | 获取账户和租户上下文信息   |
+| `AuditContextSupplier` | Supplier 定制扩展点 |
 
 
 

@@ -5,5 +5,135 @@ description: ApiHug SDK Common extension
 
 import { TipInfo } from '@/components/Tip'
 
+## Common
+
+`Hope` 带来框架层几个扩展：
+
+| 类别                  | 备注                        |
+|---------------------|---------------------------|
+| `it-common`         | 包含：通用辅助类(Utils), 通用协议定义   |
+| `it-common-api`     | 涉及到API通用类，辅助类定义           |
+| `it-common-mock`    | 运行时 mock 上下文定义            |
+| `it-common-spring*` | spring 扩展，详细参考下面spring 系列 |
+
+
+## it-common
+
+| 包名            | 备注                         | 范围     |
+|---------------|----------------------------|--------|
+| `async`       | 包含两个通用 Executor Global帮助类  | 可选     |
+| `contract`    | contract 测试协议定义            | mock使用 |
+| `enumeration` | 常量定义协议                     | **必须** |
+| `meta`        | 框架 `meta`信息定义，框架需要(运行时不需要) | 框架     |
+| `persistence` | 框架 ORMd定义信息，框架需要(运行时不需要)   | 框架     |
+| `runtime`     | 运行时上下文，作为actuator信息暴露，框架处理 | 框架     |
+| `script`      | IDEA 扩展内嵌script 需要，运行时不需要  | 框架     |
+| `service`     | API 服务信息annotation,运行时信息   | 框架     |
+
+1. 大部分是框架运行时依赖的对象，在自己业务逻辑代码基本不需要引用；
+2. `enumeration` 是框架内定义需要对外暴露常量固定范式，使用 proto 方式定义会自动符合此标准；
+
+## it-common-api
+
+包含 API 运行时定义公用数据类型和帮助类；
+
+| 类名              | 备注              |
+|-----------------|-----------------|
+| `PageRequest`   | 分页查询Parameter对象 |
+| `Pageable`      | 分页数据集           |
+| `Result`        | 标准API返回结果       |
+| `ResultBuilder` | Result Builder  |
+
+### 分页
+
+参考Spring:
+
+1. [org.springframework.data.domain.PageRequest](https://github.com/spring-projects/spring-data-commons/blob/main/src/main/java/org/springframework/data/domain/PageRequest.java)
+2. [org.springframework.data.domain.Pageable](https://github.com/spring-projects/spring-data-commons/blob/main/src/main/java/org/springframework/data/domain/Pageable.java)
+
+**分页请求-PageRequest**
+
+| 名称       | 备注                                                                                                                             |
+|----------|--------------------------------------------------------------------------------------------------------------------------------|
+| `page`   | Zero-based page index (0..N)                                                                                                   |
+| `size`   | Size of the page to be returned                                                                                                |
+| `offSet` | infinite scroll load this is the last offset if any key specific                                                               |
+| `sort`   | Sorting criteria in the format: property,(asc or desc). Default sort order is ascending. Multiple sort criteria are supported. |
+
+
+**分页数据集-Pageable**
+
+| 名称          | 备注     |
+|-------------|--------|
+| `pageIndex` | 当前页码   |
+| `pageSize`  | 本页对象数量 |
+| `totalPage` | 总数     |
+| `totalPage` | 总页数    |
+| `data`      | 对象列表   |
+
+### 返回体
+
+**返回对象-Result**
+
+
+| 名称        | 备注             |
+|-----------|----------------|
+| `code`    | 返回码,非零失败，零成功   |
+| `message` | 返回提示信息         |
+| `payload` | 信息载体 （泛类型对象 T） |
+| `errors`  | 错误列表 `Error`   |
+
+
+### Error
+
+`Hope` 通用错误定义：
+
+| 名称              | 备注         | 例子                            |
+|-----------------|------------|-------------------------------|
+| `code`          | 错误代码       | 100002401                     |
+| `title`         | 错误标题       | USER_NAME_EMPTY               |
+| `description`   | 错误描述       | user name should not be empty |
+| `description2`  | 错误描述2      | 用户名不可以为空                      |
+| `path`          | field path | user.name                     |
+| `field`         | field name | name                          |
+| `rejectedValue` | 被拒绝值(原值)   | jake                          |
+| `constraint`    | 约束         | NOT_NULL                      |
+| `tips`          | 提示         | 价格必须是正数如:1000.12              |
+| `phase`         | 阶段         | CONTROLLER                    |
+| `severity`      | 严重程度       | ERROR                         |
+| `domain`        | domain     | account                       |
+| `properties`    | 扩展字段（Map）  | -                             |
+| `httpStatus`    | http状态     | BAD_REQUEST                   |
+
+
+#### Phase
+
+| 名称           | 备注         | 例子  |
+|--------------|------------|-----|
+| `CONTROLLER` | Controller | 表单层 |
+| `SERVICE`    | Service    | 服务层 |
+| `DOMAIN`     | Domain     | 领域层 |
+
+
+
+#### Severity
+
+| 名称      | 备注    | 例子         |
+|---------|-------|------------|
+| `LOW`   | Low   | 低,无影响      |
+| `WARN`  | Warn  | 警告,业务错误可重试 |
+| `ERROR` | Error | 错误,业务无法进行  |
+| `FATAL` | Fatal | 灾难,数据破坏    |
+
+
+#### HttpStatus
+
+包含标准的 Http 状态码， 不一一枚举，比如 BAD_REQUEST(400), FORBIDDEN(403);
+
+
+## it-common-mock
+
+mock 实在在没有编写一行代码的情况下可以测试接口的数据格式；有单独 mock 的介绍说明；
+
 
 <TipInfo>To be done 🏗️</TipInfo>
