@@ -1,9 +1,215 @@
 ---
-title: ApiHug Spring Common Extension
-description: ApiHug SDK spring common extension
+title: ApiHug Spring Common 扩展
+description: ApiHug SDK spring common 扩展文档和设计原理
 ---
 
 import { TipInfo } from '@/components/Tip'
 
+## Spring Common
 
-<TipInfo>To be done 🏗️</TipInfo>
+Spring 扩展包， 包含基本共享类和函数，目的：协助更快的开发：<a target="_blank" href="https://search.maven.org/artifact/com.apihug/it-common-spring"><img
+  src="https://img.shields.io/maven-central/v/com.apihug/it-bom.svg?label=Maven%20Central"/></a>
+
+## 功能
+
+不一一枚举，基本都非常直观和简单；使用中可以直接参考源码；
+
+### Common
+
+| 类名                          | 备注                                 |
+|-----------------------------|------------------------------------|
+| `SimpleResultBuilder`       | ResponseEntity builder             |
+| `PageableResultBuilder`     | 支持Pageable ResponseEntity  builder |
+| `RuntimeContextInitializer` | 运行时上下文校验和说明                        |
+
+#### SimpleResultBuilder
+
+ResponseEntity builder 包含:
+
+1. 默认 ResponseEntity 对象上函数
+2. 一般错误如 `HttpStatus.TOO_MANY_REQUESTS`， 人性化接口定义: `tooManyRequests`
+3. `Hope` 定义错误： `Error` or `HopeErrorDetailException`
+
+#### PageableResultBuilder
+
+支持Pageable ResponseEntity  builder, 结果预封装成 `Pageable` 对象，包含：
+
+1. page size
+2. page index
+3. total count
+4. total page
+5. payload: data list
+
+
+#### RuntimeContextInitializer
+
+运行时上下文校验和说明(`RuntimeContext`)
+
+1. 组装运行时: `RuntimeContext` 对象
+2. 运行时，版本冲突，特别是 stub 对于 wire 的依赖， 接口定义是否改变，如果改变是否 `fail-fast` 在 `hope.runtime.check.module` 配置为 `RESTRICT` 模式下
+
+运行时候版本校验包含： 
+
+1. Application version  `RuntimeContextInitializer.getClass().getPackage().getImplementationVersion()` 和运行时项目 `RuntimeContext#getProject` 是否一致。 
+2. 运行时项目  `RuntimeContext#getProject` 和   `RuntimeContext#getProto` 版本对比
+3. `hope-stub.json` 内 `dependencies` 版本对比
+
+<TipInfo>hope.runtime.check.module 默认配置为 UNCHECK， 改为 RESTRICT 任何校验错误将导致程序启动失败 </TipInfo>
+
+
+### Util
+
+| 类名            | 备注                       |
+|---------------|--------------------------|
+| `Helper`      | Http 请求头校验               |
+| `NumberUtils` | Number 帮助函数              |
+| `TripleTypes` | 辅助判断 LONG/STRING/INTEGER |
+
+
+### Audit
+
+和安全相关， 获取 Audit 上下文， 包括： `Identify` 上下文账号信息，    `Tenant`上下文租户信息，一般从 `HopeContextHolder`衍生出来；
+
+| 类名          | 备注      |
+| `AuditContext`     | 获取账户和租户上下文信息 |
+| `AuditContextSupplier`     | Supplier 定制扩展点 |
+
+
+
+### Security
+
+`Hope` 内置 Security 框架协议；
+
+| 类名                                | 备注                         |
+|-----------------------------------|----------------------------|
+| `SecurityContext`                 | Hope 资源(path)安全配置上下文       |
+| `Customer`                        | 用户信息，包含通用Identify&Tenant标识 |
+| `SecurityCustomizer`              | Security上下扩展点，实现定制         |
+| `EmptySecurityContext`            | 默认空 `SecurityContext`      |
+| `QuickCustomerRoleCheckerFactory` | 预置角色快速校验 factory           |
+
+
+**Identify&Tenant** 标识只支持： `LONG`|`STRING`|`INTEGER` 不支持复杂或者组合类型；
+
+预置角色包含 `PredefinedRoleCheckerType`：
+
+| 角色                 | 备注     |
+|--------------------|--------|
+| `TENANT`           | 租户一般用户 |
+| `TENANT_MANAGER`   | 租户管理员  |
+| `TENANT_OWNER`     | 租户拥有者  |
+| `PLATFORM`         | 平台一般用户 |
+| `PLATFORM_MANAGER` | 平台管理员  |
+| `PLATFORM_OWNER`   | 平台拥有者  |
+
+**预置角色** 的配置使用范围有局限性，只有你平台涉及的角色是这样粗粒度配置，否则请使用 `RBAC` 方式配置更灵活。 
+
+具体可以参考： [ApiHug Spring Security 扩展](/zhCN-docs/framework/spring-security)
+
+#### **checker**
+
+**checker** 包，包含 Authority & Role 组合 校验 DSL 定义；仅作为 java annotation 标致，运行时不会读取；
+
+<TipInfo>运行时通过 wire `proto` 内 RBAC 定义实现！</TipInfo>
+
+#### **internal**
+
+1. `Identify` 上下文账号信息，    `Tenant`上下文租户信息
+2. 值类型：`LONG`|`STRING`|`INTEGER`
+
+组合后的 `3*3=9` 种类型预定义 `Customer` 对象
+
+| 类名                                     | Identify | Tenant  |
+|----------------------------------------|----------|---------|
+| `CustomerIntegerIdentifyIntegerTenant` | Integer  | Integer |
+| `CustomerIntegerIdentifyLongTenant`    | Integer  | Long    |
+| `CustomerIntegerIdentifyStringTenant`  | Integer  | String  |
+| `CustomerLongIdentifyIntegerTenant`    | Long     | Integer |
+| `CustomerLongIdentifyLongTenant`       | Long     | Long    |
+| `CustomerLongIdentifyStringTenant`     | Long     | String  |
+| `CustomerStringIdentifyIntegerTenant`  | String   | Integer |
+| `CustomerStringIdentifyLongTenant`     | String   | Long    |
+| `CustomerStringIdentifyStringTenant`   | String   | String  |
+
+
+### Aspect
+
+由于 `Hope` 应用， 基础代码使用代码生成技术，所以 Aspect(切面)无需采用运行时动态代理；
+
+Aspect 协议类其实只包含两个， 在我们的 安全框架里有 `SecurityAspect` 实现安全校验，当然你也可以扩展自己的比如log/audit 之类；
+
+
+| 类名           | 备注     |
+|--------------|--------|
+| `Aspect`     | 租户一般用户 |
+| `AspectType` | 租户管理员  |
+
+Aspect 包含：
+
+1. type `AspectType`
+2. priority 越高优先级别越高
+3. name: 默认类名
+4. before: 前置
+5. after： 后置
+6. exception： 异常
+
+AspectType:
+
+| 类型          | 备注      |
+|-------------|---------|
+| `ALL`       | 所有切面都支持 |
+| `BEFORE`    | 只支持前置   |
+| `AFTER`     | 只支持后置   |
+| `EXCEPTION` | 只支持异常   |
+
+
+
+## Refer
+
+```
+│  PageableResultBuilder.java
+│  RuntimeContextInitializer.java
+│  SimpleResultBuilder.java
+│
+├─aspect
+│      Aspect.java
+│      AspectType.java
+│
+├─audit
+│      AuditContext.java
+│      AuditContextSupplier.java
+│
+├─context
+│      CustomerContext.java
+│      CustomerContextSupplier.java
+│      package-info.java
+│
+├─security
+│  │  AuthorizationToCheckerMapper.java
+│  │  Customer.java
+│  │  EmptySecurityContext.java
+│  │  package-info.java
+│  │  QuickCustomerRoleCheckerFactory.java
+│  │  SecurityContext.java
+│  │  SecurityCustomizer.java
+│  │
+│  ├─checker
+│  │      And.java
+│  └─internal
+│          CustomerIntegerIdentifyIntegerTenant.java
+│          CustomerIntegerIdentifyLongTenant.java
+│          CustomerIntegerIdentifyStringTenant.java
+│          CustomerLongIdentifyIntegerTenant.java
+│          CustomerLongIdentifyLongTenant.java
+│          CustomerLongIdentifyStringTenant.java
+│          CustomerStringIdentifyIntegerTenant.java
+│          CustomerStringIdentifyLongTenant.java
+│          CustomerStringIdentifyStringTenant.java
+│          ImmutableCustomer.java
+│          PredefinedCustomerOption.java
+│
+└─util
+        Helper.java
+        NumberUtils.java
+        TripleTypes.java
+```
