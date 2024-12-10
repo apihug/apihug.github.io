@@ -38,9 +38,12 @@ export const documentationNav = {
     {title: 'Framework Intro', href: '/docs/framework'},
     {title: 'Spring Common', href: '/docs/framework/spring-common'},
     {title: 'Spring Core', href: '/docs/framework/spring-core'},
+    {title: 'Spring Cache', href: '/docs/framework/spring-cache'},
+    {title: 'Spring API', href: '/docs/framework/spring-api'},
     {title: 'Spring Data', href: '/docs/framework/spring-data'},
     {title: 'Spring Security', href: '/docs/framework/spring-security'},
-    {title: 'Widget Authority', href: '/docs/framework/widget/authority'},
+    {title: 'Spring Mock', href: '/docs/framework/spring-mock'},
+    {title: 'Basic Authority', href: '/docs/framework/widget/authority'},
   ],
   "Kola": [
     {title: 'Intro', href: '/docs/kola'},

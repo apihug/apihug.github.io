@@ -5,5 +5,256 @@ description: ApiHug SDK spring data extension
 
 import { TipInfo } from '@/components/Tip'
 
+Implement efficient and simple ORM database management!
+
+1. ORM
+2. Multi Tenant
+3. OLAP/OLTP
+
+## Configuration
+
+Configuration path: `hope.data`; Configuration object: `HopeDataProperties`
+
+| Configuration         | Note                        |
+|-----------------------|-----------------------------|
+| `defaultUserIdString` | Default User ID (String)    |
+| `defaultTenantString` | Default Tenant ID (String)  |
+| `defaultUserId`       | Default User ID (Integer)   |
+| `defaultTenantId`     | Default Tenant ID (Integer) |
+
+Default User ID and Tenant ID are retrieved from the context when data auditing is required. If not provided (e.g., for non-logged-in users), these default values are used.
+
+User ID and Tenant ID must be of type: `LONG` | `STRING` | `INTEGER`.
+
+## Liquibase
+
+`ApiHug` uses `Liquibase` to implement version management and migration of database schemas (for development environments; production environments should be manually maintained).
+
+[Database Initialization - Execute Liquibase Database Migrations on Startup](https://docs.spring.io/spring-boot/how-to/data-initialization.html#howto.data-initialization.migration-tool.liquibase)
+
+Configuration fully utilizes [Spring Data Migration](https://docs.spring.io/spring-boot/appendix/application-properties/index.html#appendix.application-properties.data-migration) regarding the `spring.liquibase` section:
+
+Configuration path: `spring.liquibase`; Configuration object: `LiquibaseProperties`.
+
+| Configuration        | Note                                   |
+|----------------------|----------------------------------------|
+| `enabled`            | Whether to enable Liquibase support.   |
+
+There is also a `no-liquibase` profile setting that forces Liquibase not to start.
+
+<TipInfo>In production environments,</TipInfo>
+
+Table structure migration and generation configurations are maintained by the framework's stub tasks, so development and testing environments can start without additional configuration.
+
+## JDBC
+
+**ApiHug**'s entire JDBC section is built on [Spring Data JDBC](https://docs.spring.io/spring-data/relational/reference/).
+
+Why not use more advanced ORM frameworks like JPA or Hibernate? Due to the inherent heterogeneity of applications and databases, overly complex database interactions (OLAP) can undermine the stability and robustness of core business logic.
+
+Therefore, we directly use JDBC; this makes complex SQL operations through JDBC cumbersome and unpleasant (we provide an alternative OLAP solution).
+
+The core OLTP is provided by Spring Data Repository, which offers a robust and mature solution.
+
+Spring Data only provides the core concept of Repository for data operations, completing basic CRUD operations in a simple and clean manner.
+
+### Entity
+
+**ApiHug** entity objects are defined using `protobuf`, translated using the `wire` command, and finally generated as entity classes in the application module through `stub`.
+
+Supports Jakarta & Spring annotations:
+
+1. `jakarta.persistence`
+2. `org.springframework.data.annotation`
+
+Generates the most standard POJO objects.
+
+### Wire
+
+| Class Name     | Identify                                              |
+|----------------|-------------------------------------------------------|
+| `ALL`          | Supports all protocols listed below                   |
+| `AUDITABLE`    | Auditable: CreatedAt, CreatedBy, UpdatedAt, UpdatedBy |
+| `DELETABLE`    | Deletable: Deleted, DeletedAt, DeletedBy              |
+| `IDENTIFIABLE` | Identifiable: Id                                      |
+| `TENANTABLE`   | Tenantable: TenantId                                  |
+| `VERSIONABLE`  | Versionable: Version                                  |
+| `NONE`         | No protocols                                          |
+
+When defining entities, you can weave in different protocols as needed. **ApiHug** will automatically add extra properties and maintain these value objects.
+
+### DSL
+
+ORM frameworks allow developers to write cleaner and more concise persistence code and domain logic.
+
+However, building a correct and type-safe query API is a design challenge for ORM frameworks.
+
+The widely-used Java ORM framework Hibernate (similar to the JPA standard) introduced a string-based query language called HQL (JPQL), which is very similar to SQL.
+
+The obvious drawback of this approach is the lack of type safety and static query checking. Furthermore, in more complex scenarios (e.g., when queries need to be constructed at runtime based on certain conditions), building HQL queries often involves string concatenation, which is usually unsafe and error-prone.
+
+Are you tired of checking SQL syntax errors in production environments? SQL's expressive power is strong, type-safe, and has rich syntax.
+
+**ApiHug** sets a DSL for SQL, allowing the Java compiler to compile SQL statements, metadata, and data types, checking the correctness of SQL statements at compile time rather than at runtime, thus improving development efficiency and reducing runtime errors.
+
+Achieving truly **Typesafe** SQL!
+
+**ApiHug** SQL DSL draws from JOOQ, MyBatis dynamic SQL, QueryDSL, and other solutions:
+
+1. `proto` meta-entity design
+2. `annotation` entity annotations
+3. Entity companion DSL classes
+
+Combining efficiency, practicality, and safety!
+
+```sql
+  SELECT
+      SYSTEM_PLATFORM_ROLE_AUTHORITY.AUTHORITIES
+  FROM
+      SYSTEM_PLATFORM_ROLE_AUTHORITY
+          JOIN
+      SYSTEM_PLATFORM_ROLE ON SYSTEM_PLATFORM_ROLE_AUTHORITY.ROLE_ID = SYSTEM_PLATFORM_ROLE.ID
+          JOIN
+      SYSTEM_PLATFORM_ACCOUNT_ROLE_MAPPER ON SYSTEM_PLATFORM_ROLE.ID = SYSTEM_PLATFORM_ACCOUNT_ROLE_MAPPER.ROLE_ID
+  WHERE
+      SYSTEM_PLATFORM_ACCOUNT_ROLE_MAPPER.ACCOUNT_ID = ?
+```
+
+Equal Code implementation:
+
+```java
+ final Buildable<SelectModel> selectStatement =
+        select(SYSTEM_PLATFORM_ROLE_AUTHORITY.Authorities)
+            .from(SYSTEM_PLATFORM_ROLE_AUTHORITY)
+            .join(
+                SYSTEM_PLATFORM_ROLE,
+                on(SYSTEM_PLATFORM_ROLE_AUTHORITY.RoleId, equalTo(SYSTEM_PLATFORM_ROLE.Id)))
+            .join(
+                SYSTEM_PLATFORM_ACCOUNT_ROLE_MAPPER,
+                on(SYSTEM_PLATFORM_ROLE.Id, equalTo(SYSTEM_PLATFORM_ACCOUNT_ROLE_MAPPER.RoleId)))
+            // Base on specific account
+            .where(SYSTEM_PLATFORM_ACCOUNT_ROLE_MAPPER.AccountId, isEqualTo(accountId));
+```
+
+### Repository
+The core interface in the Spring Data abstraction is the [Repository](https://docs.spring.io/spring-data/relational/reference/repositories/core-concepts.html). It uses the domain class to be managed and the type of the domain class's identifier as type parameters. This interface primarily serves as a marker interface to capture the type to be handled and helps you discover other interfaces that extend this interface.
+
+> Spring Data considers domain types to be entities, more specifically aggregates.
+> So you will see the term "entity" used throughout the documentation that can be interchanged with the term "domain type" or "aggregate".
+> As you might have noticed in the introduction it already hinted towards domain-driven concepts. We consider domain objects in the sense of DDD. Domain objects have identifiers (otherwise these would be identity-less value objects), and we somehow need to refer to identifiers when working with certain patterns to access data.
+> Referring to identifiers will become more meaningful as we talk about repositories and query methods.
+
+**ApiHug** combines `SimpleJdbcRepository` + DSL
+
+1.  `HopeJdbcRepository` extends `springframework.SimpleJdbcRepository` (`CrudRepository`|`PagingAndSortingRepository`|`QueryByExampleExecutor`)
+2.  Entity DSL definitions are mixed in through `Stub`
+
+A simple `Student` entity `Repository` definition:
+
+
+```java
+public interface StudentEntityRepository 
+    extends HopeJdbc<StudentEntity>, 
+            SampleJdbcSupport, 
+            StudentEntityDSL, 
+            ListCrudRepository<StudentEntity, Long> {
+}
+```
+## Mybatis
+
+In existing business systems at the database interaction layer, besides the inherent heterogeneous nature of the database world and the application world, another complexity arises from the indistinction between OLTP and OLAP.
+
+As mentioned above, **ApiHug** uses the most basic JDBC for OLTP, and DSL solves type safety. So how does it address OLAP?
+
+Inspired by CQRS (Command Query Responsibility Segregation) from DDD (Domain-Driven Design), **ApiHug** presents:
+
+> CQRS is an architectural pattern that separates command (modifying data) and query (reading data) operations.
+
+Thus, OLTP and OLAP should naturally be separated, even if they are based on the same data source! Even if some logic needs to be re-implemented, **ApiHug** recommends the following practices:
+
+1. Cross-table statistics and queries
+2. Complex statistics (beyond basic single-table statistics, such as sum/avg, etc.)
+
+The DSL example code mentioned above is a great illustration.
+
+What about the underlying technology? It is based on [mybatis-dynamic-sql](https://github.com/mybatis/mybatis-dynamic-sql) and the Spring extension [NamedParameterJdbcTemplateExtensions](https://github.com/mybatis/mybatis-dynamic-sql/blob/master/src/main/java/org/mybatis/dynamic/sql/util/spring/NamedParameterJdbcTemplateExtensions.java).
+
+The template classes are all generated uniformly by the `stub` command, allowing the business layer to simply `wire` in the logic. Isn't that convenient?
+
+## Converter
+
+Involves serialization and deserialization of non-`primitive` data types, such as list objects and Enum type values.
+
+**Built-in**:
+
+| Class Name                    | Remarks                            |
+|-------------------------------|------------------------------------|
+| BigDecimalListReaderConverter | BigDecimal List deserialization    |
+| BigDecimalListWriterConverter | BigDecimal List serialization      |
+| BooleanListWriterConverter    | Boolean List serialization         |
+| BooleanListReaderConverter    | Boolean List deserialization       |
+| ByteListReaderConverter       | Byte List serialization            |
+| ByteListWriterConverter       | Byte List deserialization          |
+| DateListReaderConverter       | LocalDate List serialization       |
+| DateListWriterConverter       | LocalDate List deserialization     |
+| DateTimeListReaderConverter   | LocalDateTime List serialization   |
+| DateTimeListWriterConverter   | LocalDateTime List deserialization |
+| DoubleListReaderConverter     | Double List serialization          |
+| DoubleListWriterConverter     | Double List deserialization        |
+| FloatListReaderConverter      | Float List serialization           |
+| FloatListWriterConverter      | Float List deserialization         |
+| IntegerListReaderConverter    | Integer List serialization         |
+| IntegerListWriterConverter    | Integer List deserialization       |
+| LongListReaderConverter       | Long List serialization            |
+| LongListWriterConverter       | Long List deserialization          |
+| ShortListReaderConverter      | Short List serialization           |
+| ShortListWriterConverter      | Short List deserialization         |
+| StringListReaderConverter     | String List serialization          |
+| StringListWriterConverter     | String List deserialization        |
+| TimeListWriterConverter       | LocalTime List serialization       |
+| TimeListReaderConverter       | LocalTime List deserialization     |
+
+In addition to the built-in converters, you can also extend them. By defining Enum value types through `proto`, the framework has already pre-generated the relevant converters and automatically registered them in the context.
+
+For instance, if there is an `AccountStatusEnum` enum type, **ApiHug** will automatically generate and register the following converters:
+
+| Class Name                            | Remarks                                         |
+|---------------------------------------|-------------------------------------------------|
+| AccountStatusEnumReaderTitleConverter | AccountStatusEnum deserialization by title      |
+| AccountStatusEnumWriterTitleConverter | AccountStatusEnum serialization by title        |
+| AccountStatusEnumListWriterConverter  | AccountStatusEnum List deserialization by title |
+| AccountStatusEnumListReaderConverter  | AccountStatusEnum List serialization by title   |
+
+
+## Pageable
+
+You can implement pagination queries using [Criteria](https://docs.spring.io/spring-data/relational/reference/jdbc/entity-persistence.html#jdbc.criteria) + [Pageable](https://docs.spring.io/spring-data/relational/reference/repositories/query-methods-details.html#repositories.special-parameters):
+
+
+```java
+@Derived
+@Query
+default Page<Account> queryPlatformAccount(QueryPlatformAccountRequest request, PageRequest pageParameter) {
+      Criteria criteria = EasyCriteria
+                            .in(Domain.Type,Constant.AccountTypes.PLATFORM_ACCOUNT_TYPE_NAME)
+                            .and(EasyCriteria.like(Domain.Name, request.getName()))
+                            .and(EasyCriteria.eq(Domain.Email, request.getEmail()));
+      return findAll(criteria, page(pageParameter));
+}
+```
+
+
+## Multi Data Source
 
 <TipInfo>To be done 🏗️</TipInfo>
+
+
+## Refer
+
+1. [jOOQ](https://www.jooq.org/) generates Java code from your database and lets you build type safe SQL queries through its fluent API.
+2. [mybatis-dynamic-sql](https://github.com/mybatis/mybatis-dynamic-sql) About SQL DSL (Domain Specific Language) for Kotlin and Java. Supports rendering for MyBatis or Spring JDBC Templates
+3. [querydsl](http://querydsl.com/) Unified Queries for Java.Querydsl is compact, safe and easy to learn.
+4. [Intro to Querydsl](https://www.baeldung.com/intro-to-querydsl)
+5. [Spring Data Using jOOQ](https://docs.spring.io/spring-boot/reference/data/sql.html#data.sql.jooq)
+6. [JPQL](https://www.javatpoint.com/jpa-jpql-introduction)
+7. [HQL](https://www.javatpoint.com/hql)

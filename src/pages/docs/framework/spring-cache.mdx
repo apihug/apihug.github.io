@@ -1,0 +1,135 @@
+---
+title: ApiHug Spring Cache Extension
+description: ApiHug SDK Spring Cache Extension
+---
+
+## Cache
+
+Includes a simple wrapper for [spring-cache](https://docs.spring.io/spring-boot/reference/io/caching.html):
+
+1. Wrapper for Caffeine, Redis, Ehcache
+2. Error handling and encapsulation via `HopeCacheErrorHandler`
+3. `RedissonClient` auto-configuration when `hope.redis.enable=true`
+4. Support for `@EnableCaffeineCaching`, `@EnableRedisCaching`, `@EnableEhcacheCaching`
+
+### Configuration
+
+#### Cache Configuration
+
+`hope.cache` configuration path, configuration object: `HopeCacheProperties`
+
+| Configuration                          | Note                                                                                                                                                                                     |
+|----------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `caffeine`                             | **Caffeine Configuration**                                                                                                                                                               |
+| `caffeine.allowInFlightCacheCreation`  | Whether to allow the creation of undefined caches                                                                                                                                        |
+| `caffeine.timeToLive`                  | Default TTL                                                                                                                                                                              |
+| `caffeine.caches`                      | Multiple cache configuration map, refer to [CaffeineSpec](https://github.com/ben-manes/caffeine/blob/master/caffeine/src/main/java/com/github/benmanes/caffeine/cache/CaffeineSpec.java) |
+| `caffeine.caches[*].initialCapacity`   | Refer to `CaffeineSpec`                                                                                                                                                                  |
+| `caffeine.caches[*].maximumWeight`     | Refer to `CaffeineSpec`                                                                                                                                                                  |
+| `caffeine.caches[*].maximumSize`       | Refer to `CaffeineSpec`                                                                                                                                                                  |
+| `caffeine.caches[*].recordStats`       | Refer to `CaffeineSpec`                                                                                                                                                                  |
+| `caffeine.caches[*].keyStrength`       | Refer to `CaffeineSpec`                                                                                                                                                                  |
+| `caffeine.caches[*].valueStrength`     | Refer to `CaffeineSpec`                                                                                                                                                                  |
+| `caffeine.caches[*].expireAfterWrite`  | Refer to `CaffeineSpec`                                                                                                                                                                  |
+| `caffeine.caches[*].expireAfterAccess` | Refer to `CaffeineSpec`                                                                                                                                                                  |
+| `caffeine.caches[*].refreshAfterWrite` | Refer to `CaffeineSpec`                                                                                                                                                                  |
+| `redis`                                | **Redis Configuration**                                                                                                                                                                  |
+| `redis.allowInFlightCacheCreation`     | Whether to allow the creation of undefined caches                                                                                                                                        |
+| `redis.timeToLive`                     | Default TTL                                                                                                                                                                              |
+| `redis.caches`                         | Multiple cache configuration map                                                                                                                                                         |
+| `redis.caches[*].timeToLive`           | Individual cache TTL                                                                                                                                                                     |
+| `redis.caches[*].cacheNullValues`      | Allow NULL values in individual cache                                                                                                                                                    |
+| `redis.caches[*].keyPrefix`            | Key prefix for individual cache                                                                                                                                                          |
+| `redis.caches[*].useKeyPrefix`         | Use key prefix for individual cache                                                                                                                                                      |
+| `redis.caches[*].enableStatistics`     | Enable statistics for individual cache                                                                                                                                                   |
+| `redis.caches[*].enableTransactions`   | Enable transaction management for individual cache                                                                                                                                       |
+| `redis.caches[*].serializer`           | Serializer for individual cache                                                                                                                                                          |
+| `ehCache`                              | **EhCache Configuration**                                                                                                                                                                |
+| `ehCache.heap`                         | Number of heap entities                                                                                                                                                                  |
+| `ehCache.offHeap`                      | OffHeap size (storage)                                                                                                                                                                   |
+| `ehCache.disk`                         | Disk size (storage)                                                                                                                                                                      |
+| `ehCache.duration`                     | Default TTL                                                                                                                                                                              |
+| `ehCache.caches`                       | Various EhCache configurations                                                                                                                                                           |
+| `ehCache.caches[*].keyClz`             | Key type                                                                                                                                                                                 |
+| `ehCache.caches[*].valueClz`           | Value type                                                                                                                                                                               |
+| `ehCache.caches[*].heap`               | Number of heap entities                                                                                                                                                                  |
+| `ehCache.caches[*].offHeap`            | OffHeap size (storage)                                                                                                                                                                   |
+| `ehCache.caches[*].disk`               | Disk size (storage)                                                                                                                                                                      |
+| `ehCache.caches[*].duration`           | TTL                                                                                                                                                                                      |
+| `errorPolicy`                          | Error handling policy                                                                                                                                                                    |
+| `errorPolicy.swallowGetException`      | Ignore Get errors                                                                                                                                                                        |
+| `errorPolicy.swallowPutException`      | Ignore Put errors                                                                                                                                                                        |
+| `errorPolicy.swallowEvictException`    | Ignore Evict errors                                                                                                                                                                      |
+| `errorPolicy.swallowClearException`    | Ignore Clear errors                                                                                                                                                                      |
+| `errorPolicy.logStackTraces`           | Print error stack traces                                                                                                                                                                 |
+| `timeToLive`                           | Default TTL (fallback)                                                                                                                                                                   |
+
+#### Redis Configuration
+
+Configuration path: `hope.redis`; Configuration object: `HopeRedisProperties`
+
+Merged with Spring's own configuration:
+
+1. [Spring Boot CacheProperties](https://github.com/spring-projects/spring-boot/blob/main/spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/cache/CacheProperties.java)
+2. [Spring Data RedisProperties](https://github.com/spring-projects/spring-boot/blob/main/spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/data/redis/RedisProperties.java)
+3. [Spring Boot CacheAutoConfiguration](https://github.com/spring-projects/spring-boot/blob/main/spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/cache/CacheAutoConfiguration.java)
+4. [Spring Boot Cache](https://docs.spring.io/spring-boot/reference/io/caching.html)
+5. [Spring Cache spring.cache](https://docs.spring.io/spring-boot/appendix/application-properties/index.html#appendix.application-properties.cache)
+6. [Spring Data Redis spring.data.redis](https://docs.spring.io/spring-boot/appendix/application-properties/index.html#appendix.application-properties.data)
+
+Hope further draws on the **spring.data.redis** configuration style, and is quite similar to [Spring Data RedisProperties](https://github.com/spring-projects/spring-boot/blob/main/spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/data/redis/RedisProperties.java);
+
+| Configuration           | Note                                                                                                                                        |
+|-------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
+| `cluster`               | Cluster node configuration                                                                                                                  |
+| `cluster.max-redirects` | Maximum number of redirects to follow when executing commands across the cluster.                                                           |
+| `cluster.nodes`         | List of "host:port" pairs to bootstrap from. This represents an "initial" list of cluster nodes and is required to have at least one entry. |
+| `sentinel`              | Sentinel nodes                                                                                                                              |
+| `sentinel.master`       | Sentinel master node                                                                                                                        |
+| `sentinel.nodes`        | List of "host:port" pairs.                                                                                                                  |
+| `sentinel.username`     | Login username for authenticating with sentinel(s).                                                                                         |
+| `sentinel.password`     | Password for authenticating with sentinel(s).                                                                                               |
+| `master`                | Configuration method for master and slaves                                                                                                  |
+| `master.master`         | Master node host:port                                                                                                                       |
+| `master.slaves`         | Slave node host:port list                                                                                                                   |
+| `master.username`       | Username                                                                                                                                    |
+| `master.password`       | Password                                                                                                                                    |
+| `database`              | Database index used by the connection factory.                                                                                              |
+| `enable`                | -                                                                                                                                           |
+| `config`                | Import Redisson [configuration file](https://redisson.org/docs/configuration/) via path                                                     |
+| `url`                   | Connection URL. Overrides host, port, username, and password. Example: redis://user:password@example.com:6379                               |
+| `host`                  | Redis server host.                                                                                                                          |
+| `username`              | Login username of the Redis server.                                                                                                         |
+| `password`              | Login password of the Redis server.                                                                                                         |
+| `port`                  | Redis server port.                                                                                                                          |
+| `ssl`                   | Whether to enable SSL support.                                                                                                              |
+| `poolSize`              | Connection pool size                                                                                                                        |
+| `idleSize`              | Minimum number of idle connections                                                                                                          |
+| `idleTimeout`           | Idle connection timeout, unit: milliseconds                                                                                                 |
+| `connectionTimeout`     | Connection timeout, unit: milliseconds                                                                                                      |
+| `timeout`               | Command wait timeout, unit: milliseconds                                                                                                    |
+| `clientName`            | Client name to be set on connections with `CLIENT SETNAME`.                                                                                 |
+
+### Error Handling
+
+Handled according to the `errorPolicy` configuration. If an error needs to be thrown, it will be assembled into `CacheErrorsEnum` output:
+
+| Error Code | Error Title                 | Error Description                 | Error Description 2       |
+|------------|-----------------------------|-----------------------------------|---------------------------|
+| 1002000001 | FAIL_GET_CACHE              | Fail to get data from the cache   | Cache miss                |
+| 1002000002 | FAIL_EVICT_CACHE            | Fail to evict data from the cache | Cache clear failure       |
+| 1002000003 | FAIL_PUT_CACHE              | Fail to put data to the cache     | Cache update failure      |
+| 1002000004 | FAIL_CLEAR_CACHE            | Fail to clear cache               | Cache clear failure       |
+| 1002000005 | FAIL_CREATE_CACHE           | Fail to create cache              | Cache creation error      |
+| 1002000006 | CACHE_CONFIGURATION_ILLEGAL | Cache configuration illegal       | Cache configuration error |
+
+### ~hope.cache.type~
+
+Old control method, triggering configuration context based on ~hope.cache.type~ type is no longer supported!
+
+1. CAFFEINE: Explicitly via `@EnableCaffeineCaching`
+2. REDIS: Explicitly via `@EnableRedisCaching`
+3. JCACHE: Explicitly via `@EnableEhcacheCaching`
+
+
+## Sample

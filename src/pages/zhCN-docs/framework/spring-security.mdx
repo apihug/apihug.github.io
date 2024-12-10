@@ -5,7 +5,44 @@ description: ApiHug SDK spring security extension
 
 import { TipInfo } from '@/components/Tip'
 
-[极简 Authentication & Authorization](/zhCN-docs/framework/widget/authority)
+安全框架是一个提供身份验证（authentication）、授权（authorization）和防止常见攻击的框架。
+
+**ApiHug** 提供了一个极简又凑效的解决安全解决方案，有别于传统 Apache Shiro, 或者 Spring Security。
+
+底层依然是基于资源(Resource 也就是API)权限管理；再集合角色，就是一个最最简单的 RBAC架构, 能够做到开箱及用。
+
+## 协议
+
+Proto 层如何定义协议 [极简 Authentication & Authorization](/zhCN-docs/framework/widget/authority)
+
+## 实现
+
+1. SecurityAspect  切面 Aspect
+2. SecurityContext: 运行时候 security context, 包括资源 到 CheckerAuthorization 映射
+3. HopeSecurityManager 运行时 security 参数组装
+4. JWTFilter jwt filter 过滤
+
+目前**Aspect** SecurityAspect 切面只支持 **BEFORE** 也就是进入资源(API)业务逻辑前校验。
+
+### 配置
+
+配置路径 `hope.security`； 配置对象 `HopeSecurityProperties`。
+
+| 配置                                        | 备注                       |
+|-------------------------------------------|--------------------------|
+| `enabled`                                 | 是否启用 ApiHug Security.    |
+| `jwt`                                     | JWT 配置.                  |
+| `jwt.base64Secret`                        | Base64 secret.           |
+| `jwt.secret`                              | secret.                  |
+| `jwt.tokenValidityInSecondsForRememberMe` | Remember me 时候有效期，默认30天. |
+| `jwt.tokenValidityInSeconds`              | 默认有效时间，7天.               |
 
 
 <TipInfo>To be done 🏗️</TipInfo>
+
+## Refer
+
+1. [极简 Authentication & Authorization](/zhCN-docs/framework/widget/authority)
+2. [Spring Security](https://docs.spring.io/spring-security/reference/index.html)
+3. [Apache Shiro](https://shiro.apache.org/)
+4. [RBAC - Role-based access control](https://en.wikipedia.org/wiki/Role-based_access_control)

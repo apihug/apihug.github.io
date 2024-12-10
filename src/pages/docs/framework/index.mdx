@@ -1,9 +1,144 @@
 ---
-title: ApiHug SDK Common Extension
-description: ApiHug SDK Common extension
+title: ApiHug SDK Extension
+description: ApiHug SDK Extension
 ---
 
 import { TipInfo } from '@/components/Tip'
+
+## Common
+
+`Hope` brings several extensions to the framework layer:
+
+| Module                    | Note                                                                  |
+|---------------------------|-----------------------------------------------------------------------|
+| `it-common`               | Includes: Common utility classes (Utils), common protocol definitions |
+| `it-common-api`           | Involves common API classes, auxiliary class definitions              |
+| `it-common-mock`          | Runtime mock context definitions                                      |
+| `it-common-spring`        | Spring extensions, detailed reference in the Spring series below      |
+| `it-common-spring-common` | Common Spring extensions                                              |
+| `it-common-spring-api`    | Spring API definition extensions                                      |
+| `it-common-spring-cache`  | Spring cache extensions                                               |
+| `it-common-spring-core`   | Spring core extensions                                                |
+| `it-common-spring-data`   | Spring data extensions                                                |
+| `it-common-spring-mock`   | Spring mock extensions                                                |
+
+
+## it-common
+
+| Package Name  | Note                                                                                        | Scope        |
+|---------------|---------------------------------------------------------------------------------------------|--------------|
+| `async`       | Contains two common Executor Global helper classes                                          | Optional     |
+| `contract`    | Contract testing protocol definitions                                                       | Mock usage   |
+| `enumeration` | Constant definition protocol                                                                | **Required** |
+| `meta`        | Framework `meta` information definitions, required by the framework (not needed at runtime) | Framework    |
+| `persistence` | Framework ORM definition information, required by the framework (not needed at runtime)     | Framework    |
+| `runtime`     | Runtime context, exposed as actuator information, handled by the framework                  | Framework    |
+| `script`      | Embedded scripts needed for IDEA extensions, not needed at runtime                          | Framework    |
+| `service`     | API service information annotations, runtime information                                    | Framework    |
+
+1. Most are objects that the framework relies on at runtime and are generally not referenced in your business logic code;
+2. `enumeration` is a fixed pattern for constants defined within the framework that need to be exposed externally, defined using proto will automatically conform to this standard;
+
+## it-common-api
+
+Includes common data types and helper classes for API runtime definitions;
+
+| Class Name      | Note                              |
+|-----------------|-----------------------------------|
+| `PageRequest`   | Pagination query parameter object |
+| `Pageable`      | Paginated dataset                 |
+| `Result`        | Standard API return result        |
+| `ResultBuilder` | Result Builder                    |
+
+### Pagination
+
+Refer to Spring:
+
+1. [Spring Data PageRequest](https://github.com/spring-projects/spring-data-commons/blob/main/src/main/java/org/springframework/data/domain/PageRequest.java)
+2. [Spring Data Pageable](https://github.com/spring-projects/spring-data-commons/blob/main/src/main/java/org/springframework/data/domain/Pageable.java)
+
+**Pagination Request - PageRequest**
+
+| Name     | Note                                                                                                                           |
+|----------|--------------------------------------------------------------------------------------------------------------------------------|
+| `page`   | Zero-based page index (0..N)                                                                                                   |
+| `size`   | Size of the page to be returned                                                                                                |
+| `offSet` | Infinite scroll load; this is the last offset if any key is specific                                                           |
+| `sort`   | Sorting criteria in the format: property,(asc or desc). Default sort order is ascending. Multiple sort criteria are supported. |
+
+
+**Paginated Dataset - Pageable**
+
+| Name        | Note                           |
+|-------------|--------------------------------|
+| `pageIndex` | Current page number            |
+| `pageSize`  | Number of objects on this page |
+| `totalPage` | Total count                    |
+| `totalPage` | Total number of pages          |
+| `data`      | List of objects                |
+
+### Response Body
+
+**Return Object - Result**
+
+| Name      | Note                                                            |
+|-----------|-----------------------------------------------------------------|
+| `code`    | Return code, non-zero indicates failure, zero indicates success |
+| `message` | Return prompt message                                           |
+| `payload` | Information carrier (generic type object T)                     |
+| `errors`  | List of errors `Error`                                          |
+
+
+### Error
+
+`Hope` general error definitions:
+
+| Name            | Note                            | Example                       |
+|-----------------|---------------------------------|-------------------------------|
+| `code`          | Error code                      | 100002401                     |
+| `title`         | Error title                     | USER_NAME_EMPTY               |
+| `description`   | Error description               | user name should not be empty |
+| `description2`  | Error description 2             | 用户名不可以为空                      |
+| `path`          | Field path                      | `user.name`                   |
+| `field`         | Field name                      | `name`                        |
+| `rejectedValue` | Rejected value (original value) | jake                          |
+| `constraint`    | Constraint                      | NOT_NULL                      |
+| `tips`          | Tips                            | 价格必须是正数如:1000.12              |
+| `phase`         | Phase                           | CONTROLLER                    |
+| `severity`      | Severity                        | ERROR                         |
+| `domain`        | Domain                          | account                       |
+| `properties`    | Extended fields (Map)           | -                             |
+| `httpStatus`    | HTTP status                     | BAD_REQUEST                   |
+
+
+#### Phase
+
+| Name         | Note       | Example       |
+|--------------|------------|---------------|
+| `CONTROLLER` | Controller | Form layer    |
+| `SERVICE`    | Service    | Service layer |
+| `DOMAIN`     | Domain     | Domain layer  |
+
+
+
+#### Severity
+
+| Name    | Note  | Example                                |
+|---------|-------|----------------------------------------|
+| `LOW`   | Low   | Low, no impact                         |
+| `WARN`  | Warn  | Warning, business error can be retried |
+| `ERROR` | Error | Error, business cannot proceed         |
+| `FATAL` | Fatal | Disaster, data corruption              |
+
+
+#### HttpStatus
+
+Includes standard HTTP status codes, not enumerated one by one, such as `BAD_REQUEST(400)`, `FORBIDDEN(403)`;
+
+
+## it-common-mock
+
+Mock allows testing interface data formats without writing a single line of code; there is a separate introduction and explanation for mocking;
 
 
 <TipInfo>To be done 🏗️</TipInfo>

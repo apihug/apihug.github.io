@@ -5,5 +5,44 @@ description: ApiHug SDK spring security extension
 
 import { TipInfo } from '@/components/Tip'
 
+The security framework provides authentication, authorization, and protection against common attacks.
+
+**ApiHug** offers a minimalist and efficient security solution, different from traditional frameworks like Apache Shiro or Spring Security.
+
+It is still based on resource (API) permission management, combined with roles, creating a very simple RBAC (Role-Based Access Control) structure that is ready to use out of the box.
+
+## Protocol
+
+How to define the protocol at the Proto layer: [Minimal Authentication & Authorization](/zhCN-docs/framework/widget/authority)
+
+## Implementation
+
+1. SecurityAspect: Aspect
+2. SecurityContext: Runtime security context, including resource to CheckerAuthorization mapping
+3. HopeSecurityManager: Runtime security parameter assembly
+4. JWTFilter: JWT filter
+
+Currently, the **Aspect** SecurityAspect only supports **BEFORE** checks, meaning it validates before entering the resource (API) business logic.
+
+### Configuration
+
+Configuration path: `hope.security`; Configuration object: `HopeSecurityProperties`.
+
+| Configuration                             | Remarks                                              |
+|-------------------------------------------|------------------------------------------------------|
+| `enabled`                                 | Whether to enable ApiHug Security.                   |
+| `jwt`                                     | JWT configuration.                                   |
+| `jwt.base64Secret`                        | Base64 secret.                                       |
+| `jwt.secret`                              | Secret.                                              |
+| `jwt.tokenValidityInSecondsForRememberMe` | Validity period for Remember Me, default is 30 days. |
+| `jwt.tokenValidityInSeconds`              | Default validity time, 7 days.                       |
+
 
 <TipInfo>To be done 🏗️</TipInfo>
+
+## Refer
+
+1. [Authentication & Authorization](/docs/framework/widget/authority)
+2. [Spring Security](https://docs.spring.io/spring-security/reference/index.html)
+3. [Apache Shiro](https://shiro.apache.org/)
+4. [RBAC - Role-based access control](https://en.wikipedia.org/wiki/Role-based_access_control)

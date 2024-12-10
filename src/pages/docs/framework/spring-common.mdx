@@ -1,9 +1,208 @@
 ---
 title: ApiHug Spring Common Extension
-description: ApiHug SDK spring common extension
+description: ApiHug SDK spring common Extension
 ---
 
 import { TipInfo } from '@/components/Tip'
 
+## Spring Common
 
-<TipInfo>To be done 🏗️</TipInfo>
+Spring extension package that includes basic shared classes and functions, aimed at facilitating faster development: <a target="_blank" href="https://search.maven.org/artifact/com.apihug/it-common-spring"><img
+src="https://img.shields.io/maven-central/v/com.apihug/it-bom.svg?label=Maven%20Central"/></a>
+
+## Features
+
+Not enumerating all; generally very intuitive and simple; you can directly refer to the source code during use.
+
+### Common
+
+| Class Name                    | Note                                 |
+|-------------------------------|--------------------------------------|
+| `SimpleResultBuilder`         | ResponseEntity builder               |
+| `PageableResultBuilder`       | Supports Pageable ResponseEntity builder |
+| `RuntimeContextInitializer`   | Runtime context validation and description |
+
+#### SimpleResultBuilder
+
+The ResponseEntity builder includes:
+
+1. Default functions on the ResponseEntity object
+2. Common errors like `HttpStatus.TOO_MANY_REQUESTS`, with user-friendly interface definition: `tooManyRequests`
+3. `Hope` defined errors: `Error` or `HopeErrorDetailException`
+
+#### PageableResultBuilder
+
+Supports Pageable ResponseEntity builder, result pre-packaged as a `Pageable` object, including:
+
+1. pageIndex: Current page number
+2. pageSize: Number of objects on this page
+3. totalCount: Total count
+4. totalPage: Total pages
+5. data: List of objects
+
+#### RuntimeContextInitializer
+
+Runtime context validation and description (`RuntimeContext`):
+
+1. Assembles runtime: `RuntimeContext` object
+2. Runtime version conflicts, particularly regarding stub dependencies on wire; checks if interface definitions have changed and whether to `fail-fast` under `hope.runtime.check.module` configuration set to `RESTRICT` mode.
+
+Runtime version validation includes:
+
+1. Application version `RuntimeContextInitializer.getClass().getPackage().getImplementationVersion()` compared with `RuntimeContext#getProject`.
+2. Runtime project `RuntimeContext#getProject` compared with `RuntimeContext#getProto` version.
+3. Version comparison of `dependencies` within `hope-stub.json`.
+
+<TipInfo> The default configuration for `hope.runtime.check.module` is UNCHECK; changing it to RESTRICT will cause any validation errors to lead to program startup failure. </TipInfo>
+
+### Util
+
+| Class Name    | Note                                       |
+|---------------|--------------------------------------------|
+| `Helper`      | Http request header validation             |
+| `NumberUtils` | Number utility functions                   |
+| `TripleTypes` | Assists in determining LONG/STRING/INTEGER |
+
+### Audit
+
+Related to security, retrieving the Audit context, including: `Identify` context account information and `Tenant` context tenant information, generally derived from `HopeContextHolder`;
+
+| Class Name             | Note                                             |
+|------------------------|--------------------------------------------------|
+| `AuditContext`         | Retrieves account and tenant context information |
+| `AuditContextSupplier` | Custom extension point for suppliers             |
+
+### Security
+
+Built-in security framework protocol for `Hope`;
+
+| Class Name                        | Note                                                             |
+|-----------------------------------|------------------------------------------------------------------|
+| `SecurityContext`                 | Hope resource (path) security configuration context              |
+| `Customer`                        | User information, including common Identify & Tenant identifiers |
+| `SecurityCustomizer`              | Security extension point for customization                       |
+| `EmptySecurityContext`            | Default empty `SecurityContext`                                  |
+| `QuickCustomerRoleCheckerFactory` | Predefined role quick-check factory                              |
+
+**Identify & Tenant** identifiers only support: `LONG` | `STRING` | `INTEGER` and do not support complex or composite types;
+
+The predefined roles include `PredefinedRoleCheckerType`:
+
+| Role               | Note                   |
+|--------------------|------------------------|
+| `TENANT`           | General tenant user    |
+| `TENANT_MANAGER`   | Tenant administrator   |
+| `TENANT_OWNER`     | Tenant owner           |
+| `PLATFORM`         | General platform user  |
+| `PLATFORM_MANAGER` | Platform administrator |
+| `PLATFORM_OWNER`   | Platform owner         |
+
+**Predefined roles** have limited configuration scope; they are suitable for coarse-grained roles involved in your platform. For finer-grained configuration, please use `RBAC`.
+
+Refer to: [ApiHug Spring Security Extensions](/zhCN-docs/framework/spring-security)
+
+#### **checker**
+
+The **checker** package contains Authority & Role combination validation DSL definitions; it serves only as Java annotations and will not be read at runtime.
+
+<TipInfo>Runtime implementation is achieved through wire `proto` with RBAC definitions!</TipInfo>
+
+#### **internal**
+
+1. `Identify` context account information and `Tenant` context tenant information
+2. Value types: `LONG` | `STRING` | `INTEGER`
+
+This results in a predefined `Customer` object with `3*3=9` combinations:
+
+| Class Name                                     | Identify | Tenant   |
+|------------------------------------------------|----------|----------|
+| `CustomerIntegerIdentifyIntegerTenant`         | Integer  | Integer  |
+| `CustomerIntegerIdentifyLongTenant`            | Integer  | Long     |
+| `CustomerIntegerIdentifyStringTenant`          | Integer  | String   |
+| `CustomerLongIdentifyIntegerTenant`            | Long     | Integer  |
+| `CustomerLongIdentifyLongTenant`               | Long     | Long     |
+| `CustomerLongIdentifyStringTenant`             | Long     | String   |
+| `CustomerStringIdentifyIntegerTenant`          | String   | Integer  |
+| `CustomerStringIdentifyLongTenant`             | String   | Long     |
+| `CustomerStringIdentifyStringTenant`           | String   | String   |
+
+### Aspect
+
+Due to the application of `Hope`, the base code employs code generation technology, so aspects do not require runtime dynamic proxies.
+
+The Aspect protocol class includes only two; in our security framework, there is a `SecurityAspect` that implements security checks. You can also extend your own, such as for logging or auditing.
+
+| Class Name   | Note              |
+|--------------|-------------------|
+| `Aspect`     | Aspect definition |
+| `AspectType` | Aspect type       |
+
+Aspects include:
+
+1. type `AspectType`
+2. priority: Higher values indicate higher priority
+3. name: Default class name
+4. before: Before advice
+5. after: After advice
+6. exception: Exception advice
+
+AspectType:
+
+| Type        | Note                           |
+|-------------|--------------------------------|
+| `ALL`       | All aspects supported          |
+| `BEFORE`    | Only supports before advice    |
+| `AFTER`     | Only supports after advice     |
+| `EXCEPTION` | Only supports exception advice |
+
+
+
+## Refer
+
+```
+│  PageableResultBuilder.java
+│  RuntimeContextInitializer.java
+│  SimpleResultBuilder.java
+│
+├─aspect
+│      Aspect.java
+│      AspectType.java
+│
+├─audit
+│      AuditContext.java
+│      AuditContextSupplier.java
+│
+├─context
+│      CustomerContext.java
+│      CustomerContextSupplier.java
+│      package-info.java
+│
+├─security
+│  │  AuthorizationToCheckerMapper.java
+│  │  Customer.java
+│  │  EmptySecurityContext.java
+│  │  package-info.java
+│  │  QuickCustomerRoleCheckerFactory.java
+│  │  SecurityContext.java
+│  │  SecurityCustomizer.java
+│  │
+│  ├─checker
+│  │      And.java
+│  └─internal
+│          CustomerIntegerIdentifyIntegerTenant.java
+│          CustomerIntegerIdentifyLongTenant.java
+│          CustomerIntegerIdentifyStringTenant.java
+│          CustomerLongIdentifyIntegerTenant.java
+│          CustomerLongIdentifyLongTenant.java
+│          CustomerLongIdentifyStringTenant.java
+│          CustomerStringIdentifyIntegerTenant.java
+│          CustomerStringIdentifyLongTenant.java
+│          CustomerStringIdentifyStringTenant.java
+│          ImmutableCustomer.java
+│          PredefinedCustomerOption.java
+│
+└─util
+        Helper.java
+        NumberUtils.java
+        TripleTypes.java
+```

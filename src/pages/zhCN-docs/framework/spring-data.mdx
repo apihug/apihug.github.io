@@ -91,7 +91,7 @@ ORM框架使得开发者能够编写更干净、更简洁的持久化代码和�
 
 然而，对于ORM框架来说，构建正确且类型安全的查询API是一个设计上的挑战。
 
-在广泛使用的Java ORM框架Hibernate（以及与之密切相关的JPA标准），它提出了一个基于字符串的查询语言HQL（JPQL），与SQL非常相似。
+在广泛使用的Java ORM框架Hibernate（类似JPA标准），提出了一个基于字符串的查询语言HQL（JPQL），与SQL非常相似。
 
 这种方法的明显缺点是缺乏类型安全性和静态查询检查。此外，在更复杂的情况下（例如，当查询需要根据某些条件在运行时构建时），构建HQL查询通常涉及到字符串的拼接，这通常是不安全的，并且容易出错。
 
@@ -260,3 +260,5 @@ default Page<Account> queryPlatformAccount(QueryPlatformAccountRequest request, 
 3. [querydsl](http://querydsl.com/) Unified Queries for Java.Querydsl is compact, safe and easy to learn.
 4. [Intro to Querydsl](https://www.baeldung.com/intro-to-querydsl)
 5. [Spring Data Using jOOQ](https://docs.spring.io/spring-boot/reference/data/sql.html#data.sql.jooq)
+6. [JPQL](https://www.javatpoint.com/jpa-jpql-introduction)
+7. [HQL](https://www.javatpoint.com/hql)

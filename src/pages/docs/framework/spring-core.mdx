@@ -1,9 +1,203 @@
 ---
 title: ApiHug Spring Core Extension
-description: ApiHug SDK spring core extension
+description: ApiHug SDK Spring Core Extension
 ---
 
-import { TipInfo } from '@/components/Tip'
+Includes:
+
+1. Error Handling
+2. General Validation
+3. Actuator
+4. Aspect
+
+## Error Handling
+
+Reference solutions:
+
+1. Zalando [problem-spring-web](https://github.com/zalando/problem-spring-web)
+2. [A Guide to the Problem Spring Web Library](https://www.baeldung.com/problem-spring-web)
+3. [Spring Error Handing](https://docs.spring.io/spring-boot/reference/web/servlet.html#web.servlet.spring-mvc.error-handling)
+4. [Spring Error Responses](https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-ann-rest-exceptions.html)
+5. [RFC9457 - Problem Details for HTTP APIs](https://datatracker.ietf.org/doc/html/rfc9457)
+
+`HopeExceptionHandler` is an implementation of `@ControllerAdvice`.
+
+1. Finds the most suitable Exception Handler based on the exception class.
+2. Handles exceptions.
+3. Adds exception headers (HTTP).
+4. Prints exceptions.
+5. Returns results.
+
+### Built-in Error Handling
+
+| Class Name                                        | Note                                                                                                      |
+|---------------------------------------------------|-----------------------------------------------------------------------------------------------------------|
+| AsyncRequestTimeoutExceptionHandler               | Handles AsyncRequestTimeoutException                                                                      |
+| BindExceptionHandler                              | Handles BindingResult                                                                                     |
+| ConstraintViolationExceptionHandler               | Handles ConstraintViolationException                                                                      |
+| HopeErrorDetailExceptionHandler                   | Handles HopeErrorDetailException                                                                          |
+| HttpMediaTypeExceptionHandler                     | Handles HttpMediaTypeException                                                                            |
+| HttpMessageNotReadableExceptionHandler            | Handles HttpMessageNotReadableException                                                                   |
+| HttpMessageNotWritableExceptionHandler            | Handles HttpMessageNotWritableException                                                                   |
+| MissingRequestValueExceptionHandler               | Handles MissingRequestValueException                                                                      |
+| ObjectOptimisticLockingFailureApiExceptionHandler | Handles ObjectOptimisticLockingFailureException                                                           |
+| ServerErrorExceptionHandler                       | Handles ServerErrorException                                                                              |
+| ServerWebInputExceptionHandler                    | Handles ServerWebInputException                                                                           |
+| SpringSecurityExceptionHandler                    | Handles AccessDeniedException & UsernameNotFoundException & org.springframework.security.authentication.* |
+| TypeMismatchExceptionHandler                      | Handles TypeMismatchException                                                                             |
+
+Exceptions will be processed by the Exception Handler and encapsulated into `ServerErrorEnum` objects before being returned to the client.
+
+| Error Code | Error Title                                   | Error Description                                                                                                               | Error Description 2                               |
+|------------|-----------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------|
+| 1003000001 | MISSING_REQUEST_PARAMETER                     | Missing Request Parameter                                                                                                       | Request parameter missing                         |
+| 1003000011 | MISSING_PATH_VARIABLE                         | Missing Path Variable                                                                                                           | Missing path parameter                            |
+| 1003000012 | MISSING_MATRIX_VARIABLE                       | Missing MatrixVariable Exception                                                                                                | Missing Matrix parameter                          |
+| 1003000013 | MISSING_REQUEST_COOKIE                        | Missing RequestCookie Exception                                                                                                 | Validation error, cookie missing                  |
+| 1003000014 | MISSING_REQUEST_HEADER                        | Missing RequestHeader Exception                                                                                                 | Validation error, header missing                  |
+| 1003000023 | HTTP_REQUEST_METHOD_NOT_SUPPORTED             | Http Request Method Not Supported                                                                                               | Unsupported HTTP request method                   |
+| 1003000024 | HTTP_MEDIA_TYPE_NOT_SUPPORTED                 | Http MediaType Not Supported                                                                                                    | Unsupported HTTP media type                       |
+| 1003000025 | HTTP_MEDIA_TYPE_NOT_ACCEPTABLE                | Http MediaType Not Acceptable                                                                                                   | Incorrect HTTP media type                         |
+| 1003000036 | SERVLET_REQUEST_BINDING                       | Request Binding Exception                                                                                                       | Request data binding error, data validation issue |
+| 1003000037 | TYPE_MISMATCH                                 | Type Mismatch                                                                                                                   | Validation error                                  |
+| 1003000038 | METHOD_ARGUMENT_NOT_VALID                     | Method Argument Not Valid                                                                                                       | Validation error                                  |
+| 1003000039 | CONSTRAINT_VIOLATION                          | Constraint Violation                                                                                                            | Validation error                                  |
+| 1003000040 | SERVER_ERROR                                  | Server Error, exposes extra information about a controller method that failed, or a method argument that could not be resolved. | Internal server error                             |
+| 1003000041 | BINDING_ERROR                                 | Server Error, exposes extra information about a controller method that failed, or a method argument that could not be resolved. | Data binding error                                |
+| 1003000051 | HTTP_MESSAGE_NOT_READABLE                     | Http Message Not Readable                                                                                                       | Http input unreadable                             |
+| 1003000052 | HTTP_MESSAGE_NOT_WRITABLE                     | Http Message Not Writable                                                                                                       | Http output unwritable                            |
+| 1003000060 | MISSING_REQUEST_PART                          | Missing Servlet Request Part Exception, 'multipart/form-data' request                                                           | Upload request validation failed                  |
+| 1003000061 | ASYNC_REQUEST_TIMEOUT                         | Async Request Timeout Exception                                                                                                 | Async request timeout                             |
+| 1003000101 | ORM_OBJECT_OPTIMISTIC_LOCKING_FAILURE         | Exception thrown on an optimistic locking violation for a mapped object.                                                        | Optimistic lock error                             |
+| 1003000501 | SECURITY_ACCESS_DENIED                        | Access Denied                                                                                                                   | Access denied                                     |
+| 1003000502 | SECURITY_ACCOUNT_EXPIRED                      | Account Expired                                                                                                                 | Account expired                                   |
+| 1003000503 | SECURITY_AUTHENTICATION_CREDENTIALS_NOT_FOUND | Authentication Credentials Not Found                                                                                            | Authentication credentials missing                |
+| 1003000504 | SECURITY_AUTHENTICATION_SERVICE               | Authentication Service                                                                                                          | Authorization service error                       |
+| 1003000505 | SECURITY_BAD_CREDENTIALS                      | Bad Credentials                                                                                                                 | Incorrect authorization                           |
+| 1003000506 | SECURITY_USER_NOT_FOUND                       | User Not Found                                                                                                                  | User not found                                    |
+| 1003000507 | SECURITY_INSUFFICIENT_AUTHENTICATION          | Insufficient Authentication                                                                                                     | Authorization validation error                    |
+| 1003000508 | SECURITY_LOCKED                               | Account Locked                                                                                                                  | Account locked                                    |
+| 1003000509 | SECURITY_DISABLED                             | Account Disabled                                                                                                                | Account disabled                                  |
+| 1003000510 | SECURITY_AUTHENTICATION                       | Authentication Fail                                                                                                             | Authorization error                               |
+| 1003000511 | SECURITY_ANONYMOUS_UN_CHANGEABLE              | Authentication Try Update Anonymous properties                                                                                  | Update anonymous error                            |
+| 1003000512 | SECURITY_JWT_EXPIRE                           | JWT Expire                                                                                                                      | JWT expired                                       |
+| 1003000513 | SECURITY_JWT_UNSUPPORTED                      | JWT Unsupported                                                                                                                 | JWT unsupported                                   |
+| 1003000514 | SECURITY_JWT_MALFORMED                        | JWT Malformed                                                                                                                   | JWT format error                                  |
+| 1003000515 | SECURITY_JWT_SIGNATURE                        | JWT Signature                                                                                                                   | JWT signature error                               |
+| 1003000516 | SECURITY_JWT_GENERIC                          | JWT Generic Exception                                                                                                           | General JWT error                                 |
+
+**BindingResult**
+
+`BindingResult` is not an exception, but its implementation classes include `BindException` & `WebExchangeBindException`, which are parameter binding exception classes.
+
+Field binding errors are translated into `BINDING_ERROR` type errors.
+
+**ConstraintViolationException**
+
+Validation exceptions are translated from `ConstraintViolation` to `CONSTRAINT_VIOLATION` type errors.
+
+**HopeErrorDetailException**
+
+`HopeErrorDetailException` is an internal general exception class that includes:
+
+1. message
+2. cause
+3. List of `hope.common.api.error.Error`
+
+### Error Configuration
+
+Configuration path: `hope.error`; Configuration object: `HopeProblemProperties`
+
+| Configuration               | Note                                                   |
+|-----------------------------|--------------------------------------------------------|
+| `codes`                     | Exception to code mapper `Map<String, String>`         |
+| `logLevel`                  | Log output detail level                                |
+| `errorCodeStrategy`         | Error class name handling method                       |
+| `httpStatuses`              | Class to HTTP status mapping `Map<String, HttpStatus>` |
+| `searchSuperClassHierarchy` | Whether to search superclass in the hierarchy          |
+| `addPathToError`            | Whether to add the path to the error details           |
+| `messages`                  | Output messages mapping `Map<String, String>`          |
+
+#### **LogLevel**
+
+| Configuration     | Note                 |
+|-------------------|----------------------|
+| `NO_LOGGING`      | No logs printed      |
+| `MESSAGE_ONLY`    | Only include message |
+| `WITH_STACKTRACE` | Entire stack trace   |
+
+#### **ErrorCodeStrategy**
+
+| Name                    | Note                                               |
+|-------------------------|----------------------------------------------------|
+| `FULL_QUALIFIED_NAME`   | `hope.common.spring.problem.Example`               |
+| `ALL_CAPS`              | `hope.common.spring.problem.Example` -> EXAMPLE    |
+
+## General Validation
+
+| Name           | Note                           |
+|----------------|--------------------------------|
+| `@ChinaMobile` | China mobile number validation |
+| `@Enums`       | Enum list validation           |
+## Actuator
+
+`HopeProjectInfoContributor` includes runtime context information for debugging:
+
+| Name            | Note                               |
+|-----------------|------------------------------------|
+| `domain`        | Domain information                 |
+| `application`   | Application name                   |
+| `mainClass`     | Entry class                        |
+| `mainPackage`   | Main package                       |
+| `stubBuildTime` | Stub compilation time              |
+| `project`       | Main project `Project` information |
+| `proto`         | Proto `Project` information        |
+
+Project includes:
+
+1. Artifact
+2. Name
+3. Description
+4. Module
+
+And other information.
+
+## Aspect
+
+`AspectManager` primarily manages external service aspects: organizes runtime context `Aspect` weaving, running as follows:
+
+```java
+public ResponseEntity<Result<String>> exampleSayHello() {
+    final SimpleResultBuilder<String> builder = new SimpleResultBuilder<String>();
+
+    try {
+    	aspect().before("/demo-001/hello-world" );
+    	_service.exampleSayHello(builder);
+    	ResponseEntity<Result<String>> res = builder.done();
+    	aspect().after("/demo-001/hello-world", res  );
+    	return res;
+    } catch (Throwable exception ) { 
+    	logger.error("FAIL_ACTION METHOD:[exampleSayHello] PATH:[/demo-001/hello-world]",exception);
+    	aspect().exception("/demo-001/hello-world", exception  );
+    	throw exception;
+    }
+  }
+
+  public AspectManager aspect() {
+    return AspectManager.get();
+  }
+```
+
+## Pagination
+
+`PageRequestGuardian` is responsible for validating pagination parameters to prevent excessively large page sizes.
 
 
-<TipInfo>To be done 🏗️</TipInfo>
+
+## Refer
+
+1. Zalando [problem-spring-web](https://github.com/zalando/problem-spring-web)
+2. [A Guide to the Problem Spring Web Library](https://www.baeldung.com/problem-spring-web)
+3. [Spring Error Handing](https://docs.spring.io/spring-boot/reference/web/servlet.html#web.servlet.spring-mvc.error-handling)
+4. [Spring Error Responses](https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-ann-rest-exceptions.html)
+5. [RFC9457 - Problem Details for HTTP APIs](https://datatracker.ietf.org/doc/html/rfc9457)
