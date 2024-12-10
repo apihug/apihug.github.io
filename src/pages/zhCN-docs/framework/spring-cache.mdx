@@ -3,17 +3,14 @@ title: ApiHug Spring Cache Extension
 description: ApiHug SDK Spring Cache 扩展
 ---
 
-import { TipInfo } from '@/components/Tip'
-
-
 ## Cache
 
 包含 [spring-cache](https://docs.spring.io/spring-boot/reference/io/caching.html) 简单封装：
 
-1. 针对 Caffeine,Redis, Ehcache 的封装
+1. 针对 Caffeine,Redis, Ehcache 封装
 2. 错误封装和处理 `HopeCacheErrorHandler`
 3. `RedissonClient` 自动配置 `hope.redis.enable=true`
-4.  `EnableCaffeineCaching` `EnableRedisCaching` `EnableEhcacheCaching` 支持
+4. `@EnableCaffeineCaching` `@EnableRedisCaching` `@EnableEhcacheCaching` 支持
 
 ### 配置
 
@@ -21,51 +18,51 @@ import { TipInfo } from '@/components/Tip'
 
 `hope.cache` 配置路径， 配置对象： `HopeCacheProperties`
 
-| 配置                                     | 备注                                                              |
-|----------------------------------------|-----------------------------------------------------------------|
-| `caffeine`                             | 包含caffeine配置                                                    |
-| `caffeine.allowInFlightCacheCreation`  | 是否允许创建非定义cache                                                  |
-| `caffeine.timeToLive`                  | 默认TTL                                                           |
-| `caffeine.caches`                      | 多cache配置map，参考`com.github.benmanes.caffeine.cache.CaffeineSpec` |
-| `caffeine.caches[*].initialCapacity`   | 参考 `CaffeinSpec`                                                |
-| `caffeine.caches[*].maximumWeight`     | 参考 `CaffeinSpec`                                                |
-| `caffeine.caches[*].maximumSize`       | 参考 `CaffeinSpec`                                                |
-| `caffeine.caches[*].recordStats`       | 参考 `CaffeinSpec`                                                |
-| `caffeine.caches[*].keyStrength`       | 参考 `CaffeinSpec`                                                |
-| `caffeine.caches[*].valueStrength`     | 参考 `CaffeinSpec`                                                |
-| `caffeine.caches[*].expireAfterWrite`  | 参考 `CaffeinSpec`                                                |
-| `caffeine.caches[*].expireAfterAccess` | 参考 `CaffeinSpec`                                                |
-| `caffeine.caches[*].refreshAfterWrite` | 参考 `CaffeinSpec`                                                |
-| `redis`                                | Redis 配置                                                        |
-| `redis.allowInFlightCacheCreation`     | 是否允许创建非定义cache                                                  |
-| `redis.timeToLive`                     | 默认TTL                                                           |
-| `redis.caches`                         | 多cache配置map                                                     |
-| `redis.caches[*].timeToLive`           | 单个cache TTL                                                     |
-| `redis.caches[*].cacheNullValues`      | 单个cache 运行NULL值                                                 |
-| `redis.caches[*].keyPrefix`            | 单个cache keyPrefix                                               |
-| `redis.caches[*].useKeyPrefix`         | 单个cache useKeyPrefix                                            |
-| `redis.caches[*].enableStatistics`     | 单个cache 打开统计                                                    |
-| `redis.caches[*].enableTransactions`   | 单个cache 事务管理                                                    |
-| `redis.caches[*].serializer`           | 单个cache 序列化                                                     |
-| `ehCache`                              | EhCache配置                                                       |
-| `ehCache.heap`                         | Heap 实体数量(个)                                                    |
-| `ehCache.offHeap`                      | OffHeap 大小(存储)                                                  |
-| `ehCache.disk`                         | Disk大小(存储)                                                      |
-| `ehCache.duration`                     | 默认TTL                                                           |
-| `ehCache.caches`                       | 各个EhCache配置                                                     |
-| `ehCache.caches[*].keyClz`             | key 类型                                                          |
-| `ehCache.caches[*].valueClz`           | value 类型                                                        |
-| `ehCache.caches[*].heap`               | Heap 实体数量(个)                                                    |
-| `ehCache.caches[*].offHeap`            | OffHeap 大小(存储)                                                  |
-| `ehCache.caches[*].disk`               | Disk大小(存储)                                                      |
-| `ehCache.caches[*].duration`           | TTL                                                             |
-| `errorPolicy`                          | 错误处理策略                                                          |
-| `errorPolicy.swallowGetException`      | 忽略Get错误                                                         |
-| `errorPolicy.swallowPutException`      | 忽略Put错误                                                         |
-| `errorPolicy.swallowEvictException`    | 忽略Evict错误                                                       |
-| `errorPolicy.swallowClearException`    | 忽略Clear错误                                                       |
-| `errorPolicy.logStackTraces`           | 打印错误堆栈                                                          |
-| `timeToLive`                           | 默认TTL(兜底)                                                       |
+| 配置                                     | 备注                                                                                                                                                          |
+|----------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `caffeine`                             | **Caffeine配置**                                                                                                                                              |
+| `caffeine.allowInFlightCacheCreation`  | 是否允许创建非定义cache                                                                                                                                              |
+| `caffeine.timeToLive`                  | 默认TTL                                                                                                                                                       |
+| `caffeine.caches`                      | 多cache配置map，参考[CaffeineSpec](https://github.com/ben-manes/caffeine/blob/master/caffeine/src/main/java/com/github/benmanes/caffeine/cache/CaffeineSpec.java) |
+| `caffeine.caches[*].initialCapacity`   | 参考 `CaffeinSpec`                                                                                                                                            |
+| `caffeine.caches[*].maximumWeight`     | 参考 `CaffeinSpec`                                                                                                                                            |
+| `caffeine.caches[*].maximumSize`       | 参考 `CaffeinSpec`                                                                                                                                            |
+| `caffeine.caches[*].recordStats`       | 参考 `CaffeinSpec`                                                                                                                                            |
+| `caffeine.caches[*].keyStrength`       | 参考 `CaffeinSpec`                                                                                                                                            |
+| `caffeine.caches[*].valueStrength`     | 参考 `CaffeinSpec`                                                                                                                                            |
+| `caffeine.caches[*].expireAfterWrite`  | 参考 `CaffeinSpec`                                                                                                                                            |
+| `caffeine.caches[*].expireAfterAccess` | 参考 `CaffeinSpec`                                                                                                                                            |
+| `caffeine.caches[*].refreshAfterWrite` | 参考 `CaffeinSpec`                                                                                                                                            |
+| `redis`                                | **Redis 配置**                                                                                                                                                |
+| `redis.allowInFlightCacheCreation`     | 是否允许创建非预定义cache                                                                                                                                             |
+| `redis.timeToLive`                     | 默认TTL                                                                                                                                                       |
+| `redis.caches`                         | 多cache配置map                                                                                                                                                 |
+| `redis.caches[*].timeToLive`           | 单个cache TTL                                                                                                                                                 |
+| `redis.caches[*].cacheNullValues`      | 单个cache 运行NULL值                                                                                                                                             |
+| `redis.caches[*].keyPrefix`            | 单个cache keyPrefix                                                                                                                                           |
+| `redis.caches[*].useKeyPrefix`         | 单个cache useKeyPrefix                                                                                                                                        |
+| `redis.caches[*].enableStatistics`     | 单个cache 打开统计                                                                                                                                                |
+| `redis.caches[*].enableTransactions`   | 单个cache 事务管理                                                                                                                                                |
+| `redis.caches[*].serializer`           | 单个cache 序列化                                                                                                                                                 |
+| `ehCache`                              | **EhCache配置**                                                                                                                                               |
+| `ehCache.heap`                         | Heap 实体数量(个)                                                                                                                                                |
+| `ehCache.offHeap`                      | OffHeap 大小(存储)                                                                                                                                              |
+| `ehCache.disk`                         | Disk大小(存储)                                                                                                                                                  |
+| `ehCache.duration`                     | 默认TTL                                                                                                                                                       |
+| `ehCache.caches`                       | 各个EhCache配置                                                                                                                                                 |
+| `ehCache.caches[*].keyClz`             | key 类型                                                                                                                                                      |
+| `ehCache.caches[*].valueClz`           | value 类型                                                                                                                                                    |
+| `ehCache.caches[*].heap`               | Heap 实体数量(个)                                                                                                                                                |
+| `ehCache.caches[*].offHeap`            | OffHeap 大小(存储)                                                                                                                                              |
+| `ehCache.caches[*].disk`               | Disk大小(存储)                                                                                                                                                  |
+| `ehCache.caches[*].duration`           | TTL                                                                                                                                                         |
+| `errorPolicy`                          | 错误处理策略                                                                                                                                                      |
+| `errorPolicy.swallowGetException`      | 忽略Get错误                                                                                                                                                     |
+| `errorPolicy.swallowPutException`      | 忽略Put错误                                                                                                                                                     |
+| `errorPolicy.swallowEvictException`    | 忽略Evict错误                                                                                                                                                   |
+| `errorPolicy.swallowClearException`    | 忽略Clear错误                                                                                                                                                   |
+| `errorPolicy.logStackTraces`           | 打印错误堆栈                                                                                                                                                      |
+| `timeToLive`                           | 默认TTL(兜底)                                                                                                                                                   |
 
 #### Redis 配置
 
@@ -73,14 +70,14 @@ import { TipInfo } from '@/components/Tip'
 
 众和了spring 本身的配置： 
 
-1. [org.springframework.boot.autoconfigure.cache.CacheProperties](https://github.com/spring-projects/spring-boot/blob/main/spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/cache/CacheProperties.java)
-2. [org.springframework.boot.autoconfigure.data.redis.RedisProperties](https://github.com/spring-projects/spring-boot/blob/main/spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/data/redis/RedisProperties.java)
-3. [org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration](https://github.com/spring-projects/spring-boot/blob/main/spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/cache/CacheAutoConfiguration.java)
-4. [Spring boot cache](https://docs.spring.io/spring-boot/reference/io/caching.html)
-5. [Spring Cache **spring.cache**](https://docs.spring.io/spring-boot/appendix/application-properties/index.html#appendix.application-properties.cache)
-6. [Spring Data redis **spring.data.redis**](https://docs.spring.io/spring-boot/appendix/application-properties/index.html#appendix.application-properties.data)
+1. [Spring Boot CacheProperties](https://github.com/spring-projects/spring-boot/blob/main/spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/cache/CacheProperties.java)
+2. [Spring Data RedisProperties](https://github.com/spring-projects/spring-boot/blob/main/spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/data/redis/RedisProperties.java)
+3. [Spring Boot CacheAutoConfiguration](https://github.com/spring-projects/spring-boot/blob/main/spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/cache/CacheAutoConfiguration.java)
+4. [Spring Boot Cache](https://docs.spring.io/spring-boot/reference/io/caching.html)
+5. [Spring Cache spring.cache](https://docs.spring.io/spring-boot/appendix/application-properties/index.html#appendix.application-properties.cache)
+6. [Spring Data Redis spring.data.redis](https://docs.spring.io/spring-boot/appendix/application-properties/index.html#appendix.application-properties.data)
 
-Hope 更借鉴 **spring.data.redis** 配置方式， 也就是和 [org.springframework.boot.autoconfigure.data.redis.RedisProperties](https://github.com/spring-projects/spring-boot/blob/main/spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/data/redis/RedisProperties.java) 比较类似；
+Hope 更借鉴 **spring.data.redis** 配置方式和 [Spring Data RedisProperties](https://github.com/spring-projects/spring-boot/blob/main/spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/data/redis/RedisProperties.java) 比较类似；
 
 
 | 配置                       | 备注                                                                                                                                          |
@@ -89,7 +86,7 @@ Hope 更借鉴 **spring.data.redis** 配置方式， 也就是和 [org.springfra
 | `cluster.max-redirects.` | Maximum number of redirects to follow when executing commands across the cluster.                                                           |
 | `cluster.nodes`          | List of "host:port" pairs to bootstrap from. This represents an "initial" list of cluster nodes and is required to have at least one entry. |
 | `sentinel`               | sentinel节点                                                                                                                                  |
-| `sentinel.master`        | sentinel节点                                                                                                                                  |
+| `sentinel.master`        | sentinel Master 节点                                                                                                                          |
 | `sentinel.nodes`         | List of "host:port" pairs.                                                                                                                  |
 | `sentinel.username`      | Login username for authenticating with sentinel(s).                                                                                         |
 | `sentinel.password`      | Password for authenticating with sentinel(s).                                                                                               |
@@ -132,9 +129,9 @@ Hope 更借鉴 **spring.data.redis** 配置方式， 也就是和 [org.springfra
 
 老的控制方式，根据 ~hope.cache.type~ 类型触发配置上下文，现已不支持！ 
 
-1. CAFFEINE  通过显式的  `EnableCaffeineCaching`
-2. REDIS  通过显式的  `EnableRedisCaching`
-3. JCACHE  通过显式的  `EnableEhcacheCaching`
+1. CAFFEINE  通过显式的  `@EnableCaffeineCaching`
+2. REDIS  通过显式的  `@EnableRedisCaching`
+3. JCACHE  通过显式的  `@EnableEhcacheCaching`
 
 
-<TipInfo>To be done 🏗️</TipInfo>
+## Sample

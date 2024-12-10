@@ -3,19 +3,208 @@ title: ApiHug Spring Core 扩展
 description: ApiHug SDK Spring Core 扩展
 ---
 
-import { TipInfo } from '@/components/Tip'
-
-
-## Core
-
+包含：
 
 1. 错误处理
 2. 通用校验
 3. Actuator
-4. Aspect管理
-5. 运行时上下文
+4. Aspect
+
+## 错误处理
+
+参考解决方案：
+
+1. Zalando [problem-spring-web](https://github.com/zalando/problem-spring-web)
+2. [A Guide to the Problem Spring Web Library](https://www.baeldung.com/problem-spring-web)
+3. [Spring Error Handing](https://docs.spring.io/spring-boot/reference/web/servlet.html#web.servlet.spring-mvc.error-handling)
+4. [Spring Error Responses](https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-ann-rest-exceptions.html)
+5. [RFC9457 - Problem Details for HTTP APIs](https://datatracker.ietf.org/doc/html/rfc9457)
+
+
+`HopeExceptionHandler` 为 `@ControllerAdvice`
+
+1. 根据异常类寻找最合适的 Exception Handler 
+2. 处理异常
+3. 添加异常头(HTTP)
+4. 打印异常
+5. 返回结果
+
+### 内置错误处理
+
+| 类名                                                | 备注                                                                                                |
+|---------------------------------------------------|---------------------------------------------------------------------------------------------------|
+| AsyncRequestTimeoutExceptionHandler               | AsyncRequestTimeoutException                                                                      |
+| BindExceptionHandler                              | BindingResult                                                                                     |
+| ConstraintViolationExceptionHandler               | ConstraintViolationException                                                                      |
+| HopeErrorDetailExceptionHandler                   | HopeErrorDetailException                                                                          |
+| HttpMediaTypeExceptionHandler                     | HttpMediaTypeException                                                                            |
+| HttpMessageNotReadableExceptionHandler            | HttpMessageNotReadableException                                                                   |
+| HttpMessageNotWritableExceptionHandler            | HttpMessageNotWritableException                                                                   |
+| MissingRequestValueExceptionHandler               | MissingRequestValueException                                                                      |
+| ObjectOptimisticLockingFailureApiExceptionHandler | ObjectOptimisticLockingFailureException                                                           |
+| ServerErrorExceptionHandler                       | ServerErrorException                                                                              |
+| ServerWebInputExceptionHandler                    | ServerWebInputException                                                                           |
+| SpringSecurityExceptionHandler                    | AccessDeniedException & UsernameNotFoundException & org.springframework.security.authentication.* |
+| TypeMismatchExceptionHandler                      | TypeMismatchException                                                                             |
+
+异常会被 Exception Handler 处理封装成  `ServerErrorEnum` 对象再返回给客户端。
+
+| 错误码        | 错误标题                                          | 错误描述                                                                                                                                      | 错误描述2              |
+|------------|-----------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------|--------------------|
+| 1003000001 | MISSING_REQUEST_PARAMETER                     | Missing Request Parameter                                                                                                                 | 请求参数缺失             |
+| 1003000011 | MISSING_PATH_VARIABLE                         | Missing Path Variable                                                                                                                     | 缺失路径参数             |
+| 1003000012 | MISSING_MATRIX_VARIABLE                       | Missing MatrixVariable Exception                                                                                                          | 缺失Matrix 参数        |
+| 1003000013 | MISSING_REQUEST_COOKIE                        | Missing RequestCookie Exception                                                                                                           | 校验异常错误，缺乏相关的cookie |
+| 1003000014 | MISSING_REQUEST_HEADER                        | Missing RequestHeader Exception                                                                                                           | 校验异常错误，缺乏相关的header |
+| 1003000023 | HTTP_REQUEST_METHOD_NOT_SUPPORTED             | Http Request Method Not Supported                                                                                                         | Http 请求方式不对        |
+| 1003000024 | HTTP_MEDIA_TYPE_NOT_SUPPORTED                 | Http MediaType Not Supported                                                                                                              | Http 请求数据格式不支持     |
+| 1003000025 | HTTP_MEDIA_TYPE_NOT_ACCEPTABLE                | Http MediaType Not Acceptable                                                                                                             | Http 请求数据格式不对      |
+| 1003000036 | SERVLET_REQUEST_BINDING                       | Request Binding Exception                                                                                                                 | 请求数据绑定错误, 数据校验问题   |
+| 1003000037 | TYPE_MISMATCH                                 | Type Mismatch                                                                                                                             | 校验异常错误             |
+| 1003000038 | METHOD_ARGUMENT_NOT_VALID                     | Method Argument Not Valid                                                                                                                 | 校验异常错误             |
+| 1003000039 | CONSTRAINT_VIOLATION                          | Constraint Violation                                                                                                                      | 校验异常错误             |
+| 1003000040 | SERVER_ERROR                                  | Server Error,Exposes extra information about a controller method that failed, or a controller method argument that could not be resolved. | 服务内部错误             |
+| 1003000041 | BINDING_ERROR                                 | Server Error,Exposes extra information about a controller method that failed, or a controller method argument that could not be resolved. | 数据绑定错误             |
+| 1003000051 | HTTP_MESSAGE_NOT_READABLE                     | Http Message Not Readable                                                                                                                 | Http 输入无法读取        |
+| 1003000052 | HTTP_MESSAGE_NOT_WRITABLE                     | Http Message Not Writable                                                                                                                 | Http 无法输出          |
+| 1003000060 | MISSING_REQUEST_PART                          | Missing Servlet Request Part Exception, 'multipart/form-data' request                                                                     | 上传请求校验失败           |
+| 1003000061 | ASYNC_REQUEST_TIMEOUT                         | Async Request Timeout Exception                                                                                                           | 异步请求超时             |
+| 1003000101 | ORM_OBJECT_OPTIMISTIC_LOCKING_FAILURE         | Exception thrown on an optimistic locking violation for a mapped object.                                                                  | 对象乐观锁错误            |
+| 1003000501 | SECURITY_ACCESS_DENIED                        | Access Denied                                                                                                                             | 访问拒绝               |
+| 1003000502 | SECURITY_ACCOUNT_EXPIRED                      | Account Expired                                                                                                                           | 账户失效               |
+| 1003000503 | SECURITY_AUTHENTICATION_CREDENTIALS_NOT_FOUND | Authentication Credentials Not Found                                                                                                      | 授权信息不匹配            |
+| 1003000504 | SECURITY_AUTHENTICATION_SERVICE               | Authentication Service                                                                                                                    | 授权服务异常             |
+| 1003000505 | SECURITY_BAD_CREDENTIALS                      | Bad Credentials                                                                                                                           | 错误授权               |
+| 1003000506 | SECURITY_USER_NOT_FOUND                       | User Not Found                                                                                                                            | 用户不存在              |
+| 1003000507 | SECURITY_INSUFFICIENT_AUTHENTICATION          | Insufficient Authentication                                                                                                               | 授权检验错误             |
+| 1003000508 | SECURITY_LOCKED                               | Account Locked                                                                                                                            | 账号锁定               |
+| 1003000509 | SECURITY_DISABLED                             | Account Disabled                                                                                                                          | 账号禁用               |
+| 1003000510 | SECURITY_AUTHENTICATION                       | Authentication Fail                                                                                                                       | 授权错误               |
+| 1003000511 | SECURITY_ANONYMOUS_UN_CHANGEABLE              | Authentication Try Update Anonymous properties                                                                                            | 更新匿名错误             |
+| 1003000512 | SECURITY_JWT_EXPIRE                           | JWT Expire                                                                                                                                | JWT过期              |
+| 1003000513 | SECURITY_JWT_UNSUPPORTED                      | JWT Unsupported                                                                                                                           | JWT不支持             |
+| 1003000514 | SECURITY_JWT_MALFORMED                        | JWT Malformed                                                                                                                             | JWT格式错误            |
+| 1003000515 | SECURITY_JWT_SIGNATURE                        | JWT Signature                                                                                                                             | JWT签名错误            |
+| 1003000516 | SECURITY_JWT_GENERIC                          | JWT Generic Exception                                                                                                                     | JWT一般错误            |
+
+
+**BindingResult**
+
+BindingResult 并非exception, 而她的实现类里面有： `BindException` & `WebExchangeBindException` 是参数绑定异常类；
+
+根据字段绑定错误翻译成  `BINDING_ERROR` 类型错误。
+
+**ConstraintViolationException**
+
+校验异常， 翻译 `ConstraintViolation` 为 `CONSTRAINT_VIOLATION`类型错误。
+
+**HopeErrorDetailException**
+
+`HopeErrorDetailException` 为内部通用异常类，包含：
+
+1. message
+2. cause
+3. `hope.common.api.error.Error` 列表
+
+
+### 错误配置
+
+配置路径：`hope.error`； 配置对象： `HopeProblemProperties`
+
+| 配置                          | 备注                                                         |
+|-----------------------------|------------------------------------------------------------|
+| `codes`                     | Exception to the code mapper ` Map<String, String>`        |
+| `logLevel`                  | Log 输出详细程度                                                 |
+| `errorCodeStrategy`         | 错误类名处理方式                                                   |
+| `httpStatuses`              | class to the http status mapping `Map<String, HttpStatus>` |
+| `searchSuperClassHierarchy` | whether to search super class in the hierarchy             |
+| `addPathToError`            | whether to add the path to the error details               |
+| `messages`                  | 输出信息映射 `Map<String, String>`                               |
+
+
+#### **LogLevel**
+
+| 配置                | 备注          |
+|-------------------|-------------|
+| `NO_LOGGING`      | 不打印log      |
+| `MESSAGE_ONLY`    | 只包含 message |
+| `WITH_STACKTRACE` | 整个堆栈        |
+
+#### **ErrorCodeStrategy**
+
+| 名称                    | 备注                                             |
+|-----------------------|------------------------------------------------|
+| `FULL_QUALIFIED_NAME` | `hope.common.spring.problem.Example`           |
+| `ALL_CAPS`            | `hope.common.spring.problem.Example`-> EXAMPLE |
+
+
+## 通用校验
+
+| 名称             | 备注       |
+|----------------|----------|
+| `@ChinaMobile` | 中国手机号码验证 |
+| `@Enums`       | 枚举列表验证   |
+
+## Actuator
+
+`HopeProjectInfoContributor` 包含运行时上下文信息方便调试调用：
+
+| 名称              | 备注                 |
+|-----------------|--------------------|
+| `domain`        | domain 信息          |
+| `application`   | application 名称     |
+| `mainClass`     | 入口类                |
+| `mainPackage`   | 主包                 |
+| `stubBuildTime` | stub编译时间           |
+| `project`       | 主项目 `Project`信息    |
+| `proto`         | proto `Project` 信息 |
+
+Project 包含：
+
+1. Artifact 
+2. name
+3. description
+4. module 
+
+等信息
+
+
+## Aspect
+
+`AspectManager` 主要针对对外服务切面的管理：组织运行时上下文 `Aspect` 织入,运行是如下：
+
+```java
+public ResponseEntity<Result<String>> exampleSayHello() {
+    final SimpleResultBuilder<String> builder = new SimpleResultBuilder<String>();
+
+    try {
+    	aspect().before("/demo-001/hello-world" );
+    	_service.exampleSayHello(builder);
+    	ResponseEntity<Result<String>> res = builder.done();
+    	aspect().after("/demo-001/hello-world", res  );
+    	return res;
+    } catch (Throwable exception ) { 
+    	logger.error("FAIL_ACTION METHOD:[exampleSayHello] PATH:[/demo-001/hello-world]",exception);
+    	aspect().exception("/demo-001/hello-world", exception  );
+    	throw exception;
+    }
+  }
+
+  public AspectManager aspect() {
+    return AspectManager.get();
+  }
+```
+
+## 分页
+
+`PageRequestGuardian` 分页参数校验保护， 防止设置太大 page size;
 
 
 
+## Refer
 
-<TipInfo>To be done 🏗️</TipInfo>
+1. Zalando [problem-spring-web](https://github.com/zalando/problem-spring-web)
+2. [A Guide to the Problem Spring Web Library](https://www.baeldung.com/problem-spring-web)
+3. [Spring Error Handing](https://docs.spring.io/spring-boot/reference/web/servlet.html#web.servlet.spring-mvc.error-handling)
+4. [Spring Error Responses](https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-ann-rest-exceptions.html)
+5. [RFC9457 - Problem Details for HTTP APIs](https://datatracker.ietf.org/doc/html/rfc9457)

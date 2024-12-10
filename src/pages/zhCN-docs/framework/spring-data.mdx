@@ -5,15 +5,258 @@ description: ApiHug SDK spring data extension
 
 import { TipInfo } from '@/components/Tip'
 
-## Data
+实现 高效简单的 ORM 数据库管理!
 
-1. 配置管理
-2. liquibase
-3. jdbc 模版（repository）
-4. wire
-5. pageable
-6. OLTP vs OLAP
-7. MyBatis
+1. ORM
+2. Multi Tenant
+3. OLAP/OLTP
 
+
+## 配置
+
+配置路径：`hope.data`； 配置对象： `HopeDataProperties`
+
+| 配置                    | 备注                |
+|-----------------------|-------------------|
+| `defaultUserIdString` | 默认 用户 ID(String)  |
+| `defaultTenantString` | 默认 租户 ID(String)  |
+| `defaultUserId`       | 默认 用户 ID(Integer) |
+| `defaultTenantId`     | 默认 租户 ID(Integer) |
+
+默认用户ID, 租户ID 在涉及到，数据落地 audit 需要时从上下文获取，如未提供(如非登录用户)使用此默认值。
+
+用户ID, 租户ID，值类型必须是：`LONG`|`STRING`|`INTEGER` 之一。
+
+## Liquibase
+
+`ApiHug` 使用 `Liquibase` 实现数据库Schema 的版本管理和迁移(开发环境，线上环境暂且手动维护不建议自动化)；
+
+[Database Initialization-Execute Liquibase Database Migrations on Startup](https://docs.spring.io/spring-boot/how-to/data-initialization.html#howto.data-initialization.migration-tool.liquibase)
+
+配置完全使用 [Spring Data Migration](https://docs.spring.io/spring-boot/appendix/application-properties/index.html#appendix.application-properties.data-migration) 关于 `spring.liquibase` 部分：
+
+配置路径 `spring.liquibase`； 配置对象 `LiquibaseProperties`。
+
+
+| 配置        | 备注                                   |
+|-----------|--------------------------------------|
+| `enabled` | Whether to enable Liquibase support. |
+
+同时有 `no-liquibase` 强制不启动  Liquibase 的profile设置；
+
+<TipInfo>生产环境，</TipInfo>
+
+表结构迁移和生成配置，均由框架 stub 任务维护， 所以开发测试环境，可免配置启动。
+
+## JDBC
+
+**ApiHug** 整个 JDBC 部分是建立在 [Spring Data JDBC](https://docs.spring.io/spring-data/relational/reference/) 基础上。
+
+为什么没有使用更高级的 ORM 框架如JPA, Hibernate? 基于应用程序和数据库天然的异构性，过于复杂的数据库交互(OLAP)会削弱核心业务逻辑的稳定性和健壮性。
+
+所以直接使用 JDBC； 使得如果通过JDBC进行复杂的SQL 操作变得非常别扭和难受(我们提供另外一套OLAP 方案)； 
+
+核心的 OLTP 由 Spring Data Repository 提供非常健壮、成熟的解决方案。
+
+Spring Data 对于数据操作其实只提供了 Repository 核心概念，完成基本的 CRUD 操作，简单而又干净。
+
+### Entity 
+
+**ApiHug** 实体对象都是通过 `protobuf` 定义，通过 `wire`命令转译，最后通过 `stub` 在应用模块生成实体类。
+
+支持  jakarta & spring annotation 标注；
+
+1. `jakarta.persistence`
+2. `org.springframework.data.annotation`
+
+生成最标准的 POJO 对象；
+
+### Wire
+
+| 类名             | Identify                                           |
+|----------------|----------------------------------------------------|
+| `ALL`          | 支持下面所有协议                                           |
+| `AUDITABLE`    | Auditable: CreatedAt,CreatedBy,UpdatedAt,UpdatedBy |
+| `DELETABLE`    | Deletable: Deleted,DeletedAt,DeletedBy             | 
+| `IDENTIFIABLE` | Identifiable: Id                                   | 
+| `TENANTABLE`   | Tenantable:TenantId                                | 
+| `VERSIONABLE`  | Versionable:Version                                | 
+| `NONE`         | 没有协议                                               |
+
+定义实体时候可以根据需要，织入不同的协议，**ApiHug** 将自动为你加入额外属性，且自动维护这些值对象；
+
+### DSL
+
+ORM框架使得开发者能够编写更干净、更简洁的持久化代码和领域逻辑。
+
+然而，对于ORM框架来说，构建正确且类型安全的查询API是一个设计上的挑战。
+
+在广泛使用的Java ORM框架Hibernate（以及与之密切相关的JPA标准），它提出了一个基于字符串的查询语言HQL（JPQL），与SQL非常相似。
+
+这种方法的明显缺点是缺乏类型安全性和静态查询检查。此外，在更复杂的情况下（例如，当查询需要根据某些条件在运行时构建时），构建HQL查询通常涉及到字符串的拼接，这通常是不安全的，并且容易出错。
+
+你是否厌倦了在线上环境检测SQL语法错误？ SQL语言的表达能力强大，是类型安全的，并且具有丰富的语法。
+
+而 **ApiHug** 为 SQL设定DSL， 可以使用Java编译器来编译SQL语句、元数据和数据类型， 在编译时检查SQL语句的正确性，而不是在运行时，从而提高开发效率和减少运行时错误。
+
+做到真正意义上的 **Typesafe** SQL!
+
+**ApiHug** SQL DSL 借鉴了 JOOQ, Mybatis dynamic SQL, QueryDsl 等解决方案：
+
+1. `proto` 元语实体设计
+2. `annotation` 实体标注
+3. 实体伴生 DSL 类
+
+兼具效率、实用和安全！
+
+```sql
+  SELECT
+      SYSTEM_PLATFORM_ROLE_AUTHORITY.AUTHORITIES
+  FROM
+      SYSTEM_PLATFORM_ROLE_AUTHORITY
+          JOIN
+      SYSTEM_PLATFORM_ROLE ON SYSTEM_PLATFORM_ROLE_AUTHORITY.ROLE_ID = SYSTEM_PLATFORM_ROLE.ID
+          JOIN
+      SYSTEM_PLATFORM_ACCOUNT_ROLE_MAPPER ON SYSTEM_PLATFORM_ROLE.ID = SYSTEM_PLATFORM_ACCOUNT_ROLE_MAPPER.ROLE_ID
+  WHERE
+      SYSTEM_PLATFORM_ACCOUNT_ROLE_MAPPER.ACCOUNT_ID = ?
+```
+
+等同表达式：
+
+```java
+ final Buildable<SelectModel> selectStatement =
+        select(SYSTEM_PLATFORM_ROLE_AUTHORITY.Authorities)
+            .from(SYSTEM_PLATFORM_ROLE_AUTHORITY)
+            .join(
+                SYSTEM_PLATFORM_ROLE,
+                on(SYSTEM_PLATFORM_ROLE_AUTHORITY.RoleId, equalTo(SYSTEM_PLATFORM_ROLE.Id)))
+            .join(
+                SYSTEM_PLATFORM_ACCOUNT_ROLE_MAPPER,
+                on(SYSTEM_PLATFORM_ROLE.Id, equalTo(SYSTEM_PLATFORM_ACCOUNT_ROLE_MAPPER.RoleId)))
+            // Base on specific account
+            .where(SYSTEM_PLATFORM_ACCOUNT_ROLE_MAPPER.AccountId, isEqualTo(accountId));
+```
+
+### Repository
+
+
+Spring Data 抽象中的核心接口是 [Repository]((https://docs.spring.io/spring-data/relational/reference/repositories/core-concepts.html))。它将要管理的领域类以及领域类的标识符类型作为类型参数。该接口主要作为一个标记接口，用于捕获要处理的类型，并帮助您发现扩展此接口的其他接口。
+
+> Spring Data considers domain types to be entities, more specifically aggregates. 
+> So you will see the term "entity" used throughout the documentation that can be interchanged with the term "domain type" or "aggregate".
+> As you might have noticed in the introduction it already hinted towards domain-driven concepts. We consider domain objects in the sense of DDD. Domain objects have identifiers (otherwise these would be identity-less value objects), and we somehow need to refer to identifiers when working with certain patterns to access data. 
+> Referring to identifiers will become more meaningful as we talk about repositories and query methods.
+
+**ApiHug** 混合了 `SimpleJdbcRepository` + DSL 
+
+1.  `HopeJdbcRepository` 继承自  `springframework.SimpleJdbcRepository` (`CrudRepository`|`PagingAndSortingRepository`|`QueryByExampleExecutor`)
+2.  通过 `Stub` 混入 Entity DSL 定义
+
+一个简单的 `Student` 实体  `Repository` 定义：
+
+```java
+public interface StudentEntityRepository 
+    extends HopeJdbc<StudentEntity>, 
+            SampleJdbcSupport, 
+            StudentEntityDSL, 
+            ListCrudRepository<StudentEntity, Long> {
+}
+```
+
+## Mybatis
+
+现有业务系统在数据库交互层， 除了上面说的数据库世界和应用程序世界天然的异构特质，另外一个增加复杂度就是 OLTP/OLAP 不分。
+
+上面说到**ApiHug** 采用最原始的JDBC来做 OLTP, DSL 解决类型安全, 那么OLAP 如何解决呢？
+
+从 DDD(领域驱动设计)的 CQRS(命令查询责任分离), **ApiHug** 得到了灵感：
+
+> CQRS 是一种架构模式，将系统的命令（修改数据）和查询（读取数据）操作分开处理。
+
+所以 OLTP/OLAP 天然就应该分开的，哪怕基于同一个数据源！哪怕需要重新部分逻辑， so **ApiHug** 推荐实践：
+
+1. 跨表统计和查询
+2. 复杂的统计(除单表基本统计，sum/avg etc)
+
+上文的 DSL举例代码就是个很好的例子。
+
+技术的底座呢?基于 [mybatis-dynamic-sql](https://github.com/mybatis/mybatis-dynamic-sql)，spring扩展 [NamedParameterJdbcTemplateExtensions](https://github.com/mybatis/mybatis-dynamic-sql/blob/master/src/main/java/org/mybatis/dynamic/sql/util/spring/NamedParameterJdbcTemplateExtensions.java)。
+
+模板类生成均由 `stub` 命令统一生成，业务层只需 `wire`进来实现逻辑就可以，是不是很便捷呢？
+
+## Converter
+
+涉及非 `primitive` 数据类型的序列和反序列化，比如列表对象， Enum 类型值。
+
+**内置**:
+
+| 类名                            | 备注                       |
+|-------------------------------|--------------------------|
+| BigDecimalListReaderConverter | BigDecimal List  反序列化    |
+| BigDecimalListWriterConverter | BigDecimal List  序列化     |
+| BooleanListWriterConverter    | Boolean List  序列化        |
+| BooleanListReaderConverter    | Boolean List  反序列化       |
+| ByteListReaderConverter       | Byte List  序列化           |
+| ByteListWriterConverter       | Byte List  反序列化          |
+| DateListReaderConverter       | LocalDate List  序列化      |
+| DateListWriterConverter       | LocalDate List  反序列化     |
+| DateTimeListReaderConverter   | LocalDateTime List  序列化  |
+| DateTimeListWriterConverter   | LocalDateTime List  反序列化 |
+| DoubleListReaderConverter     | Double List  序列化         |
+| DoubleListWriterConverter     | Double List  反序列化        |
+| FloatListReaderConverter      | Float List  序列化          |
+| FloatListWriterConverter      | Float List  反序列化         |
+| IntegerListReaderConverter    | Integer List  序列化        |
+| IntegerListWriterConverter    | Integer List  反序列化       |
+| LongListReaderConverter       | Long List  序列化           |
+| LongListWriterConverter       | Long List  反序列化          |
+| ShortListReaderConverter      | Short List  序列化          |
+| ShortListWriterConverter      | Short List  反序列化         |
+| StringListReaderConverter     | String List  序列化         |
+| StringListWriterConverter     | String List  反序列化        |
+| TimeListWriterConverter       | LocalTime List  序列化      |
+| TimeListReaderConverter       | LocalTime List  反序列化     |
+
+除预置converter外， 也可以自扩展， 通过 `proto` 定义的 Enum 值类型，框架已经帮你预生成了相关converter 自动注册到上下文了；
+
+如有一个 `AccountStatusEnum` 枚举类型，**ApiHug** 将自动生成注册如下几个 converter:
+
+| 类名                                    | 备注                               |
+|---------------------------------------|----------------------------------|
+| AccountStatusEnumReaderTitleConverter | AccountStatusEnum 按照标题 反序列化      |
+| AccountStatusEnumWriterTitleConverter | AccountStatusEnum 按照标题 反序列化      |
+| AccountStatusEnumListWriterConverter  | AccountStatusEnum List 按照标题 反序列化 |
+| AccountStatusEnumListReaderConverter  | AccountStatusEnum List 按照标题 反序列化 |
+
+
+## Pageable
+
+通过 [Criteria](https://docs.spring.io/spring-data/relational/reference/jdbc/entity-persistence.html#jdbc.criteria)  + [Pageable](https://docs.spring.io/spring-data/relational/reference/repositories/query-methods-details.html#repositories.special-parameters) 实现分页查询：
+
+
+```java
+@Derived
+@Query
+default Page<Account> queryPlatformAccount(QueryPlatformAccountRequest request, PageRequest pageParameter) {
+      Criteria criteria = EasyCriteria
+                            .in(Domain.Type,Constant.AccountTypes.PLATFORM_ACCOUNT_TYPE_NAME)
+                            .and(EasyCriteria.like(Domain.Name, request.getName()))
+                            .and(EasyCriteria.eq(Domain.Email, request.getEmail()));
+      return findAll(criteria, page(pageParameter));
+}
+```
+
+
+## Multi Data Source
 
 <TipInfo>To be done 🏗️</TipInfo>
+
+
+## Refer
+
+1. [jOOQ](https://www.jooq.org/) generates Java code from your database and lets you build type safe SQL queries through its fluent API.
+2. [mybatis-dynamic-sql](https://github.com/mybatis/mybatis-dynamic-sql) About SQL DSL (Domain Specific Language) for Kotlin and Java. Supports rendering for MyBatis or Spring JDBC Templates
+3. [querydsl](http://querydsl.com/) Unified Queries for Java.Querydsl is compact, safe and easy to learn.
+4. [Intro to Querydsl](https://www.baeldung.com/intro-to-querydsl)
+5. [Spring Data Using jOOQ](https://docs.spring.io/spring-boot/reference/data/sql.html#data.sql.jooq)

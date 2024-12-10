@@ -1,6 +1,6 @@
 ---
-title: ApiHug SDK Common Extension
-description: ApiHug SDK Common extension
+title: ApiHug SDK 扩展
+description: ApiHug SDK 扩展
 ---
 
 import { TipInfo } from '@/components/Tip'
@@ -54,8 +54,8 @@ import { TipInfo } from '@/components/Tip'
 
 参考Spring:
 
-1. [org.springframework.data.domain.PageRequest](https://github.com/spring-projects/spring-data-commons/blob/main/src/main/java/org/springframework/data/domain/PageRequest.java)
-2. [org.springframework.data.domain.Pageable](https://github.com/spring-projects/spring-data-commons/blob/main/src/main/java/org/springframework/data/domain/Pageable.java)
+1. [Spring Data PageRequest](https://github.com/spring-projects/spring-data-commons/blob/main/src/main/java/org/springframework/data/domain/PageRequest.java)
+2. [Spring Data Pageable](https://github.com/spring-projects/spring-data-commons/blob/main/src/main/java/org/springframework/data/domain/Pageable.java)
 
 **分页请求-PageRequest**
 
@@ -100,8 +100,8 @@ import { TipInfo } from '@/components/Tip'
 | `title`         | 错误标题       | USER_NAME_EMPTY               |
 | `description`   | 错误描述       | user name should not be empty |
 | `description2`  | 错误描述2      | 用户名不可以为空                      |
-| `path`          | field path | user.name                     |
-| `field`         | field name | name                          |
+| `path`          | field path | `user.name`                   |
+| `field`         | field name | `name`                        |
 | `rejectedValue` | 被拒绝值(原值)   | jake                          |
 | `constraint`    | 约束         | NOT_NULL                      |
 | `tips`          | 提示         | 价格必须是正数如:1000.12              |
@@ -134,7 +134,7 @@ import { TipInfo } from '@/components/Tip'
 
 #### HttpStatus
 
-包含标准的 Http 状态码， 不一一枚举，比如 BAD_REQUEST(400), FORBIDDEN(403);
+包含标准的 Http 状态码， 不一一枚举，比如 `BAD_REQUEST(400)`, `FORBIDDEN(403)`;
 
 
 ## it-common-mock
