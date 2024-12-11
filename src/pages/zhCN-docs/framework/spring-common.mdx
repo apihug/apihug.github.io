@@ -7,20 +7,20 @@ import { TipInfo } from '@/components/Tip'
 
 ## Spring Common
 
-Spring 扩展包， 包含基本共享类和函数，目的：协助更快的开发：<a target="_blank" href="https://search.maven.org/artifact/com.apihug/it-common-spring"><img
+Spring 扩展包， 包含基本共享类和函数，为更快更安全的开发：<a target="_blank" href="https://search.maven.org/artifact/com.apihug/it-common-spring"><img
   src="https://img.shields.io/maven-central/v/com.apihug/it-bom.svg?label=Maven%20Central"/></a>
 
 ## 功能
 
-不一一枚举，基本都非常直观和简单；使用中可以直接参考源码；
+不一一枚举，基本都非常直观和简单；使用中可以直接参考源码。
 
 ### Common
 
-| 类名                          | 备注                                 |
-|-----------------------------|------------------------------------|
-| `SimpleResultBuilder`       | ResponseEntity builder             |
-| `PageableResultBuilder`     | 支持Pageable ResponseEntity  builder |
-| `RuntimeContextInitializer` | 运行时上下文校验和说明                        |
+| 类名                          | 备注                               |
+|-----------------------------|----------------------------------|
+| `SimpleResultBuilder`       | ResponseEntity builder           |
+| `PageableResultBuilder`     | Pageable ResponseEntity  builder |
+| `RuntimeContextInitializer` | 运行时上下文校验和说明                      |
 
 #### SimpleResultBuilder
 
@@ -55,7 +55,7 @@ ResponseEntity builder 包含:
 2. 运行时项目  `RuntimeContext#getProject` 和   `RuntimeContext#getProto` 版本对比
 3. `hope-stub.json` 内 `dependencies` 版本对比
 
-<TipInfo>hope.runtime.check.module 默认配置为 UNCHECK， 改为 RESTRICT 任何校验错误将导致程序启动失败 </TipInfo>
+<TipInfo>hope.runtime.check.module 默认配置为 UNCHECK， 改为 RESTRICT 任何校验错误，将终止程序启动！ </TipInfo>
 
 
 ### Util
@@ -69,7 +69,7 @@ ResponseEntity builder 包含:
 
 ### Audit
 
-和安全相关， 获取 Audit 上下文， 包括： `Identify` 上下文账号信息，    `Tenant`上下文租户信息，一般从 `HopeContextHolder`衍生出来；
+和安全相关， 获取 Audit 上下文， 包括： `Identify` 上下文账号信息，    `Tenant`上下文租户信息，一般从 `HopeContextHolder`衍生出来。
 
 | 类名                     | 备注             |
 |------------------------|----------------|
@@ -138,7 +138,7 @@ ResponseEntity builder 包含:
 
 由于 `Hope` 应用， 基础代码使用代码生成技术，所以 Aspect(切面)无需采用运行时动态代理；
 
-Aspect 协议类其实只包含两个， 在我们的 安全框架里有 `SecurityAspect` 实现安全校验，当然你也可以扩展自己的比如log/audit 之类；
+Aspect 协议类其实只包含两个基类，安全框架里有 `SecurityAspect` 实现安全校验，当然你也可以扩展自己的比如log/audit 之类；
 
 
 | 类名           | 备注   |
@@ -151,9 +151,9 @@ Aspect 包含：
 1. type `AspectType`
 2. priority 越高优先级别越高
 3. name: 默认类名
-4. before: 前置
-5. after： 后置
-6. exception： 异常
+4. before: 前置操作
+5. after： 后置操纵
+6. exception： 异常操作
 
 AspectType:
 
