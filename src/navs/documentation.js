@@ -67,6 +67,7 @@ export const documentationNav = {
   "How": [
     {title: 'Upload File', href: '/docs/how/001_support_upload_file'},
     {title: 'Update Header & Cookie', href: '/docs/how/002_update_header_cookie'},
+    {title: 'How to use Enum', href: '/docs/how/003_how_to_handle_enum'},
   ],
   Milestone:[
     {title: 'Index', href: '/docs/milestone'},

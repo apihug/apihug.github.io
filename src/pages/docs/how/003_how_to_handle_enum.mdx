@@ -1,0 +1,99 @@
+---
+title: How to Better Handle Enums
+description: Hope's approach to better handling Enum (lists)
+---
+
+import { TipInfo } from '@/components/Tip'
+
+Enum handling can be a tricky issue. In applications, enum constants are great for avoiding hard-coding, but how do you handle enums during API transmission and serialization/deserialization at the database layer?
+
+The complexity increases further if list support is added. Enums have two default identifiers: `name` and `ordinal`.
+
+1. name(string): Returns the name of this enum constant, exactly as declared in its enum declaration.
+2. ordinal(int): The position of this enumeration constant in the enum declaration, where the initial constant is assigned an ordinal of zero.
+
+While `ordinal` seems to be a very efficient way to pass and store information, it can be compromised during the evolution of the enum and is harder to understand and read.
+
+Given this, the `Hope` framework, drawing on extensive engineering practices, has found a fairly moderate solution to the problem of handling the `Enum` data type:
+
+Two interfaces:
+
+1. Network Transmission: At the API level (automatically handled by Spring).
+2. Serialization Layer: Database (read/write).
+
+Two formats:
+
+1. Single
+2. Multiple (List)
+
+Goals:
+
+1. Intuitive and simple.
+2. Low learning curve.
+
+## Protocol
+
+Since **1.1.5-RELEASE**, only two configuration methods remain, see also [jakarta.persistence.EnumType](https://github.com/jakartaee/persistence/blob/master/api/src/main/java/jakarta/persistence/EnumType.java):
+
+1. STRING: Default `hope.common.enumeration.Enumeration#title()`, delegates to `java.lang.Enum#name()`.
+2. CODE: `hope.common.enumeration.Enumeration#code()` does not use `ordinal` (no longer used within the Hope framework to avoid explanation and cognitive costs).
+
+```protobuf
+enum EnumType {
+  //Default as STRING
+  // Persist `hope.common.enumeration.Enumeration#title()` usually this will delegate to the `java.lang.Enum#name()`
+  STRING = 0;
+  // Persist `hope.common.enumeration.Enumeration#code()`
+  CODE = 1;
+}
+```
+
+## Definition
+
+`Entity` definition:
+
+1. `status_list`: List of `OrderStatusEnum`, example with `CODE`: `100001,10002`.
+2. `status`: Single `OrderStatusEnum`, example with `TITLE`: `PLACED`.
+
+```protobuf
+repeated OrderStatusEnum status_list = 3 [(hope.persistence.column) = {
+    name: "STATUS_LIST",
+    type: VARCHAR,
+    length:{
+      value: 64
+    },
+    enum_type: CODE
+  }];
+
+OrderStatusEnum status = 4 [(hope.persistence.column) = {
+    name: "status",
+    type: VARCHAR,
+    length:{
+      value: 64
+    },
+    enum_type: STRING
+  }];
+```
+
+## Generation
+
+Generation mainly involves Spring JDBC reader/writer (OLAP), Mybatis Reader/Query (OLTP);
+
+<TipInfo>
+
+  Hope OLTP is based on Spring Data JDBC (not JPA/Hibernate/Mybatis)!
+
+  OLAP is based on Mybatis Query DSL, used for statistics and queries, not recommended for write operations!
+
+</TipInfo>
+
+
+| Class Name                                      | Function                | Included Classes                                                     | Notes                                      |
+|-------------------------------------------------|-------------------------|----------------------------------------------------------------------|--------------------------------------------|
+| `*domain.bootstrap.converter.{Domain}Converter` | Spring data convert     | OrderStatus(CodeListReaderConverter, CodeListWriterConverter, Title) | Injected during Spring JDBC initialization |
+| `*domain.bootstrap.mybatis.type.*TypeHandler`   | iBatis type TypeHandler | OrderStatus(CodeListTypeHandler, TitleListTypeHandler, Title)        | Batis Column Converter                     |
+
+The Hope framework will:
+
+1. During JDBC configuration, introduce extended Converters via `JdbcCustomConversions`.
+2. During Mybatis configuration: Define `org.mybatis.dynamic.sql.SqlColumn` with `TypeHandler` and parameter `ParameterTypeConverter`.
