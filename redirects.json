@@ -1,5 +1,6 @@
 [
   { "source": "/docs", "destination": "/docs/start", "permanent": false },
+  { "source": "/zhCN-docs", "destination": "/zhCN-docs/start", "permanent": false },
   {
     "source": "/docs/guides/user-guide/what-is-apihug",
     "destination": "/docs/start/what-is-apihug",
