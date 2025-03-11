@@ -1,0 +1,78 @@
+---
+title: How to Set API Root Path
+description: Configure the global API root path
+---
+
+import { TipInfo } from '@/components/Tip'
+
+此功能自：
+
+<TipInfo>
+  1. SDK 1.1.8-RELEASE
+  2. IDEA Plugin 0.6.5
+</TipInfo>
+
+Stay updated for more conveniences!
+
+<a target="_blank" href="https://search.maven.org/artifact/com.apihug/it-bom"><img src="https://img.shields.io/maven-central/v/com.apihug/it-bom.svg?label=Maven%20Central"/></a>
+
+<div>
+  <iframe src="https://plugins.jetbrains.com/embeddable/install/23534" border="0" height={'48px'} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+</div>
+
+## Background
+
+When designing `APIs`, we usually distinguish API resources from other server resources with a special prefix, for example:
+
+`{api}/{version}/{resources}/{resource_id}/action`
+
+1. `api`: The prefix for all API resources, such as `/api`.
+2. `version`: Version number, like `v1`, `v100`.
+3. `resource`: For instance, `books` related to books.
+4. `resource_id`: The ISBN of a book or your business ID, e.g., `1038DK-12`.
+5. `action`: Such as `get`. You can also use HTTP methods like `GET`.
+
+Benefits of using a special prefix:
+
+1. Enables targeted monitoring and management.
+2. Reduces cognitive load.
+
+<TipInfo>
+  The API prefix is a global setting, so all APIs under the module will have the same prefix!
+</TipInfo>
+
+## Setup
+
+
+**Update the configuration of your wire module**
+
+Project `{module}-proto/main/resources/hope-wire.json`:
+
+```json
+{
+  "packageName" : "com.good.work",
+  "name" : "good-app-proto",
+  "application" : "good-app",
+  "domain" : "work",
+  "apiRoot" : "/api"
+}
+```
+
+Add `api` root directory:  `"apiRoot" : "/api"`
+
+**Update your SDK version**
+
+Project `/gradle/libs.versions.toml`:
+
+```toml
+[versions]
+# libraries
+apihug = "1.1.8-RELEASE"
+
+```
+`apihug` to `1.1.8-RELEASE`+ <a target="_blank" href="https://search.maven.org/artifact/com.apihug/it-bom"><img
+src="https://img.shields.io/maven-central/v/com.apihug/it-bom.svg?label=Maven%20Central"/></a>
+
+## Plugin
+
+Please update the IDEA plugin to 0.6.5+ to enjoy configuration and debugging in the **UI**!

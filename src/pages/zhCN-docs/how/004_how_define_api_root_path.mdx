@@ -1,0 +1,88 @@
+---
+title: 如何设置 API 跟路径
+description: 设置全局 API 根路径
+---
+
+import { TipInfo } from '@/components/Tip'
+
+此功能自：
+
+<TipInfo>
+  1. SDK 1.1.8-RELEASE
+  2. IDEA Plugin 0.6.5
+</TipInfo>
+
+保持更新，享受更多便捷！
+
+<a target="_blank" href="https://search.maven.org/artifact/com.apihug/it-bom"><img
+  src="https://img.shields.io/maven-central/v/com.apihug/it-bom.svg?label=Maven%20Central"/></a>
+
+<div>
+  <iframe
+    src="https://plugins.jetbrains.com/embeddable/install/23534"
+    border="0"
+    height={'48px'}
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
+## 背景
+
+在设计 `api` 时候, 一般我们通过特殊的前缀来区分 `api` 和其他的服务器资源区分, 例如:
+
+`{api}/{version}/{resources}/{resource_id}/action`
+
+1.  `api`:  所有`api` 资源的前缀, 比如就叫 `/api`
+2.  `version`:  版本号，比如 `v1`, `v100`
+3.  `resource` 比如 `books` 关于图书
+4.  `resource_id` 图书 ISBN 码，或者你的业务ID, 比如 `1038DK-12`
+5.  `action` 比如 `get` 当然你也可以使用 HTTP 动作 `GET`
+
+使用特别的前缀好处：
+
+1. 可针对性监控管理
+2. 减低认知负担
+
+<TipInfo>
+  api 前缀是个全局性的设置， 所以模块下的api 都被加上同样的前缀！
+</TipInfo>
+
+## 设置
+
+
+**更新您wire模块的配置**
+
+项目 `{module}-proto/main/resources/hope-wire.json`:
+
+```json
+{
+  "packageName" : "com.good.work",
+  "name" : "good-app-proto",
+  "application" : "good-app",
+  "domain" : "work",
+  "apiRoot" : "/api"
+}
+```
+
+添加 `api` 根目录：  `"apiRoot" : "/api"`
+
+**更新您sdk 版本**
+
+项目 `/gradle/libs.versions.toml`:
+
+```toml
+[versions]
+# libraries
+apihug = "1.1.8-RELEASE"
+```
+
+`apihug`到  `1.1.8-RELEASE`+ <a target="_blank" href="https://search.maven.org/artifact/com.apihug/it-bom"><img
+src="https://img.shields.io/maven-central/v/com.apihug/it-bom.svg?label=Maven%20Central"/></a>
+
+
+## Plugin
+
+IDEA plugin 请更新到  0.6.5+ 也以在 **UI** 上愉快的进行配置和调试拉！
+
+
