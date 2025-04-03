@@ -11,7 +11,7 @@ import { ThemeSelect, ThemeToggle } from './ThemeToggle'
 function Featured2() {
   return (
     <a
-      href="/zhCN-docs/start"
+      href="/zhCN-docs/start.html"
       className="ml-3 text-xs leading-5 font-medium text-sky-600 dark:text-sky-400 bg-sky-400/10 rounded-full py-1 px-3 hidden xl:flex items-center hover:bg-sky-400/20"
     >
       <strong className="font-semibold">中文</strong>
@@ -48,7 +48,7 @@ function Featured2() {
 function Featured() {
   return (
     <a
-      href="/docs/changelog/sdk"
+      href="/docs/changelog/sdk.html"
       className="ml-3 text-xs leading-5 font-medium text-sky-600 dark:text-sky-400 bg-sky-400/10 rounded-full py-1 px-3 hidden xl:flex items-center hover:bg-sky-400/20"
     >
       <strong className="font-semibold">SDK v1.2.1 + Plugin 0.6.7</strong>
