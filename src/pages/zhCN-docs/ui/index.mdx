@@ -3,4 +3,27 @@ title: ApiHug UI 解决方案
 description: 前后端语义化设计，节约80%以上时间
 ---
 
-## TODO
+## 背景
+
+现代前端框架日趋SPA(Single Page Application)化，给前后协同都带来了挑战，ApiHug试图减少多人在前后协同带来的理解难度，和同步的滞后性。
+所以采用了：
+
+1. 前后项目在同工程中不同子模块
+2. 工具链上融合， `gradle` +  `vite`, 无缝集成，互相可以调用任务
+3. 运行时，java application 静态代理 + vue 端 proxy
+
+以实现前后端人员协同最大化，上下文切换最低化，开发效率最大化！ 
+
+这中新开发方式不是 ApiHug 首创，很早如[Jhipster](https://www.jhipster.tech/) 已在尝试，当然 ApiHug 也从 Jhipster上获取了很多灵感；
+
+ApiHug 紧紧围绕 Open Api 标准，使用DSL作为不同角色之间通用语言，让这一步推进异常的顺利！
+
+下面我们从协议层， 到应用层， 再到UI 层一一带你一步步领略如何借助 ApiHug 快速而又优雅进行全栈开发！ 
+
+
+## Refer
+
+1. [Jhipster](https://www.jhipster.tech/)
+2. [jmix](https://www.jmix.io/)
+3. [vaadin](https://vaadin.com/)
+

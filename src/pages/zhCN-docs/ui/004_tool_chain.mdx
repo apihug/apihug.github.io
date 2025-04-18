@@ -1,6 +1,45 @@
 ---
 title: ApiHug UI工具链
-description: 如何无缝集成gradle 和 pnpm,一站式体验
+description: 如何无缝集成gradle 和 vite,一站式体验
 ---
 
-## TODO
+由于 ApiHug 专门为企业级 Java 开发而设计，整个工具链是基于 Gradle, 而前端解决方案是基于 Vue, 所以必然涉及到 vite，pnpm 等前端
+
+## Gradle
+
+引入了插件 [com.github.node-gradle.node](https://github.com/node-gradle/gradle-node-plugin) 作为 node 和 gradle 工具栈之间的桥接；
+
+Task：
+
+| Name            | Comment                                                  |
+|-----------------|----------------------------------------------------------|
+| `clean`         | 清理 build 结果                                              |
+| `build`         | `clean` > `check` > `buildPackages` > `build` > `output` |
+| `buildPackages` | `pnpm install` > `build:packages`                        |
+| `test`          | `lint` > `typecheck` > `buildPackages` > `test:unit`     |
+| `lint`          | `buildPackages` > `lint`                                 |
+| `typecheck`     | `buildPackages` > `type-check`                           |
+| `check`         | `lint` > `typecheck` > `test`                            |
+| `dev`           | `buildPackages` > `dev`                                  |
+
+
+## Vite
+
+标准的 vite 项目编译流程:
+
+### Plugin
+
+1. vue
+2. vueJsx
+3. VueDevtools
+4. unplugin-auto-import/vite
+5. unplugin-vue-components/vite
+6. unplugin-icons/resolver
+7. unplugin-icons/vite
+8. unplugin-icons/loaders
+9. progress (vite-plugin-progress)
+
+### Other
+1. proxy
+2. tailwindcss
+

@@ -48,7 +48,7 @@ hopeStub {
 }
 ```
 
-| Property       | Meaning                                                      |
+| Property       | Comment                                                      |
 |----------------|--------------------------------------------------------------|
 | projectDir     | UI 模块相对路径                                                    |
 | httpVendor     | `@/service/http`, useGet/Post Module                         |
@@ -126,10 +126,10 @@ hopeStub {
 所以采用了：
 
 1. 前后项目在同工程中不同子模块
-2. 工具链上融合， `gradle` +  `pnpm`, 无缝集成，互相可以调用任务
+2. 工具链上融合， `gradle` +  `vite`, 无缝集成，互相可以调用任务
 3. 运行时，java application 静态代理 + vue 端 proxy
 
-所以最后达前后端人员最大程度协同，和最低上下文切换理解难度。 
+以实现前后端人员协同最大化，上下文切换最低化，开发效率最大化！
 
 ### App Build Hook
 

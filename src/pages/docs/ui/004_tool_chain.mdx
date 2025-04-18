@@ -3,4 +3,42 @@ title: ApiHug UI Tool Chain
 description: How to seamlessly integrate gradle and pnpm for a one-stop experience
 ---
 
-## TODO
+Since ApiHug is specifically designed for enterprise-level Java development, the entire toolchain is based on Gradle, while the frontend solution is based on Vue, which inevitably involves frontend tools like Vite and pnpm.
+
+## Gradle
+
+The plugin [com.github.node-gradle.node](https://github.com/node-gradle/gradle-node-plugin) is introduced as a bridge between Node.js and Gradle tool stacks;
+
+Tasks:
+
+| Name            | Comment                                                  |
+|-----------------|----------------------------------------------------------|
+| `clean`         | Clean build results                                      |
+| `build`         | `clean` > `check` > `buildPackages` > `build` > `output` |
+| `buildPackages` | `pnpm install` > `build:packages`                        |
+| `test`          | `lint` > `typecheck` > `buildPackages` > `test:unit`     |
+| `lint`          | `buildPackages` > `lint`                                 |
+| `typecheck`     | `buildPackages` > `type-check`                           |
+| `check`         | `lint` > `typecheck` > `test`                            |
+| `dev`           | `buildPackages` > `dev`                                  |
+
+
+## Vite
+
+Standard Vite project compilation process:
+
+### Plugin
+
+1. vue
+2. vueJsx
+3. VueDevtools
+4. unplugin-auto-import/vite
+5. unplugin-vue-components/vite
+6. unplugin-icons/resolver
+7. unplugin-icons/vite
+8. unplugin-icons/loaders
+9. progress (vite-plugin-progress)
+
+### Other
+1. proxy
+2. tailwindcss
