@@ -48,22 +48,22 @@ hopeStub {
 }
 ```
 
-| Property       | Meaning                                                      |
-|----------------|--------------------------------------------------------------|
-| projectDir     | UI module relative path                                       |
-| httpVendor     | `@/service/http`, useGet/Post Module                         |
-| noMerger       | `false` reserved, unused                                     |
-| outputDir      | `src/service`, API output relative directory in UI module    |
-| alwaysEraseOld | `false` reserved, unused                                     |
-| formType       | `RequestItem` form type                                      |
-| formModule     | `../type` form type reference path                          |
-| columnType     | `ResponseItem` column type                                   |
-| columnModule   | `../type` column type reference path                        |
-| pathToUrl      | `import { pathToUrl } from '@/service/utils'` path parsing helper function |
+| Property       | Meaning                                                                         |
+|----------------|---------------------------------------------------------------------------------|
+| projectDir     | UI module relative path                                                         |
+| httpVendor     | `@/service/http`, useGet/Post Module                                            |
+| noMerger       | `false` reserved, unused                                                        |
+| outputDir      | `src/service`, API output relative directory in UI module                       |
+| alwaysEraseOld | `false` reserved, unused                                                        |
+| formType       | `RequestItem` form type                                                         |
+| formModule     | `../type` form type reference path                                              |
+| columnType     | `ResponseItem` column type                                                      |
+| columnModule   | `../type` column type reference path                                            |
+| pathToUrl      | `import { pathToUrl } from '@/service/utils'` path parsing helper function      |
 | langDir        | `src/locales/langs` internationalization output relative directory in UI module |
-| firstLanguage  | `zh-CN` internationalization, first language                 |
-| secondLanguage | `en-US` internationalization, second language                |
-| types          | `src/types` types output relative directory in UI module     |
+| firstLanguage  | `zh-CN` internationalization, first language                                    |
+| secondLanguage | `en-US` internationalization, second language                                   |
+| types          | `src/types` types output relative directory in UI module                        |
 
 
 ## Compilation
@@ -107,17 +107,21 @@ Simply execute the `stub` command to generate UI content:
 │  │
 │  └─table
 │          TemplateExampleResponse.ts
+├─types
+│      api.d.ts
+│      app.d.ts
+│      auth.d.ts
 ```
 
 
 ## Runtime
 
-Since modern frameworks all use SPA architecture, which brings challenges to frontend-backend collaboration, ApiHug attempts to reduce the complexity of understanding and synchronization delays in multi-person frontend-backend collaboration.
+Since modern frameworks all use SPA(Single Page Application) architecture, which brings challenges to frontend-backend collaboration, ApiHug attempts to reduce the complexity of understanding and synchronization delays in multi-person frontend-backend collaboration.
 Therefore, it adopts:
 
 1. Frontend and backend projects in different submodules within the same project
 2. Tool chain integration, `gradle` + `pnpm`, seamless integration, tasks can call each other
-3. At runtime, java application static proxy + vue proxy
+3. Runtime, java application static proxy + vue proxy
 
 This achieves maximum collaboration between frontend and backend personnel with minimal context switching and understanding difficulty.
 
