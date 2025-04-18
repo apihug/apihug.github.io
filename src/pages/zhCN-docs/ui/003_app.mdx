@@ -3,4 +3,162 @@ title: ApiHug 应用UI配置
 description: 前后分离后端架构设计调整和说明
 ---
 
-## TODO
+<a target="_blank" href="https://search.maven.org/artifact/com.apihug/it-bom"><img
+  src="https://img.shields.io/maven-central/v/com.apihug/it-bom.svg?label=Maven%20Central"/></a>
+
+<div>
+  <iframe
+    src="https://plugins.jetbrains.com/embeddable/install/23534"
+    border="0"
+    height={'48px'}
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
+## 配置
+
+角色定义：
+
+1. proto 定义标准
+2. app 定义应用
+3. ui 定义交互
+
+源泉均来自 `proto`生成的协议，然后具由此生成应用基础，应用再链接 `ui`; 所以一般流程：
+
+1. 编译 proto 生成协议
+2. 通过协议 stub 生成 应用
+3. 生成应用过程中选择是否生成 ui
+
+UI 的生成规则，需要配置给 app, app触发UI生成;
+
+打开 vue 生成标志， `{app}/build.gradle`:
+
+```groovy
+hopeStub {
+    enableFrontVue = true
+}
+```
+
+`{app}/ui.json`:
+
+```json
+{
+  "projectDir": "../good-app-ui"
+}
+```
+
+| Property       | Meaning                                                      |
+|----------------|--------------------------------------------------------------|
+| projectDir     | UI 模块相对路径                                                    |
+| httpVendor     | `@/service/http`, useGet/Post Module                         |
+| noMerger       | `false` 预留，未用                                                |
+| outputDir      | `src/service`, API输出UI模块内相对目录                                |
+| alwaysEraseOld | `false` 预留，未用                                                |
+| formType       | `RequestItem` form 类型                                        |
+| formModule     | `../type`     form 类型引用路径                                    |
+| columnType     | `ResponseItem`  column 类型                                    |
+| columnModule   | `../type`       column 类型引用路径                                |
+| pathToUrl      | `import { pathToUrl } from '@/service/utils'`  path 路径解析帮助函数 |
+| langDir        | `src/locales/langs` 国际化输出UI模块内相对目录                           |
+| firstLanguage  | `zh-CN`  国际化，第一语言                                            |
+| secondLanguage | `en-US`  国际化，第二语言                                            |
+| types          | `src/types` 类型输出UI模块相对目录                                     |
+
+
+## 编译
+
+普通执行 `stub` 命令即可生成 UI 内容:
+
+`./gradlew.bat {app}:clean stub build -x test -x stubTest`
+
+```
+├─assets
+│....
+├─locales
+│  │  
+│  └─langs
+│      ├─en-US
+│      │      app.json
+│      │
+│      └─zh-CN
+│              app.json
+├─service
+│  │  http.ts
+│  │  index.ts
+│  │  type.ts
+│  │  utils.ts
+│  │
+│  ├─api
+│  │      api-example-api.ts
+│  │      api-system-system.ts
+│  │      index.ts
+│  │
+│  ├─form
+│  │      TemplateExampleRequest.ts
+│  │      UploadBookCoverToLocalRequest.ts
+│  │
+│  ├─model
+│  │      api-example-request-example.ts
+│  │      api-example-response-example.ts
+│  │      index.ts
+│  │      _common.ts
+│  │      _error.ts
+│  │
+│  └─table
+│          TemplateExampleResponse.ts
+
+```
+
+
+## 运行
+
+由于现代的框架都是SPA架构，给前后协同都带来了挑战，ApiHug试图减少多人在前后协同带来的理解难度，和同步的滞后性。 
+所以采用了：
+
+1. 前后项目在同工程中不同子模块
+2. 工具链上融合， `gradle` +  `pnpm`, 无缝集成，互相可以调用任务
+3. 运行时，java application 静态代理 + vue 端 proxy
+
+所以最后达前后端人员最大程度协同，和最低上下文切换理解难度。 
+
+### App Build Hook
+
+打包资源依赖 UI 项目打包，同时copy UI 资源 `dist` 到运行时静态文件目录：
+
+```groovy
+    //Really Static resource of the UI to Output Dir
+    tasks.register('copyUIResources', Copy) {
+        dependsOn project(':good-app-ui').tasks.named('build')
+        from project(':good-app-ui').layout.projectDirectory.dir('dist')
+        into "${layout.buildDirectory.get()}/resources/main/static"
+    }
+
+    tasks.named('processResources') {
+        dependsOn 'copyUIResources'
+    }
+```
+
+### SPA Filter
+
+打开 `hope.open.api.enable` 标志; 将 `api` 之外目录反向到 `index.html` 入口：
+
+```java
+SpaPathChecker DEFAULT =
+      path ->
+          !path.startsWith("/api")
+              && !path.startsWith("/management")
+              && !path.startsWith("/v3/api-docs")
+              && !path.startsWith("/hope/meta")
+              && !path.startsWith("/h2-console")
+              && !path.contains(".")
+              && path.matches("/(.*)");
+
+if (checker.passToSpa(path)) {
+      request.getRequestDispatcher("/index.html").forward(request, response);
+      return;
+}
+```
+
+然后就可以尽情享受和前端一样丝滑的便捷和体验！
+
