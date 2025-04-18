@@ -3,4 +3,80 @@ title: ApiHug Vue 框架
 description: 前端框架设计原则和说明
 ---
 
-## TODO
+## Structure
+
+```
+├─assets ①
+│  ├─styles
+│  │  └─transition
+│  └─svg-icon
+├─components ②
+│  ├─dashboard
+│  └─ui
+│      ├─accordion
+│      ├─alert
+├─composables ③
+├─config  ④
+├─directive ⑤
+├─layouts ⑥
+│  └─admin
+├─lib ⑦
+├─locales  ⑧
+│  └─langs
+│      ├─en-US
+│      └─zh-CN
+├─pages ⑨
+│  ├─dashboard
+│  └─example
+├─router ⑩
+│  └─auto
+├─service ⑫
+│  ├─api
+│  ├─form
+│  ├─model
+│  └─table
+├─stores ⑬
+├─types  ⑭
+└─utils ⑮
+```
+| 目录 | 内容       |
+|----|----------|
+| ①  | CSS 风格   |
+| ②  | 组件库      |
+| ③  | Hook     |
+| ④  | 配置       |
+| ⑤  | 指令扩展     |
+| ⑥  | 布局       |
+| ⑦  | 三方类      |
+| ⑧  | 国际化      |
+| ⑨  | 页面       |
+| ⑩  | 路由       |
+| ⑫  | 服务       |
+| ⑬  | 状态       |
+| ⑭  | `d.ts`定义 |
+| ⑮  | 帮助类      |
+
+## Function
+
+### Auto-import
+
+### Component
+
+### Layout
+
+### Router
+
+### Menu
+
+### Authority
+
+### Style
+
+### Icon
+
+
+## Trivial
+
+1. 生成文件可以在文件备注 `// hope-no-merger` 禁止生成覆盖，⚠️无法升级更新
+
+TBD
