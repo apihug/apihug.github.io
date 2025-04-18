@@ -64,6 +64,13 @@ export const documentationNav = {
     {title: '配置', href: '/zhCN-docs/copilot/001_settings.html'},
     {title: '功能', href: '/zhCN-docs/copilot/002_functions.html'},
   ],
+  "UI": [
+    {title: '介绍', href: '/zhCN-docs/ui.html'},
+    {title: '协议', href: '/zhCN-docs/ui/001_proto.html'},
+    {title: 'Vue', href: '/zhCN-docs/ui/002_vue.html'},
+    {title: '应用', href: '/zhCN-docs/ui/003_app.html'},
+    {title: '工具链', href: '/zhCN-docs/ui/004_tool_chain.html'},
+  ],
   "How": [
     {title: '文件上传', href: '/zhCN-docs/how/001_support_upload_file.html'},
     {title: '更新 Header & Cookie', href: '/zhCN-docs/how/002_update_header_cookie.html'},

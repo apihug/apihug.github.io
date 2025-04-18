@@ -64,6 +64,13 @@ export const documentationNav = {
     {title: 'Settings', href: '/docs/copilot/001_settings.html'},
     {title: 'Functions', href: '/docs/copilot/002_functions.html'},
   ],
+  "UI": [
+    {title: 'Intro', href: '/docs/ui.html'},
+    {title: 'Proto', href: '/docs/ui/001_proto.html'},
+    {title: 'Vue', href: '/docs/ui/002_vue.html'},
+    {title: 'App', href: '/docs/ui/003_app.html'},
+    {title: 'Tool', href: '/docs/ui/004_tool_chain.html'},
+  ],
   "How": [
     {title: 'Upload File', href: '/docs/how/001_support_upload_file.html'},
     {title: 'Update Header & Cookie', href: '/docs/how/002_update_header_cookie.html'},
