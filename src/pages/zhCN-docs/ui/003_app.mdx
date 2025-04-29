@@ -48,12 +48,14 @@ hopeStub {
 }
 ```
 
+最后跟新：  `1.3.4-RELEASE`
+
 | Property       | Comment                                                      |
 |----------------|--------------------------------------------------------------|
-| projectDir     | UI 模块相对路径                                                    |
+| uiModuleDir    | UI 模块相对路径  ~~projectDir~~                                    |
 | httpVendor     | `@/service/http`, useGet/Post Module                         |
 | noMerger       | `false` 预留，未用                                                |
-| outputDir      | `src/service`, API输出UI模块内相对目录                                |
+| apiDir         | `src/service`, API输出UI模块内相对目录 ~~outputDir~~                  |
 | alwaysEraseOld | `false` 预留，未用                                                |
 | formType       | `RequestItem` form 类型                                        |
 | formModule     | `../type`     form 类型引用路径                                    |
@@ -63,7 +65,14 @@ hopeStub {
 | langDir        | `src/locales/langs` 国际化输出UI模块内相对目录                           |
 | firstLanguage  | `zh-CN`  国际化，第一语言                                            |
 | secondLanguage | `en-US`  国际化，第二语言                                            |
-| types          | `src/types` 类型输出UI模块相对目录                                     |
+| typesDir       | `src/types` 类型输出UI模块相对目录 ~~types~~                           |
+| autoRouter     | 是否打开自动router扫描,默认 `false`                                    |
+| pagesDir       | 用来扫描的页面相对目录,默认 `src/pages`                                   |
+| pagesPath      | 页面应用path, 默认 `@/pages`                                       |
+| routerOutDir   | router 输出目录,  默认 `src/router/auto`                           |
+| menuItem       | 菜单元素定义, 默认 `MenuItem`                                        |
+| menuItemImport | 菜单元素引用包, 默认 `./types`                                        |
+| authSplit      | 授权分隔符，用来组装树结构, 默认 `:`                                        |
 
 
 ## 编译
