@@ -7,6 +7,23 @@ description: 前端框架设计原则和说明
 
 ## Structure
 
+项目整体采用 **Monorepo** 设计：
+
+```
+├─packages (1)
+│  ├─antd
+│  ├─util
+│  └─hook
+├─src (2)
+│  ├─assets
+│  └─components
+│
+```
+
+1. (1) 独立包模块：组件、util、hook etc
+2. (2) 主应用
+
+**src** 为主应用入口：
 
 ```
 ├─assets (1)
@@ -62,27 +79,136 @@ description: 前端框架设计原则和说明
 
 ## 功能
 
-### Vite
-
-1. Auto-import
-2. Auto-component
-3. Icon
-
 ### Component
 
-### Layout
+**ui**
+
+来自 [shadcn-vue](https://www.shadcn-vue.com/) , 独立共享组件。
+
+> This is NOT a component library. It's a collection of re-usable components that you can copy and paste or use the CLI to add to your apps.
+
+源头来自： react 社区：[shadcn](https://ui.shadcn.com/)
+
+TBD: 移动到独立 packages
+
+**other**
+
+本目录下， 非 **ui** 为自定义组件， 注意所有 **src/components** 将被 `unplugin-vue-components/vite` 自动导入：
+
+```typescript
+    Components({
+      dts: 'src/types/components.d.ts',
+      dirs: ['src/components']
+    })
+```
 
 ### Router
 
-1. 自动生成
+路由自动发现注册，可由 `hope` 工具链，完整自动发现和生成， 配置在 `{module}-app` 的 `ui.json` 配置 [ui](/zhCN-docs/ui/003_app#configuration)。
 
-### Menu
+打开 `autoRouter` 标志， 自动扫描, **pagesDir** 默认配置自 `{module}-ui`模块下的`src/pages`路径。
+
+页面 meta 信息需要额外配置元信息(`defineOptions`)，如`src/pages/dashboard/index.vue`:
+
+```vue
+<script setup lang="ts">
+  defineOptions({
+    name: 'Dashboard',
+    meta: {
+      title: 'Dashboard页面',
+      //i18key: 'pages.dashboard.title',
+      icon: 'lucide:table',
+      hidden: false,
+      layout: 'admin',
+      sort: 1,
+    },
+  })
+</script>
+```
+
+工具执行后，输出到  `src/router/auto/index.ts` (`routerOutDir` 默认配置 `src/router/auto`):
+
+```typescript
+export const pages: RouteRecordRaw[] = [{
+  name: 'Dashboard',
+  path: '/dashboard',
+  component: () => import('@/pages/dashboard/index.vue'),
+  meta: {
+    title: 'Dashboard页面',
+    i18key: 'pages.dashboard.title',
+    icon: 'dash',
+    layout: 'admin',
+    hidden: false,
+    type: 'LEAF',
+    level: 0,
+    displayOrder: 0,
+  },
+}]
+```
+
+| Property     | Comment |
+|--------------|---------|
+| title        | 标题描述    |
+| i18key       | 国际化key  |
+| icon         | icon    |
+| layout       | 样式布局    |
+| hidden       | 是否隐藏    |
+| type         | 类型      |
+| level        | level   |
+| displayOrder | 显示顺序    |
+
+1. type: `ROOT|BRANCH|LEAF` 路径在整个路由中位置，根、中间、叶节点
+2. level: 深度，0 为根
+3. displayOrder: 显示顺序，同级别展示先后顺序， 在路由菜单中显示顺序
+
+其他输出：
+
+由路由树状结构生成菜单树结构可以作为默认菜单结构，也可做为定配菜单输入元信息。
+
+**Menu**
+
+```typescript
+export const menus: MenuItem[] = [{
+  name: 'Dashboard',
+  path: '/dashboard',
+  title: 'Dashboard页面',
+  i18key: 'pages.dashboard.title',
+  icon: 'dash',
+  hidden: false,
+  type: 'LEAF',
+  level: 0,
+  displayOrder: 0,
+}, {
+  path: '/example',
+  i18key: 'pages.example.title',
+  type: 'ROOT',
+  level: 0,
+  children: [{
+    name: 'ExampleForm',
+    path: '/example/form',
+    title: '示例表单',
+    i18key: 'pages.example.form.title',
+    icon: 'lucide:search',
+    type: 'LEAF',
+    level: 1,
+    parentPath: '/example',
+    displayOrder: 0,
+  }]
+}]
+```
+
+**i18n**
 
 1. 自动生成
 
 ### Authority
 
 1. 自动生成
+
+
+### Layout
+
+
 
 ### Style
 
@@ -96,6 +222,14 @@ description: 前端框架设计原则和说明
 ## Plugin
 
 ## packages
+
+
+## Vite
+
+1. Auto-import
+2. Auto-component
+3. Icon
+
 
 ## Trivial
 
