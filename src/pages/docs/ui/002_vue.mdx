@@ -7,75 +7,351 @@ The complete frontend template has not been officially released yet and is still
 
 ## Structure
 
-```
-├─assets (1)
-│  ├─styles
-│  │  └─transition
-│  └─svg-icon
-├─components (2)
-│  ├─dashboard
-│  └─ui
-│      ├─accordion
-│      ├─alert
-├─composables (3)
-├─config  (4)
-├─directive (5)
-├─layouts (6)
-│  └─admin
-├─lib (7)
-├─locales  (8)
-│  └─langs
-│      ├─en-US
-│      └─zh-CN
-├─pages (9)
-│  ├─dashboard
-│  └─example
-├─router (10)
-│  └─auto
-├─service (11)
-│  ├─api
-│  ├─form
-│  ├─model
-│  └─table
-├─stores (12)
-├─types  (13)
-└─utils (14)
-```
+The project adopts a **Monorepo** design:
 
-| Directory | Content               |
-|-----------|-----------------------|
-| (1)       | CSS Styles            |
-| (2)       | Component Library     |
-| (3)       | Hooks                 |
-| (4)       | Configuration         |
-| (5)       | Directive Extensions  |
-| (6)       | Layouts               |
-| (7)       | Third-party Libraries |
-| (8)       | Internationalization  |
-| (9)       | Pages                 |
-| (10)      | Routing               |
-| (11)      | Services              |
-| (12)      | State Management      |
-| (13)      | `d.ts` Definitions    |
-| (14)      | Utility Classes       |
+```  
+├─packages (1)  
+│  ├─antd  
+│  ├─util  
+│  └─hook  
+├─src (2)  
+│  ├─assets  
+│  └─components  
+│  
+```  
+
+1. (1) Independent package modules: components, util, hook, etc.
+2. (2) Main application
+
+**src** is the main application entry:
+
+```  
+├─assets (1)  
+│  ├─styles  
+│  │  └─transition  
+│  └─svg-icon  
+├─components (2)  
+│  ├─dashboard  
+│  └─ui  
+│      ├─accordion  
+│      ├─alert  
+├─composables (3)  
+├─config  (4)  
+├─directive (5)  
+├─layouts (6)  
+│  └─admin  
+├─lib (7)  
+├─locales  (8)  
+│  └─langs  
+│      ├─en-US  
+│      └─zh-CN  
+├─pages (9)  
+│  ├─dashboard  
+│  └─example  
+├─router (10)  
+│  └─auto  
+├─service (11)  
+│  ├─api  
+│  ├─form  
+│  ├─model  
+│  └─table  
+├─stores (12)  
+├─types  (13)  
+└─utils (14)  
+```  
+
+| Directory | Content               |  
+|-----------|-----------------------|  
+| (1)       | CSS Styles            |  
+| (2)       | Component Library     |  
+| (3)       | Hooks                 |  
+| (4)       | Configuration         |  
+| (5)       | Directives            |  
+| (6)       | Layouts               |  
+| (7)       | Third-party Libraries |  
+| (8)       | Internationalization  |  
+| (9)       | Pages                 |  
+| (10)      | Routing               |  
+| (11)      | Services              |  
+| (12)      | State Management      |  
+| (13)      | `d.ts` Definitions    |  
+| (14)      | Helper Classes        |  
 
 ## Features
 
-### Vite
-
-1. Auto-import
-2. Auto-component
-3. Icon
-
 ### Component
 
-### Layout
+**ui**
+
+Adopted from [shadcn-vue](https://www.shadcn-vue.com/), these are independent shared components.
+
+> This is NOT a component library. It's a collection of re-usable components that you can copy and paste or use the CLI to add to your apps.
+
+Original source from the React community: [shadcn](https://ui.shadcn.com/).
+
+TBD: Move to independent packages.
+
+**other**
+
+Non-**ui** components in this directory are custom components. Note that all **src/components** will be auto-imported by `unplugin-vue-components/vite`:
+
+```typescript  
+    Components({  
+      dts: 'src/types/components.d.ts',  
+      dirs: ['src/components']  
+    })  
+```  
 
 ### Router
 
-### Menu
+Automatic route discovery and registration via the `hope` toolchain. Configured in `ui.json` under `{module}-app` (see [ui](/docs/ui/003_app#configuration)).
+
+Enable the `autoRouter` flag to automatically scan the **pagesDir**, which defaults to `src/pages` under the `{module}-ui` module.
+
+Page meta information requires additional configuration via `defineOptions`, e.g., `src/pages/dashboard/index.vue`:
+
+```vue  
+<script setup lang="ts">  
+  defineOptions({  
+    name: 'Dashboard',  
+    meta: {  
+      title: 'Dashboard Page',  
+      //i18key: 'pages.dashboard.title',  
+      icon: 'lucide:table',  
+      hidden: false,  
+      layout: 'admin',  
+      sort: 1,  
+    },  
+  })  
+</script>  
+```  
+
+After tool execution, the output is written to `src/router/auto/index.ts` (`routerOutDir` defaults to `src/router/auto`):
+
+```typescript  
+export const pages: RouteRecordRaw[] = [{  
+  name: 'Dashboard',  
+  path: '/dashboard',  
+  component: () => import('@/pages/dashboard/index.vue'),  
+  meta: {  
+    title: 'Dashboard Page',  
+    i18key: 'pages.dashboard.title',  
+    icon: 'dash',  
+    layout: 'admin',  
+    hidden: false,  
+    type: 'LEAF',  
+    level: 0,  
+    displayOrder: 0,  
+  },  
+}]  
+```  
+
+| Property     | Comment                  |  
+|--------------|--------------------------|  
+| title        | Title Description        |  
+| i18key       | Internationalization Key |  
+| icon         | Icon                     |  
+| layout       | Layout Style             |  
+| hidden       | Whether to Hide          |  
+| type         | Type                     |  
+| level        | Depth Level              |  
+| displayOrder | Display Order            |  
+
+1. `type`: `ROOT | BRANCH | LEAF` - Position in the route hierarchy (root, branch, leaf).
+2. `level`: Depth, 0 being the root.
+3. `displayOrder`: Display order for sibling routes in menus.
+
+Other outputs:
+
+The generated route tree structure can be used as the default menu structure or as input for custom menus.
+
+**Menu**
+
+```typescript  
+export const menus: MenuItem[] = [{  
+  name: 'Dashboard',  
+  path: '/dashboard',  
+  title: 'Dashboard Page',  
+  i18key: 'pages.dashboard.title',  
+  icon: 'dash',  
+  hidden: false,  
+  type: 'LEAF',  
+  level: 0,  
+  displayOrder: 0,  
+}, {  
+  path: '/example',  
+  i18key: 'pages.example.title',  
+  type: 'ROOT',  
+  level: 0,  
+  children: [{  
+    name: 'ExampleForm',  
+    path: '/example/form',  
+    title: 'Example Form',  
+    i18key: 'pages.example.form.title',  
+    icon: 'lucide:search',  
+    type: 'LEAF',  
+    level: 1,  
+    parentPath: '/example',  
+    displayOrder: 0,  
+  }]  
+}]  
+```  
+
+**i18n**
+
+The tool auto-generates i18n configurations in `src/locales/{lang}/pages.json`:
+
+```json  
+{  
+  "dashboard": {  
+    "title": "Dashboard Page"  
+  },  
+  "example": {  
+    "title": "Pure Example",  
+    "form": {  
+      "title": "Example Form - Dashuai"  
+    },  
+    "search-table": {  
+      "title": "Search Table - Xiaomeng"  
+    },  
+    "table": {  
+      "title": "$Example Table"  
+    },  
+    "trivial": {  
+      "title": "Example Page"  
+    }  
+  }  
+}  
+```  
+
+Based on `firstLanguage` & `secondLanguage` configurations in [ui](/docs/ui/003_app#configuration):
+
+1. The page’s `title` meta is written to the default language configuration.
+2. If unconfigured, the path is used as the value.
+3. If `i18key` is unconfigured, the path is used.
+4. `i18key` is auto-formatted to start with `pages.` and end with `.title`, aligning with the framework’s i18n mechanism (see `pagePrefix` & `pageSuffix` in [ui](/zhCN-docs/ui/003_app#configuration)).
+5. i18n entries prefixed with `$` indicate unmodified defaults. Removing `$` prevents future overwrites.
+
+For example:
+- `example.form.title` (without `$`) will not sync with `meta.title` updates.
+- `example.table.title` (with `$`) will auto-update with `meta.title` changes.
+
+This workflow assists initial i18n setup while alerting developers to modify defaults.
 
 ### Authority
+
+Refer to Hope Framework’s [Minimalist Authentication & Authorization](/docs/framework/widget/authority) design.
+
+The toolchain processes Authority Enums as follows:
+
+1. Generates definitions in `src/service/model/{authority}.ts`.
+2. Defines global types in `src/types/auth.d.ts`.
+
+```protobuf  
+enum WorkAuthorityEnum {  
+    option (hope.swagger.enm) = { description: "Example Authority Enum for the project, MODIFY IT" };  
+
+    ROLE_ADD = 200 [(hope.constant.field) = {code: 200, message: "system:role:add", message2: "Authority to add role"}];  
+    //.... other  
+}  
+```  
+
+**Enum Definition**
+
+```typescript  
+export const WorkAuthorityEnum = {  
+    USER_ADD: { title: 'USER_ADD', code: 1, permission: 'user:add', deprecated: false, remark: 'Authority to add user'},  
+    //......  
+}  
+
+// eslint-disable-next-line ts/no-redeclare  
+export type WorkAuthorityEnum = keyof typeof WorkAuthorityEnum  
+
+export type WorkAuthorityEnumValue = typeof WorkAuthorityEnum[keyof typeof WorkAuthorityEnum]  
+```  
+
+| Property   | Comment                                               |  
+|------------|-------------------------------------------------------|  
+| title      | Title: `USER_ADD`                                     |  
+| code       | Code: 1                                               |  
+| permission | Permission: `user:add` (hierarchy represented by `:`) |  
+| deprecated | Deprecated?                                           |  
+| remark     | Description: Authority to add user                    |  
+
+**d.ts Definitions**
+
+1. `Api.Authority.Map`: Authority definitions (map).
+2. `Api.Authority.Type`: Authority type.
+3. `Api.Authority.TypeList`: List of Authority types.
+4. `Api.Authority.Item`: Authority item.
+5. `Api.Authority.AuthorityItem`: Authority tree structure.
+6. `Api.Authority.AuthorityTree`: Authority tree.
+
+```typescript  
+declare namespace Api {  
+  namespace Authority {  
+
+    export const Map: {  
+        USER_ADD: { title: 'USER_ADD', code: 1, permission: 'user:add', deprecated: false, remark: 'Authority to remove user(Remove or modify this template sample)'}  
+        //...  
+    }  
+
+    export type Type = keyof typeof Map  
+    export type TypeList = Type[]  
+
+    /**  
+     * Authority item type, contains the following properties:  
+     * - title: Authority title, e.g., USER_ADD  
+     * - code: Authority code, e.g., 1024  
+     * - permission: Permission, e.g., user:add  
+     * - deprecated: Whether deprecated  
+     * - remark: Notes, e.g., permission to add user account  
+     */  
+    export type Item = typeof Map[Type]  
+
+    interface AuthorityItem {  
+      code: number  
+      name: string  
+      expression: string  
+      deprecated: boolean  
+      type?: 'LEAF' | 'ROOT' | 'BRANCH'  
+      description?: string  
+      level?: number  
+      children?: AuthorityItem[]  
+    }  
+
+    export const AuthorityTree: AuthorityItem[] = [{  
+        "code": 0,  
+        "name": "system",  
+        "expression": "system",  
+        "deprecated": false,  
+        "type": "ROOT",  
+        "children": [{  
+          "code": 0,  
+          "name": "system:role",  
+          "expression": "system:role",  
+          "deprecated": false,  
+          "type": "BRANCH",  
+          "children": [{  
+            "code": 10240200,  
+            "name": "ROLE_ADD",  
+            "expression": "system:role:add",  
+            "description": "Authority to add role",  
+            "deprecated": false,  
+            "type": "LEAF",  
+            "level": 2  
+          }],  
+          "level": 1  
+        }],  
+        "level": 0  
+    }]  
+  }  
+}  
+```  
+
+### Layout
+
+TBD
 
 ### Style
 
@@ -85,19 +361,54 @@ The complete frontend template has not been officially released yet and is still
 
 ## Catalog
 
-## Plugin
+Unified third-party dependency version management via [catalog](https://pnpm.io/catalogs). Configured in `pnpm-workspace.yaml`:
+
+```yaml  
+packages:  
+  - 'packages/*'  
+
+catalog:  
+  # UI Framework  
+  'vue': '^3.5.13'  
+  'vue-router': '^4.5.0'  
+  'vue-i18n': '^11.1.2'  
+```  
+
+Project dependencies:
+
+```json  
+{  
+  "dependencies": {  
+    "vee-validate": "catalog:",  
+    "axios": "catalog:"  
+  }  
+}  
+```  
 
 ## Packages
 
+### antd
+
+### util
+
+### hook
+
+## Plugin
+
+1. Auto-import: `unplugin-auto-import/vite`
+2. Auto-component: `unplugin-vue-components/vite`
+3. Icon: `unplugin-icons/vite`
+
 ## Trivial
 
-1. Lint
-2. Prettier
-3. VSCode
-4. Format/antfu
+1. lint
+2. prettier
+3. vscode
+4. format/antfu
 
 ## Tip
 
-1. To prevent file generation from being overwritten, add the comment `// hope-no-merger` in the file. ⚠️ This will prevent updates and upgrades.
+1. Add `// hope-no-merger` to generated files to prevent overwriting. ⚠️ This disables upgrades.
 
-TBD
+TBD  
+[file content end]

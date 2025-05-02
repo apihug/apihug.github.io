@@ -199,16 +199,168 @@ export const menus: MenuItem[] = [{
 
 **i18n**
 
-1. 自动生成
+工具自动生成 i18n 配置 `sr/locals/{lang}/pages.json`:
+
+```json
+{
+  "dashboard": {
+    "title": "Dashboard页面"
+  },
+  "example": {
+    "title": "纯例子",
+    "form": {
+      "title": "示例表单-大帅"
+    },
+    "search-table": {
+      "title": "搜索表格-小萌"
+    },
+    "table": {
+      "title": "$示例表格"
+    },
+    "trivial": {
+      "title": "示例页面"
+    }
+  }
+}
+```
+
+这里会根据, [ui](/zhCN-docs/ui/003_app#configuration) 配置 `firstLanguage` & `secondLanguage`, 符合规则：
+
+1. 页面自带 `title` Meta 信息会输出到默认语言配置中
+2. 未配置，默认采用路径为值
+3. `i18key` 如果未配置默认使用路径名
+4. `i18key` 会自动格式化： `pages.` 开头， `.title` 结尾； 这个和框架 `i18n` 机制一致； 参考 [ui](/zhCN-docs/ui/003_app#configuration) 里配置 `pagePrefix` & `pageSuffix`
+5.  i18n 配置符合整体框架原则：默认未改动一 `$`前缀， 修改完后去掉 `$`,后续不会再覆盖。
+
+如例子中： `example.form.title` 后续页面中 `meta.title` 跟新，不再同步到这个 `pages.json` 配置内，应该没有 `$` 前缀；
+而 `example.table.title` 将根据 这个页面内 `meta.title` 自动更新。
+
+这种工作机制主要帮助第一次构建页面 i18n 配置， 同时提醒开发人员改变默认配置(`$`将展示在前台)。
+
 
 ### Authority
 
-1. 自动生成
+参考Hope 框架[极简 Authentication & Authorization](/zhCN-docs/framework/widget/authority)设计。
+
+配合前端便捷利用现在Hope框架 Authentication & Authorization，工具栈对 Authority 处理如下：
+
+Authority 定义 Enum 将被处理，生成到如下几个目录：
+
+1. `src/service/model/{authority}.ts`  authority enum 对象定义
+2. `src/types/auth.d.ts` 全局 enum authority type 定义
+
+```protobuf
+enum  WorkAuthorityEnum {
+
+    option (hope.swagger.enm) = { description: "Example Authority Enum for the project, MODIFY IT" };
+
+    ROLE_ADD = 200 [(hope.constant.field) = {code: 200,message: "system:role:add", message2: "Authority to add role"}];
+    //.... other
+}
+```
+
+**enum 定义**
+
+```typescript
+export const WorkAuthorityEnum = {
+	USER_ADD: { title: 'USER_ADD', code: 1, permission: 'user:add', deprecated: false, remark: 'Authority to add user'},
+  //......
+}
+
+ // eslint-disable-next-line ts/no-redeclare
+export type WorkAuthorityEnum =  keyof typeof WorkAuthorityEnum
+
+export type WorkAuthorityEnumValue =  typeof WorkAuthorityEnum[keyof typeof WorkAuthorityEnum]
+```
+
+Enum 包含属性：
+
+| Property   | Comment                      |
+|------------|------------------------------|
+| title      | 标题: `USER_ADD`               |
+| code       | 代码: 1                        |
+| permission | 权限： `user:add`  一般`:` 代表层级关系 |
+| deprecated | 失效否?                         |
+| remark     | 描述:Authority to add user     |
+
+
+**d.ts 定义**
+
+1. `Api.Authority.Map` Authority 定义 (map)
+2. `Api.Authority.Type` Authority 类型
+3. `Api.Authority.TypeList`  Authority 类型列表
+4. `Api.Authority.Item`  Authority 体
+5. `Api.Authority.AuthorityItem` Authority Tree 结构定义
+6. `Api.Authority.AuthorityTree` Authority Tree
+
+```typescript
+declare namespace Api {
+  namespace Authority {
+
+	export const Map: {
+			USER_ADD: { title: 'USER_ADD', code: 1, permission: 'user:add', deprecated: false, remark: 'Authority to remove user(Remove or modify this template sample)'}
+	    //...  
+  }
+
+    export type Type = keyof typeof Map
+    export type TypeList = Type[]
+
+    /**
+     * Authority item type, contains the following properties:
+     * - title: Authority title, USER_ADD
+     * - code: Authority code, 1024
+     * - permission: Permission, user:add
+     * - deprecated: Whether it's deprecated, false
+     * - remark: Additional notes, permission to add user account
+     */
+    export type Item = typeof Map[Type]
+
+    interface AuthorityItem {
+      code: number
+      name: string
+      expression: string
+      deprecated: boolean
+      type?: 'LEAF' | 'ROOT' | 'BRANCH'
+      description?: string
+      level?: number
+      children?: AuthorityItem[]
+    }
+
+    
+    export const AuthorityTree: AuthorityItem[] = [{
+        "code" : 0,
+        "name" : "system",
+        "expression" : "system",
+        "deprecated" : false,
+        "type" : "ROOT",
+        "children" : [ {
+          "code" : 0,
+          "name" : "system:role",
+          "expression" : "system:role",
+          "deprecated" : false,
+          "type" : "BRANCH",
+          "children" : [ {
+            "code" : 10240200,
+            "name" : "ROLE_ADD",
+            "expression" : "system:role:add",
+            "description" : "Authority to add role",
+            "deprecated" : false,
+            "type" : "LEAF",
+            "level" : 2
+          }],
+          "level" : 1
+        } ],
+        "level" : 0
+      }]
+
+  }
+}
+```
 
 
 ### Layout
 
-
+TBD
 
 ### Style
 
@@ -216,19 +368,46 @@ export const menus: MenuItem[] = [{
 2. Color
 3. Tailwindcss
 
-
 ## Catalog
 
-## Plugin
+统一三方依赖版本配置和管理，采用 [catalog](https://pnpm.io/catalogs) 方式统一配置,  `pnpm-workspace.yaml`:
+
+```yaml
+packages:
+  - 'packages/*'
+
+catalog:
+  # UI 框架相关
+  'vue': '^3.5.13'
+  'vue-router': '^4.5.0'
+  'vue-i18n': '^11.1.2'
+```
+项目中包依赖：
+
+```json
+ {
+   "dependencies": {
+    "vee-validate": "catalog:",
+    "axios": "catalog:"
+   }
+ }
+```
 
 ## packages
 
 
-## Vite
+### antd
 
-1. Auto-import
-2. Auto-component
-3. Icon
+### util
+
+### hook
+
+
+## Plugin
+
+1. Auto-import  `unplugin-auto-import/vite`
+2. Auto-component `unplugin-vue-components/vite`
+3. Icon  `unplugin-icons/vite`
 
 
 ## Trivial
