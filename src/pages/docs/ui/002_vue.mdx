@@ -224,11 +224,11 @@ The tool auto-generates i18n configurations in `src/locales/{lang}/pages.json`:
 }  
 ```  
 
-This will be processed based on the `firstLanguage` & `secondLanguage` configured in [ui](/zhCN-docs/ui/003_app#configuration):
+This will be processed based on the `firstLanguage` & `secondLanguage` configured in [ui](/docs/ui/003_app#configuration):
 
 1. The page's built-in `title` meta information will output to the default language value configuration.
 2. If `i18key` is not configured, it defaults to using the pathname: `x/y/z` → `pages.x.y.z.title`.
-3. If `i18key` is configured, it will automatically format as follows: starts with `pages.` and ends with `.title`; for example, `x.y.z` → `pages.x.y.z.title`, to align with the framework's `i18n` mechanism; refer to configuring `pagePrefix` & `pageSuffix` in [ui](/zhCN-docs/ui/003_app#configuration).
+3. If `i18key` is configured, it will automatically format as follows: starts with `pages.` and ends with `.title`; for example, `x.y.z` → `pages.x.y.z.title`, to align with the framework's `i18n` mechanism; refer to configuring `pagePrefix` & `pageSuffix` in [ui](/docs/ui/003_app#configuration).
 4. i18n configuration values must follow the principle: default unchanged values are prefixed with `$`, manually corrected values should remove the `$` -- to avoid being overwritten by merger.
 
 For example:
