@@ -3,7 +3,7 @@ title: ApiHug Vue 框架
 description: 前端框架设计原则和说明
 ---
 
-前端完整模版尚未正式发布，还在内侧中。 
+⚠️前端完整模版尚未正式发布，还在内侧中⚠️。 
 
 ## Structure
 
@@ -224,18 +224,18 @@ export const menus: MenuItem[] = [{
 }
 ```
 
-这里会根据, [ui](/zhCN-docs/ui/003_app#configuration) 配置 `firstLanguage` & `secondLanguage`, 符合规则：
+这里会根据, [ui](/zhCN-docs/ui/003_app#configuration) 配置的 `firstLanguage` & `secondLanguage`, 进行处理：
 
-1. 页面自带 `title` Meta 信息会输出到默认语言配置中
-2. 未配置，默认采用路径为值
-3. `i18key` 如果未配置默认使用路径名
-4. `i18key` 会自动格式化： `pages.` 开头， `.title` 结尾； 这个和框架 `i18n` 机制一致； 参考 [ui](/zhCN-docs/ui/003_app#configuration) 里配置 `pagePrefix` & `pageSuffix`
-5.  i18n 配置符合整体框架原则：默认未改动一 `$`前缀， 修改完后去掉 `$`,后续不会再覆盖。
+1. 页面自带 `title` Meta 信息会输出到默认语言值配置中
+2. `i18key` 如未配置，默认使用路径名： `x/y/z` → `pages.x.y.z.title`
+3. `i18key` 如配置，会自动格式化： `pages.` 开头， `.title` 结尾；如 `x.y.z` → `pages.x.y.z.title`, 以和框架 `i18n` 机制一致； 参考 [ui](/zhCN-docs/ui/003_app#configuration) 里配置 `pagePrefix` & `pageSuffix`
+4.  i18n 配置值需遵循原则：默认未改动以 `$`前缀， 手动修正完后去掉 `$`--避免merger被覆盖。
 
-如例子中： `example.form.title` 后续页面中 `meta.title` 跟新，不再同步到这个 `pages.json` 配置内，应该没有 `$` 前缀；
-而 `example.table.title` 将根据 这个页面内 `meta.title` 自动更新。
+如例子中： 
+1. `example.form.title` 值为 `示例表单-大帅`， 未以`$`开头，后续 merger 不再复制页面中 `meta.title`定义任何信息⚠️；
+2. `example.table.title` 值为 `$示例表格`，以 `$`开头，后续 merger 将根据页面 `meta.title` 自动更新(但依然强制添加**$**前缀)。
 
-这种工作机制主要帮助第一次构建页面 i18n 配置， 同时提醒开发人员改变默认配置(`$`将展示在前台)。
+此工作机制主要帮助第一次构建页面 i18n 配置， 同时提醒开发人员改变默认配置(`$`将展示在前台)。
 
 
 ### Authority
