@@ -233,7 +233,7 @@ export const menus: MenuItem[] = [{
 
 如例子中： 
 1. `example.form.title` 值为 `示例表单-大帅`， 未以`$`开头，后续 merger 不再复制页面中 `meta.title`定义任何信息⚠️；
-2. `example.table.title` 值为 `$示例表格`，以 `$`开头，后续 merger 将根据页面 `meta.title` 自动更新(但依然强制添加 **$** 前缀)。
+2. `example.table.title` 值为 `$示例表格`，以 `$`开头，后续 merger 将根据页面 `meta.title` 自动更新(但依然强制添加 **$** 前缀);
 
 此工作机制主要帮助第一次构建页面 i18n 配置， 同时提醒开发人员改变默认配置(`$`将展示在前台)。
 
@@ -242,9 +242,9 @@ export const menus: MenuItem[] = [{
 
 参考Hope 框架[极简 Authentication & Authorization](/zhCN-docs/framework/widget/authority)设计。
 
-配合前端便捷利用现在Hope框架 Authentication & Authorization，工具栈对 Authority 处理如下：
+为便捷前端使用Hope框架 Authentication & Authorization，工具栈对 Authority 处理如下：
 
-Authority 定义 Enum 将被处理，生成到如下几个目录：
+Authority 定义 Enum 将被处理，生成到如下信息：
 
 1. `src/service/model/{authority}.ts`  authority enum 对象定义
 2. `src/types/auth.d.ts` 全局 enum authority type 定义
@@ -284,7 +284,7 @@ Enum 包含属性：
 | remark     | 描述:Authority to add user     |
 
 
-**d.ts 定义**
+**auth.d.ts 定义**
 
 1. `Api.Authority.Map` Authority 定义 (map)
 2. `Api.Authority.Type` Authority 类型
