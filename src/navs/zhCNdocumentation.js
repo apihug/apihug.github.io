@@ -33,6 +33,7 @@ export const documentationNav = {
     {title: 'Proto 介绍', href: '/zhCN-docs/protobuf'},
     {title: 'Protobuf & OAS', href: '/zhCN-docs/protobuf/proto-oas'},
     {title: 'Protobuf Option', href: '/zhCN-docs/protobuf/proto-option'},
+    {title: 'Protobuf Entity', href: '/zhCN-docs/protobuf/proto-entity'},
   ],
   "Framework": [
     {title: '框架介绍', href: '/zhCN-docs/framework'},

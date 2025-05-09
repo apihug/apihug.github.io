@@ -33,6 +33,7 @@ export const documentationNav = {
     {title: 'Proto Intro', href: '/docs/protobuf'},
     {title: 'Protobuf & OAS', href: '/docs/protobuf/proto-oas'},
     {title: 'Protobuf Option', href: '/docs/protobuf/proto-option'},
+    {title: 'Protobuf Entity', href: '/docs/protobuf/proto-entity'},
   ],
   "Framework": [
     {title: 'Framework Intro', href: '/docs/framework'},
