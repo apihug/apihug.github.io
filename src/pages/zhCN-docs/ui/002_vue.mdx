@@ -165,7 +165,7 @@ export const pages: RouteRecordRaw[] = [{
 
 由路由树状结构生成菜单树结构可以作为默认菜单结构，也可做为定配菜单输入元信息。
 
-**Menu**
+#### **Menu**
 
 ```typescript
 export const menus: MenuItem[] = [{
@@ -197,7 +197,7 @@ export const menus: MenuItem[] = [{
 }]
 ```
 
-**i18n**
+#### **i18n**
 
 工具自动生成 i18n 配置 `sr/locals/{lang}/pages.json`:
 
@@ -238,12 +238,12 @@ export const menus: MenuItem[] = [{
 此工作机制主要帮助第一次构建页面 i18n 配置， 同时提醒开发人员改变默认配置(`$`将展示在前台)。
 
 
-**路由参数**
+#### **路由参数**
 
 根据目录名称，自动设置转换参数型路由：
 
-1. 必选参数使用 [param]
-2. 可选参数使用 [[param]]
+1. 必选参数使用 `[param]`
+2. 可选参数使用 `[[param]]`
 
 参数命名应具有描述性，避免使用过于简单或模糊的名称；复杂的参数组合可以使用多参数语法 `detail_[id]_[userId]` 来提高可读性。
 

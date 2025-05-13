@@ -165,7 +165,7 @@ Other outputs:
 
 The generated route tree structure can be used as the default menu structure or as input for custom menus.
 
-**Menu**
+#### **Menu**
 
 ```typescript  
 export const menus: MenuItem[] = [{  
@@ -197,7 +197,7 @@ export const menus: MenuItem[] = [{
 }]  
 ```  
 
-**i18n**
+#### **i18n**
 
 The tool auto-generates i18n configurations in `src/locales/{lang}/pages.json`:
 
@@ -238,12 +238,12 @@ For example:
 This mechanism mainly helps with the initial setup of page i18n configurations while reminding developers to change default configurations (`$` will be displayed on the front end).
 
 
-**Route Parameters**
+#### **Route Parameters**
 
 Automatically set parameterized routes based on directory names:
 
-1. Required parameters use [param]
-2. Optional parameters use [[param]]
+1. Required parameters use `[param]`
+2. Optional parameters use `[[param]]`
 
 Parameter names should be descriptive, avoiding overly simple or ambiguous names; complex parameter combinations can use multi-parameter syntax `detail_[id]_[userId]` to improve readability.
 
