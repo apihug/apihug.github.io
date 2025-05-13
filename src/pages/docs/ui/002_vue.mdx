@@ -238,6 +238,20 @@ For example:
 This mechanism mainly helps with the initial setup of page i18n configurations while reminding developers to change default configurations (`$` will be displayed on the front end).
 
 
+**Route Parameters**
+
+Automatically set parameterized routes based on directory names:
+
+1. Required parameters use [param]
+2. Optional parameters use [[param]]
+
+Parameter names should be descriptive, avoiding overly simple or ambiguous names; complex parameter combinations can use multi-parameter syntax `detail_[id]_[userId]` to improve readability.
+
+Examples:
+
+1. `/list/detail/[id]/[userId]` -> `/list/detail/:id/:userId`
+2. `/list/detail/[[id]]/[[userId]]` -> `/list/detail/:id?/:userId?`
+
 ### Authority
 
 Refer to Hope Framework’s [Minimalist Authentication & Authorization](/docs/framework/widget/authority) design.
