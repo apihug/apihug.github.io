@@ -1,0 +1,81 @@
+---
+title: Upgrade 1.3.8-RELEASE & Plugin 0.7.1
+description: Upgrade Guide: SDK 1.3.8-RELEASE & Plugin 0.7.1
+---
+
+import { TipGood } from '@/components/Tip'
+
+# Upgrade Guide: SDK 1.3.8-RELEASE & Plugin 0.7.1
+
+## Overview
+
+This guide outlines important changes and migration steps when upgrading to **SDK 1.3.8-RELEASE** and **Plugin 0.7.1**.
+
+<TipGood>
+  This release upgrades the version management system to use a new style `toml` and 
+  updates the plugin project templates accordingly.
+</TipGood>
+
+After upgrading either component, you may experience build issues due to these structural changes. If your project fails to build, please follow the guidance below to resolve compatibility issues.
+
+---
+
+## Issue: Missing `springBootVersion` Property
+
+### Symptom
+
+During execution of the `wire` task, you may encounter an error similar to the following:
+
+```
+Script 'jar:file:/.../...it-plugin-wire-1.3.8-RELEASE.jar!/wire-shared.gradle' line: 44
+
+* What went wrong:
+A problem occurred evaluating script.
+> Could not get unknown property 'springBootVersion' for object of type org.gradle.api.internal.artifacts.dsl.dependencies.DefaultDependencyHandler.
+```
+
+### Solution
+
+To resolve this issue, update your `build.gradle` file by adding the following block to define `springBootVersion` using the value from the `libs.versions.toml` file:
+
+```groovy
+// Read Spring Boot version from libs.versions.toml and set as ext property
+ext {
+    springBootVersion = libs.versions.springBootVersion.get()
+}
+```
+
+Note: The actual value of `libs.versions.springBootVersion` depends on your configuration in `gradle/libs.versions.toml`. Please ensure it's correctly defined.
+
+
+## Why This Change?
+
+We've updated the naming convention used in the `libs.versions.toml` file to align with common Gradle practices.
+
+Previously, dependencies were defined using **camelCase** keys:
+
+```toml
+springBootStarterWeb = { group = "org.springframework.boot", name = "spring-boot-starter-web" }
+```
+
+Which was referenced like this:
+
+```groovy
+implementation(libs.springBootStarterWeb)
+```
+
+However, the standard and more maintainable format in Gradle Version Catalogs uses **kebab-case**:
+
+```toml
+spring-boot-starter-web = { group = "org.springframework.boot", name = "spring-boot-starter-web" }
+```
+
+Which is accessed using nested syntax:
+
+```groovy
+implementation(libs.spring.boot.starter.web)
+```
+
+As part of this upgrade, we have standardized all dependency definitions to use kebab-case for consistency and better alignment with Gradle best practices.
+
+For further assistance or if you encounter additional issues during the upgrade, please consult the full migration documentation or reach out to our support team.

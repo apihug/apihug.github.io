@@ -80,6 +80,7 @@ export const documentationNav = {
   ],
   Milestone:[
     {title: 'Index', href: '/docs/milestone'},
+    {title: 'Upgrade-20250515', href: '/docs/milestone/upgrade-1.3.8-RELEASE'},
     {title: 'Milestone-20240510', href: '/docs/milestone/milestone-20240510'},
     {title: 'Milestone-20240222', href: '/docs/milestone/milestone-20240222'},
   ],

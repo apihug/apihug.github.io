@@ -80,6 +80,7 @@ export const documentationNav = {
   ],
   Milestone: [
     {title: 'Index', href: '/zhCN-docs/milestone'},
+    {title: 'Upgrade-20250515', href: '/zhCN-docs/milestone/upgrade-1.3.8-RELEASE'},
     {title: '里程碑-20240510', href: '/zhCN-docs/milestone/milestone-20240510'},
     {title: '里程碑-20240222', href: '/zhCN-docs/milestone/milestone-20240222'},
   ],

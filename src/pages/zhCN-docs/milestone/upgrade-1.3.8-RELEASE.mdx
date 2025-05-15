@@ -1,0 +1,77 @@
+---
+title: 升级 1.3.8-RELEASE & Plugin 0.7.1
+description: SDK 1.3.8-RELEASE & Plugin 0.7.1 升级注意项
+---
+
+import { TipGood } from '@/components/Tip'
+
+## 概述
+
+本指南列出了从旧版本升级到 **SDK 1.3.8-RELEASE** 和 **Plugin 0.7.1** 的注意事项。
+
+<TipGood>
+  在此版本中，我们对版本控制机制进行了重构，统一使用 新格式`toml` 文件进行管理，
+  并相应调整了插件项目的模板结构。
+</TipGood>
+
+升级后可能会对现有项目构建产生影响。若您在升级后遇到构建失败，请参考以下指引进行适配。
+
+---
+
+## 常见问题：`springBootVersion` 属性缺失
+
+### 现象
+
+在执行 `wire` 任务时可能出现如下错误：
+
+```
+Script 'jar:file:/.../...it-plugin-wire-1.3.8-RELEASE.jar!/wire-shared.gradle' line: 44
+
+* What went wrong:
+A problem occurred evaluating script.
+> Could not get unknown property 'springBootVersion' for object of type org.gradle.api.internal.artifacts.dsl.dependencies.DefaultDependencyHandler.
+```
+
+### 解决方案
+
+请在您的 `build.gradle` 文件中添加如下配置，用于从 `libs.versions.toml` 中读取 Spring Boot 版本号并设置为全局扩展属性：
+
+```groovy
+// Read springBoot version from libs.versions.toml and set as ext property
+ext {
+    springBootVersion = libs.versions.springBootVersion.get()
+}
+```
+
+注意：`libs.versions.springBootVersion` 的具体值取决于 `gradle/libs.versions.toml` 中的定义，请根据实际配置进行调整。
+
+
+## 变更原因说明
+
+此次变更旨在统一依赖命名规范，提升可维护性。
+
+在之前的版本中，我们在 `libs.versions.toml` 中使用驼峰命名风格定义依赖项，例如：
+
+```toml
+springBootStarterWeb = { group = "org.springframework.boot", name = "spring-boot-starter-web" }
+```
+
+调用方式为：
+
+```groovy
+implementation(libs.springBootStarterWeb)
+```
+
+然而，在社区和官方实践中，更常见且推荐的方式是使用短横线（kebab-case）命名风格：
+
+```toml
+spring-boot-starter-web = { group = "org.springframework.boot", name = "spring-boot-starter-web" }
+```
+
+调用方式则为：
+
+```groovy
+implementation(libs.spring.boot.starter.web)
+```
+
+因此，本次升级将所有依赖定义统一调整为 kebab-case 格式，以符合行业标准和 Gradle 官方推荐的最佳实践。
