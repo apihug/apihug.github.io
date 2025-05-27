@@ -48,33 +48,26 @@ hopeStub {
 }
 ```
 
-最后跟新：  `1.3.4-RELEASE`
+最后更新：  `1.3.9-M2` (2025-05-27 前端架构一致在快速变动，一些变量也在改变，谨慎使用)
+`auto router` 移如内置plugin, 不再走 app 走， router 为纯前端工作！
 
 | Property       | Comment                                                      |
 |----------------|--------------------------------------------------------------|
-| uiModuleDir    | UI 模块相对路径  ~~projectDir~~                                    |
-| httpVendor     | `@/service/http`, useGet/Post Module                         |
-| noMerger       | `false` 预留，未用                                                |
-| apiDir         | `src/service`, API输出UI模块内相对目录 ~~outputDir~~                  |
-| alwaysEraseOld | `false` 预留，未用                                                |
-| formType       | `RequestItem` form 类型                                        |
-| formModule     | `../type`     form 类型引用路径                                    |
-| columnType     | `ResponseItem`  column 类型                                    |
-| columnModule   | `../type`       column 类型引用路径                                |
-| pathToUrl      | `import { pathToUrl } from '@/service/utils'`  path 路径解析帮助函数 |
-| langDir        | `src/locales/langs` 国际化输出UI模块内相对目录                           |
+| uiModuleDir    | UI 模块相对路径                                                    |
+| httpVendor     | `../http`, `useGet`/`Post` 供应                                |
+| apiDir         | `packages/service/src`, API输出目录(相对`uiModuleDir`)             |
+| requestType    | `RequestItem` form 类型                                        |
+| requestModule  | `../type`     form 类型引用路径                                    |
+| responseType   | `ResponseItem`  column 类型                                    |
+| responseModule | `../type`       column 类型引用路径                                |
+| pathToUrl      | `import { pathToUrl } from '../utils'`  path 路径解析帮助函数        |
+| langDir        | `packages/common/locales/src/langs` 国际化输出路径(相对`uiModuleDir`) |
 | firstLanguage  | `zh-CN`  国际化，第一语言                                            |
 | secondLanguage | `en-US`  国际化，第二语言                                            |
-| typesDir       | `src/types` 类型输出UI模块相对目录 ~~types~~                           |
-| autoRouter     | 是否打开自动router扫描,默认 `false`                                    |
-| pagesDir       | 用来扫描的页面相对目录,默认 `src/pages`                                   |
-| pagesPath      | 页面应用path, 默认 `@/pages`                                       |
-| pagePrefix     | 为页面 i18n key 自动前缀, 默认: `pages` **请勿** 以 `.`结尾 **暂勿覆盖**       |
-| pageSuffix     | 为页面 i18n key 自动后缀, 默认: `title` **请勿** 以 `.`开始 **暂勿覆盖**       |
-| routerOutDir   | router 输出目录,  默认 `src/router/auto`                           |
-| menuItem       | 菜单元素定义, 默认 `MenuItem`                                        |
-| menuItemImport | 菜单元素引用包, 默认 `./types`                                        |
+| typesDir       | `src/types` 类型输出路径(相对`uiModuleDir`)                          |
 | authSplit      | 授权分隔符，用来组装树结构, 默认 `:`                                        |
+| noMerger       | `false` 预留，未用                                                |
+| alwaysEraseOld | `false` 预留，未用                                                |
 
 
 ## 编译

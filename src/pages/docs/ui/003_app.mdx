@@ -48,38 +48,26 @@ hopeStub {
 }
 ```
 
-最后跟新：  `1.3.4-RELEASE`
+Last Update: `1.3.9-M2` (2025-05-27 Frontend architecture is changing rapidly, some variables are also changing, use with caution)
+`auto router` has been moved into the built-in plugin, no longer through app, router is now purely frontend work!
 
-
-Last update:  `1.3.4-RELEASE`
-
-| Property       | Comment                                                                                 |
-|----------------|-----------------------------------------------------------------------------------------|
-| uiModuleDir    | Relative path of UI module  ~~projectDir~~                                              |
-| httpVendor     | `@/service/http`, useGet/Post Module                                                    |
-| noMerger       | `false` reserved, not used                                                              |
-| apiDir         | `src/service`, relative directory for API output within UI module ~~outputDir~~         |
-| alwaysEraseOld | `false` reserved, not used                                                              |
-| formType       | `RequestItem` form type                                                                 |
-| formModule     | `../type`     reference path for form type                                              |
-| columnType     | `ResponseItem`  column type                                                             |
-| columnModule   | `../type`       reference path for column type                                          |
-| pathToUrl      | `import { pathToUrl } from '@/service/utils'`  helper function for path resolution      |
-| langDir        | `src/locales/langs` relative directory for internationalization output within UI module |
-| firstLanguage  | `zh-CN`  internationalization, primary language                                         |
-| secondLanguage | `en-US`  internationalization, secondary language                                       |
-| typesDir       | `src/types` relative directory for type output in UI module ~~types~~                   |
-| autoRouter     | Whether to enable automatic router scanning, default `false`                            |
-| pagesDir       | Relative directory for pages to scan, default `src/pages`                               |
-| pagesPath      | Application path for pages, default `@/pages`                                           |
-| pagePrefix     | i18n key prefix for page automatically, default: `pages` **DO NOT** end with `.`        |
-| pageSuffix     | i18n key suffix for page automatically, default: `title` **DO NOT** start with `.`      |
-| authSplit      | Authorization delimiter, used to assemble tree structure, default `:`                   |
-| routerOutDir   | Output directory for router,  default `src/router/auto`                                 |
-| menuItem       | Definition of menu item, default `MenuItem`                                             |
-| menuItemImport | Reference package for menu item, default `./types`                                      |
-| authSplit      | Authorization delimiter, used to assemble tree structure, default `:`                   |
-
+| Property       | Comment                                                                                         |
+|----------------|-------------------------------------------------------------------------------------------------|
+| uiModuleDir    | UI module relative path                                                                         |
+| httpVendor     | `../http`, provides `useGet`/`Post`                                                             |
+| apiDir         | `packages/service/src`, API output directory(relative to `uiModuleDir`)                         |
+| requestType    | `RequestItem` form type                                                                         |
+| requestModule  | `../type`     form type reference path                                                          |
+| responseType   | `ResponseItem`  column type                                                                     |
+| responseModule | `../type`       column type reference path                                                      |
+| pathToUrl      | `import { pathToUrl } from '../utils'` path parsing helper function                             |
+| langDir        | `packages/common/locales/src/langs` internationalization output path(relative to `uiModuleDir`) |
+| firstLanguage  | `zh-CN`  internationalization, first language                                                   |
+| secondLanguage | `en-US`  internationalization, second language                                                  |
+| typesDir       | `src/types` type output path(relative to `uiModuleDir`)                                         |
+| authSplit      | Authorization separator, used for assembling tree structure, default `:`                        |
+| noMerger       | `false` reserved, unused                                                                        |
+| alwaysEraseOld | `false` reserved, unused                                                                        |
 
 ## Compilation
 
