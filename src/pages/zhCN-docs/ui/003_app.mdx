@@ -69,6 +69,39 @@ hopeStub {
 | noMerger       | `false` 预留，未用                                                |
 | alwaysEraseOld | `false` 预留，未用                                                |
 
+**Router**
+
+项目内置 plugin 自动扫描页面，按照文件目录结构生成路由规则。
+
+`router.json` 配置在 `{module}-ui` 模块下, 用于配置 ui 模块下应用的自动路由生成规则。
+
+支持多模块， 比如 `apps` 下面有 `web1`, `web2`, 可以进行独立配置，互相隔离。
+
+```json
+{
+  "items": [
+      {
+          "moduleDir": "apps/web1"
+      },{
+          "moduleDir": "apps/web2"
+      }
+  ]
+}
+```
+
+| Property       | Comment                    |
+|----------------|----------------------------|
+| moduleDir      | ui 模块下子模块目录，如 `apps/web`   |
+| pagesDir       | `src/pages` 该模块页面目录相对路径    |
+| pagesPath      | `@/pages` 页面module 路径      |
+| routerOutDir   | `src/router/auto` 自动路由输出目录 |
+| menuItem       | `MenuItem` 菜单类名            |
+| menuItemImport | `menuItemImport` 菜单类路径     |
+| disable        | `false` 是否disable          |
+| firstLanguage  | 第一语言                       |
+| secondLanguage | 第二语言                       |
+| langDir        | `src/locales/langs` 语言输出目录 |
+
 
 ## 编译
 

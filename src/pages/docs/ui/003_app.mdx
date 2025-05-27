@@ -69,6 +69,40 @@ Last Update: `1.3.9-M2` (2025-05-27 Frontend architecture is changing rapidly, s
 | noMerger       | `false` reserved, unused                                                                        |
 | alwaysEraseOld | `false` reserved, unused                                                                        |
 
+**Router**
+
+The project has a built-in plugin that automatically scans pages and generates routing rules according to the file directory structure.
+
+`router.json` configuration is located under the `{module}-ui` module, used to configure the automatic route generation rules for applications under the ui module.
+
+Multiple modules are supported. For example, under `apps` there are `web1`, `web2`, each can be configured independently and isolated from each other.
+
+```json
+{
+  "items": [
+      {
+          "moduleDir": "apps/web1"
+      },{
+          "moduleDir": "apps/web2"
+      }
+  ]
+}
+```
+
+| Property       | Comment                                                  |
+|----------------|----------------------------------------------------------|
+| moduleDir      | Submodule directory under ui module, such as `apps/web`  |
+| pagesDir       | `src/pages` page directory relative path for this module |
+| pagesPath      | `@/pages` page module path                               |
+| routerOutDir   | `src/router/auto` automatic route output directory       |
+| menuItem       | `MenuItem` menu class name                               |
+| menuItemImport | `menuItemImport` menu class import path                  |
+| disable        | `false` whether to disable                               |
+| firstLanguage  | First language                                           |
+| secondLanguage | Second language                                          |
+| langDir        | `src/locales/langs` language output directory            |
+
+
 ## Compilation
 
 Simply execute the `stub` command to generate UI content:
