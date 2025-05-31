@@ -1,0 +1,95 @@
+---
+title: 有用内置小插件
+description: 小插件，大用途
+---
+
+import { TipInfo } from '@/components/Tip'
+
+此功能自：
+
+<TipInfo>
+  1. SDK 1.3.9-RELEASE
+  2. IDEA Plugin 0.7.4
+</TipInfo>
+
+保持更新，享受更多便捷！
+
+<a target="_blank" href="https://search.maven.org/artifact/com.apihug/it-bom"><img
+  src="https://img.shields.io/maven-central/v/com.apihug/it-bom.svg?label=Maven%20Central"/></a>
+
+<div>
+  <iframe
+    src="https://plugins.jetbrains.com/embeddable/card/23534"
+    border="0"
+    height={'319px'}
+    width={'384px'}
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
+## 背景
+
+在我们项目深入开发时候， 总有一些需求不能清晰的归类，如果用传统方式解决非常棘手，但是换个角度可能迎刃而解。
+
+Apihug 内置小插件设计就是解决这些小问题的， 会随着新版的 IDEA 插件，不断给你日常开发带来小惊喜，小确幸；希望他给你日常变成带来乐趣。 
+
+HOP: Health-oriented programming :-)
+
+
+## `hope.optional`
+
+### 概述
+
+该插件为项目引入了对 **Maven 风格可选依赖（Optional Dependencies）** 的支持。它会创建一个新的配置项 `optional`
+。添加到该配置中的依赖会被包含在当前项目的 **编译时** 和 **运行时类路径（classpath）** 中，但不会传递给依赖该项目的其他模块或工程。
+
+这种机制在希望引入某些内部使用依赖、而不希望这些依赖强制影响下游项目时非常有用。
+
+### 使用方式
+
+当使用共享模板文件 [`spring.lib.gradle`](../gradle/spring.lib.gradle) 时，请按如下方式应用该插件：
+
+```groovy
+apply plugin: "hope.optional"
+//或者独立使用:
+//id "hope.optional"
+
+optional(libs.spring.context)
+```
+
+### 起源
+
+该插件的设计灵感来源于 Spring Framework 的实现：
+[OptionalDependenciesPlugin](https://github.com/spring-projects/spring-framework/blob/main/buildSrc/src/main/java/org/springframework/build/optional/OptionalDependenciesPlugin.java)
+
+---
+
+## `hope.router`
+
+### 概述
+
+该插件用于自动扫描前端项目的 `pages` 目录结构，并根据页面组件自动生成对应的 **路由配置结构**。
+
+通过分析目录结构与页面组件，该插件可动态生成如 `router.js` 或 `routes.ts` 等路由配置文件，从而避免手动维护路由信息，提升开发效率与一致性。
+
+### 文档参考
+
+有关具体用法及配置说明，请参阅前端相关文档：
+
+👉 [Vue 路由集成指南](https://apihug.github.io/zhCN-docs/ui/002_vue#router)
+
+当然可以，以下是你提供的英文内容的中文优化版本，保持了原有的风格和语气：
+
+## `hope.rename`
+
+该插件用于重命名包名。由于 Apihug 在 proto 与实现之间保持包名一致，因此对包名的重命名可能会带来很大的麻烦；此插件将帮助你缓解这一痛苦。
+
+- `-DpkgRename` – 指定如何将旧包名更改为新包名；格式为：`{old}-{new}`  
+示例：`-DpkgRename="com.abc-com.xyz"`
+- `-DskipModules` – 要跳过的模块，用逗号分隔  
+示例：`-DskipModules="module-a,module-b"`
+
+⚠️ **注意：** 此操作会带来大量改动，请在执行前务必**备份**项目；生成结果可能仍存在不一致之处，需要手动进行一些调整。
+
+

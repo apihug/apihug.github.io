@@ -77,6 +77,7 @@ export const documentationNav = {
     {title: '更新 Header & Cookie', href: '/zhCN-docs/how/002_update_header_cookie'},
     {title: '如何使用 Enum', href: '/zhCN-docs/how/003_how_to_handle_enum'},
     {title: '如何定义api根目录', href: '/zhCN-docs/how/004_how_define_api_root_path'},
+    {title: '有用内置小插件', href: '/zhCN-docs/how/005_helpful_inner_plugin'},
   ],
   Milestone: [
     {title: 'Index', href: '/zhCN-docs/milestone'},
