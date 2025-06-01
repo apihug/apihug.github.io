@@ -187,7 +187,12 @@ hopeStub {
 
 ### SPA Filter
 
-打开 `hope.open.api.enable` 标志; 将 `api` 之外目录反向到 `index.html` 入口：
+`hope.open.api.spa` 标志是否开启：
+
+1. `hope.common.spring.api.spa.wbmvc.SpaMvcConfiguration` 在 `SERVLET` 模式下控制 SPA 配置
+2. `hope.common.spring.api.spa.webflux.SpaFluxConfiguration` 在 `REACTIVE` 模式下控制 SPA 配置
+
+URL 反向代理规则配置在 `SpaPathChecker` 中：
 
 ```java
 SpaPathChecker DEFAULT =
@@ -206,5 +211,20 @@ if (checker.passToSpa(path)) {
 }
 ```
 
-然后就可以尽情享受和前端一样丝滑的便捷和体验！
+默认规则：
+
+1. 不以 `/api` 开头
+2. 不以 `/management` 开头
+3. 不以 `/v3/api-docs` 开头
+4. 不以 `/h2-console` 开头
+5. 路径中不包含点号（`.`）
+6. 匹配表达式 "`/(.*)`"
+
+举个例子：
+
+1. 如果有人访问 `/api/users` → 请求会转发到后端
+2. 如果有人访问 `/about` → 请求会被转发到 `index.html`
+3. 如果有人访问 `/static/image.jpg` → 请求将直接由服务器返回文件内容
+
+然后你就可以尽情享受和前端一样丝滑的便捷和体验！
 
