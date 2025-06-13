@@ -79,6 +79,29 @@ implementation(libs.spring.ai.starter.mcp.server)
 2. `mcp`：控制 MCP 服务的暴露方式 — 指定哪个服务暴露哪些方法（API）。
 3. `contract`：定义第三方模块依赖 — 哪个服务依赖于哪些方法（API）。
 
+服务过滤DSL:
+
+```java
+  return myModule.service()
+          .apiContext()
+          .orderService(
+              svc -> {
+                // Keep all the methods of this service
+                svc.keepAll();
+                // All the method start with, feel free try other shortcut
+                svc.startsWith("add");
+                // Pick method one by one
+                svc.methods(
+                    methods -> {
+                      // Include this method
+                      methods.PlaceOrder();
+                      // Exclude this method, start with `_`
+                      methods._DeleteOrder();
+                    });
+              })
+          .build();
+```
+
 ### Spring Server AI 配置
 
 请参考官方 [MCP Server Boot Starter 文档](https://docs.spring.io/spring-ai/reference/api/mcp/mcp-server-boot-starter-docs.html)，启用 MCP 服务。

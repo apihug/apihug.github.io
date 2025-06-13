@@ -79,6 +79,31 @@ To extend `hope.common.service.contract.ContractAdapter`, you need to define:
 2. `mcp`: Controls service exposure via MCP — specifies which service exposes which method (API).
 3. `contract`: Defines third-party module dependencies — which service depends on which method (API).
 
+
+Service Filter DSL:
+
+```java
+  return myModule.service()
+          .apiContext()
+          .orderService(
+              svc -> {
+                // Keep all the methods of this service
+                svc.keepAll();
+                // All the method start with, feel free try other shortcut
+                svc.startsWith("add");
+                // Pick method one by one
+                svc.methods(
+                    methods -> {
+                      // Include this method
+                      methods.PlaceOrder();
+                      // Exclude this method, start with `_`
+                      methods._DeleteOrder();
+                    });
+              })
+          .build();
+```
+
+
 ### Spring Server AI Configuration
 
 Follow the official [MCP Server Boot Starter](https://docs.spring.io/spring-ai/reference/api/mcp/mcp-server-boot-starter-docs.html) documentation to enable the MCP server.
