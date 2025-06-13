@@ -1,0 +1,99 @@
+---
+title: ApiHug MCP Support
+description: how the Apihug support MCP,
+---
+
+支持企业级 MCP，充分利用现有基础设施和授权保护。
+
+自 SDK 版本 `1.4.0-RELEASE` 及 IDEA 插件 `0.7.5` 起，支持初始化项目模板的生成。
+
+**仅** 对 MCP 服务端进行增强。
+
+## 最新版本
+
+<a target="_blank" href="https://search.maven.org/artifact/com.apihug/it-bom">
+  <img src="https://img.shields.io/maven-central/v/com.apihug/it-bom.svg?label=Maven%20Central"/>
+</a>
+
+<div>
+  <iframe
+    src="https://plugins.jetbrains.com/embeddable/card/23534"
+    border="0"
+    height={'319px'}
+    width={'384px'}
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
+## 概述
+
+[模型上下文协议（MCP）](https://modelcontextprotocol.org/docs/concepts/architecture) 是一种标准化协议，使 AI 模型能够以结构化方式与外部工具和资源交互。它支持多种传输机制，以确保在不同环境中具备良好的灵活性。
+
+请注意，目前 MCP 仍处于快速开发阶段，其概念和 API 可能会发生重大变化，且无法保证向后兼容性。
+
+由于这是一个实验性功能，须手动启用!
+
+当前的 MCP 尚未满足企业级要求，例如严格的访问控制，即使在 MCP Java SDK `0.8.0` 引入破坏性变更之后也是如此 ⚠️。为此，ApiHug 提供了关键增强功能：
+
+1. **企业级安全性**：完整的访问控制机制，与现有企业架构保持一致。
+2. **最小化集成影响**：复用现有基础设施和标准，对系统改动极小。
+
+![MCP 堆栈图](https://docs.spring.io/spring-ai/reference/_images/mcp/mcp-stack.svg)
+
+基于 Spring AI，ApiHug 引入了以下增强功能：
+
+1. **自定义协议层**：无缝注入自定义授权和会话管理。
+2. **适配层**：连接现有后端服务与 MCP 标准，不影响原有逻辑。
+3. **统一资源控制**：应用一致的验证和授权机制。
+4. **细粒度暴露控制**：精确控制哪些资源通过 MCP 暴露，细化到每个 API。
+
+## 迁移指南
+
+### `libs.versions.toml`
+
+1. 将 `apihugVersion` 升级至 `1.4.0-RELEASE` 或更高版本。
+2. 将 `springAiVersion` 升级至 `1.0.0` 或更高版本；如无，请添加。
+3. 添加以下依赖库：
+   - `apihug-spring-ai-mcp = { group = "com.apihug", name = "it-common-spring-ai-mcp" }`
+   - `spring-ai-bom = { group = "org.springframework.ai", name = "spring-ai-bom", version.ref = "springAiVersion" }`
+   - `spring-ai-starter-mcp-server = { group = "org.springframework.ai", name = "spring-ai-starter-mcp-server" }`
+
+### `app` 模块
+
+1. 启用 `hopeStub`：设置 `enableMcp = true`
+2. 添加以下依赖：
+
+```groovy
+// 用于 MCP — 当前版本正在评审中
+implementation(libs.apihug.spring.ai.mcp)
+implementation platform(libs.spring.ai.bom)
+implementation(libs.spring.ai.starter.mcp.server)
+```
+
+### 服务加载器
+
+要扩展 `hope.common.service.contract.ContractAdapter`，需指定以下内容：
+
+1. `moduleClassName`：运行时 proto 模块的类名（自包含）。
+2. `mcp`：控制 MCP 服务的暴露方式 — 指定哪个服务暴露哪些方法（API）。
+3. `contract`：定义第三方模块依赖 — 哪个服务依赖于哪些方法（API）。
+
+### Spring Server AI 配置
+
+请参考官方 [MCP Server Boot Starter 文档](https://docs.spring.io/spring-ai/reference/api/mcp/mcp-server-boot-starter-docs.html)，启用 MCP 服务。
+
+## 新模板
+
+将您的 IDEA 插件升级至 `0.7.5` 或更高版本。新生成的项目将自动包含所有必要的配置，无需像旧项目那样进行手动迁移。
+
+## 示例
+
+TBD
+
+
+## Refer
+
+1. [MCP Server Boot Starter](https://docs.spring.io/spring-ai/reference/api/mcp/mcp-server-boot-starter-docs.html)
+2. [Model Context Protocol ](https://modelcontextprotocol.org/docs/concepts/architecture)
+3. [MCP Java SDK](https://modelcontextprotocol.io/sdk/java)

@@ -1,0 +1,99 @@
+---
+title: ApiHug MCP Support
+description: how the Apihug support MCP,
+---
+
+Support for enterprise-level MCP, leveraging existing infrastructure and authorization protection.
+
+Since SDK version `1.4.0-RELEASE` and IDEA plugin `0.7.5`, support for generating initial project templates is available.
+
+**Only** enhancements applied to the MCP server side.
+
+## Latest
+
+<a target="_blank" href="https://search.maven.org/artifact/com.apihug/it-bom">
+  <img src="https://img.shields.io/maven-central/v/com.apihug/it-bom.svg?label=Maven%20Central"/>
+</a>
+
+<div>
+  <iframe
+    src="https://plugins.jetbrains.com/embeddable/card/23534"
+    border="0"
+    height={'319px'}
+    width={'384px'}
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
+## Summary
+
+The [Model Context Protocol (MCP)](https://modelcontextprotocol.org/docs/concepts/architecture) is a standardized protocol that enables AI models to interact with external tools and resources in a structured and consistent manner. It supports multiple transport mechanisms to ensure flexibility across various environments.
+
+Please note that MCP is currently under rapid development. Concepts and APIs may change significantly, and backward compatibility cannot be guaranteed.
+
+As this is an experimental feature, it must be enabled manually!
+
+Currently, MCP alone does not meet enterprise-level requirements, such as strict access control,even after breaking changes introduced in MCP Java SDK `0.8.0` ⚠️. To address this, ApiHug provides key enhancements:
+
+1. **Enterprise-grade security**: Full access control aligned with existing enterprise architecture.
+2. **Minimal integration impact**: Leverages current infrastructure and standards with minimal system changes.
+
+![MCP stack pic](https://docs.spring.io/spring-ai/reference/_images/mcp/mcp-stack.svg)
+
+Based on Spring AI, ApiHug introduces the following enhancements:
+
+1. **Custom transport provider**: Seamlessly injects custom authorization and session management.
+2. **Adapter layer**: Bridges existing backend services to MCP standards without affecting current logic.
+3. **Unified resource control**: Applies consistent validation and authorization mechanisms.
+4. **Fine-grained exposure control**: Specifies which resources are exposed via MCP, down to the individual API level.
+
+## Migration
+
+### `libs.versions.toml`
+
+1. Upgrade `apihugVersion` to `1.4.0-RELEASE` or later.
+2. Upgrade `springAiVersion` to `1.0.0` or later. If missing, add it.
+3. Add the following libraries:
+   - `apihug-spring-ai-mcp = { group = "com.apihug", name = "it-common-spring-ai-mcp" }`
+   - `spring-ai-bom = { group = "org.springframework.ai", name = "spring-ai-bom", version.ref = "springAiVersion" }`
+   - `spring-ai-starter-mcp-server = { group = "org.springframework.ai", name = "spring-ai-starter-mcp-server" }`
+
+### `app` Module
+
+1. Enable `hopeStub`: set `enableMcp = true`
+2. Add the following dependencies:
+
+```groovy
+// For MCP — current version under review
+implementation(libs.apihug.spring.ai.mcp)
+implementation platform(libs.spring.ai.bom)
+implementation(libs.spring.ai.starter.mcp.server)
+```
+
+### Service Loader
+
+To extend `hope.common.service.contract.ContractAdapter`, you need to define:
+
+1. `moduleClassName`: The runtime proto module class name (self-contained).
+2. `mcp`: Controls service exposure via MCP — specifies which service exposes which method (API).
+3. `contract`: Defines third-party module dependencies — which service depends on which method (API).
+
+### Spring Server AI Configuration
+
+Follow the official [MCP Server Boot Starter](https://docs.spring.io/spring-ai/reference/api/mcp/mcp-server-boot-starter-docs.html) documentation to enable the MCP server.
+
+## New Template
+
+Upgrade your IDEA plugin to version `0.7.5` or later. Newly generated projects will include all necessary configurations automatically, eliminating the need for manual migration steps required by legacy projects.
+
+## Demo
+
+TBD
+
+
+## Refer
+
+1. [MCP Server Boot Starter](https://docs.spring.io/spring-ai/reference/api/mcp/mcp-server-boot-starter-docs.html)
+2. [Model Context Protocol ](https://modelcontextprotocol.org/docs/concepts/architecture)
+3. [MCP Java SDK](https://modelcontextprotocol.io/sdk/java)

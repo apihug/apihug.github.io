@@ -65,6 +65,9 @@ export const documentationNav = {
     {title: '配置', href: '/zhCN-docs/copilot/001_settings'},
     {title: '功能', href: '/zhCN-docs/copilot/002_functions'},
   ],
+  "MCP": [
+    {title: '介绍', href: '/zhCN-docs/mcp/001_start'},
+  ],
   "UI": [
     {title: '介绍', href: '/zhCN-docs/ui'},
     {title: '协议', href: '/zhCN-docs/ui/001_proto'},

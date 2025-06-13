@@ -65,6 +65,9 @@ export const documentationNav = {
     {title: 'Settings', href: '/docs/copilot/001_settings'},
     {title: 'Functions', href: '/docs/copilot/002_functions'},
   ],
+  "MCP": [
+    {title: 'Intro', href: '/docs/mcp/001_start'},
+  ],
   "UI": [
     {title: 'Intro', href: '/docs/ui'},
     {title: 'Proto', href: '/docs/ui/001_proto'},
