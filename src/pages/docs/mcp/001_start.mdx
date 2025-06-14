@@ -108,6 +108,42 @@ Service Filter DSL:
 
 Follow the official [MCP Server Boot Starter](https://docs.spring.io/spring-ai/reference/api/mcp/mcp-server-boot-starter-docs.html) documentation to enable the MCP server.
 
+```yaml
+spring:
+  ai:
+    mcp:
+      server:
+        enabled: true
+        # default /sse
+        sse-endpoint: /api/mcp/sse
+        # default /mcp/message
+        sse-message-endpoint: /api/mcp/message
+        name: okai-app-mcp-server
+        stdio: false
+hope:
+  ai:
+    mcp:
+      enabled: true
+      auth-key: token
+```
+
+
+For configuration details related to `spring.ai.mcp.server`, please refer to the official documentation:  
+**[MCP Server Boot Starter - Configuration Properties](https://docs.spring.io/spring-ai/reference/api/mcp/mcp-server-boot-starter-docs.html#_configuration_properties)**.
+
+**Note:** Please ensure that the SSE endpoint and message endpoint are configured using paths that align with your team’s best practices and standards.
+
+The following two routes will be implemented:
+
+1. `GET` `/api/mcp/sse`
+2. `POST` `/api/mcp/message`
+
+For instructions on how to perform local MCP testing, please refer to the Spring example:  
+
+**[spring-ai-examples - test - ClientSse](https://github.com/spring-projects/spring-ai-examples/blob/main/model-context-protocol/weather/starter-webmvc-server/src/test/java/org/springframework/ai/mcp/sample/client/ClientSse.java)**.
+
+Everything is set! Happy coding and enjoy your development! Bon appétit🍀
+
 ## New Template
 
 Upgrade your IDEA plugin to version `0.7.5` or later. Newly generated projects will include all necessary configurations automatically, eliminating the need for manual migration steps required by legacy projects.

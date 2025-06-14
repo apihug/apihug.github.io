@@ -106,6 +106,40 @@ implementation(libs.spring.ai.starter.mcp.server)
 
 请参考官方 [MCP Server Boot Starter 文档](https://docs.spring.io/spring-ai/reference/api/mcp/mcp-server-boot-starter-docs.html)，启用 MCP 服务。
 
+```yaml
+spring:
+  ai:
+    mcp:
+      server:
+        enabled: true
+        # default /sse
+        sse-endpoint: /api/mcp/sse
+        # default /mcp/message
+        sse-message-endpoint: /api/mcp/message
+        name: okai-app-mcp-server
+        stdio: false
+hope:
+  ai:
+    mcp:
+      enabled: true
+      auth-key: token
+```
+
+有关 `spring.ai.mcp.server` 的配置详情，请参考官方文档：  
+**[MCP Server Boot Starter - 配置属性](https://docs.spring.io/spring-ai/reference/api/mcp/mcp-server-boot-starter-docs.html#_configuration_properties)**。
+
+**提示：** 请确保将 SSE 端点和消息端点的路径设置为符合你团队最佳实践标准的格式。
+
+以下两个路由将被引入：
+
+1. `GET` `/api/mcp/sse`
+2. `POST` `/api/mcp/message`
+
+如需了解如何在本地进行 MCP 测试，请参考 Spring 官方示例：  
+**[spring-ai-examples - 测试 - ClientSse](https://github.com/spring-projects/spring-ai-examples/blob/main/model-context-protocol/weather/starter-webmvc-server/src/test/java/org/springframework/ai/mcp/sample/client/ClientSse.java)**。
+
+一切已准备就绪！祝你开发顺利，大快朵颐！🍀
+
 ## 新模板
 
 将您的 IDEA 插件升级至 `0.7.5` 或更高版本。新生成的项目将自动包含所有必要的配置，无需像旧项目那样进行手动迁移。
