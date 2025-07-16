@@ -81,6 +81,7 @@ export const documentationNav = {
     {title: 'How to use Enum', href: '/docs/how/003_how_to_handle_enum'},
     {title: 'How to define api root path', href: '/docs/how/004_how_define_api_root_path'},
     {title: 'Useful Built-in Mini Plugins', href: '/docs/how/005_helpful_inner_plugin'},
+    {title: 'How to use the max/min length items', href: '/docs/how/006_understand_max_min_length_items_properties'},
   ],
   Milestone:[
     {title: 'Index', href: '/docs/milestone'},

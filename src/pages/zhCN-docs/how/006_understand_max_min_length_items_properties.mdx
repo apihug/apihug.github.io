@@ -1,0 +1,161 @@
+---
+title: max/min 长度、元素数与属性数的区别是什么？
+description: 学习如何正确使用这些验证关键字，以及 ApiHug 是如何根据标准进行设计的。
+---
+
+import {TipInfo} from '@/components/Tip'
+
+本文将详细介绍 `max/min length`、`items` 和 `properties` 这些关键字之间的区别，并解释它们与 `minimum` 和 `maximum` 的关系。
+
+这些关键字通常用于定义以下数据类型时：
+
+<TipInfo>
+  1. 基本类型（如 number、string）
+  2. 数组类型
+  3. 字典、哈希表以及其他对象类型
+</TipInfo>
+
+## 官方定义
+
+### minimum 与 maximum
+
+使用 `minimum` 和 `maximum` 来指定数值类型的取值范围：
+
+```yaml
+type: integer
+minimum: 1
+maximum: 20
+```
+
+默认情况下，边界值是 **包含在内的**：
+```
+minimum ≤ value ≤ maximum
+```
+
+如果希望排除某个边界值，请设置 `exclusiveMinimum` 或 `exclusiveMaximum` 为 `true`。例如，定义一个浮点数必须大于 0 且小于等于 50：
+
+```yaml
+type: number
+minimum: 0
+exclusiveMinimum: true
+maximum: 50
+```
+
+| 关键字                            | 描述                |
+|--------------------------------|-------------------|
+| `exclusiveMinimum: false` 或未设置 | `value ≥ minimum` |
+| `exclusiveMinimum: true`       | `value > minimum` |
+| `exclusiveMaximum: false` 或未设置 | `value ≤ maximum` |
+| `exclusiveMaximum: true`       | `value < maximum` |
+
+### minLength 与 maxLength
+
+使用 `minLength` 和 `maxLength` 来限制字符串的长度：
+
+```yaml
+type: string
+minLength: 3
+maxLength: 20
+```
+
+### minItems 与 maxItems
+
+对于数组类型，可以使用 `minItems` 和 `maxItems` 来指定允许的最小和最大元素个数：
+
+```yaml
+type: array
+items:
+  type: integer
+minItems: 1
+maxItems: 10
+```
+
+### minProperties 与 maxProperties
+
+使用 `minProperties` 和 `maxProperties` 可以限制对象中允许的属性数量。这对于动态对象（如字典、HashMap）非常有用：
+
+```yaml
+type: object
+minProperties: 2
+maxProperties: 10
+```
+
+## ApiHug 实现方式
+
+ApiHug 严格遵循 Swagger 3.0+ 规范，在生成 API 文档和代码时都按照该规范进行设计。
+
+### 示例 1：数组验证
+
+Protobuf 定义：
+
+```protobuf
+repeated string all_names = 2 [(hope.swagger.field) = {
+        description: "所有名字列表";
+        example: "user"
+        blank: FALSE;
+        max_length: {
+            value: 64
+        }
+        max_items:{
+            value: 22
+        }
+        min_items: {
+            value: 11
+        }
+    }];
+```
+
+生成的 Java 代码：
+
+```java
+@Size(
+      min = 11,
+      max = 22
+  )
+  @ArraySchema(
+      minItems = 11,
+      maxItems = 22,
+      schema = @Schema(description = "所有名字列表", 
+                       maxLength = 64, 
+                       requiredMode = Schema.RequiredMode.REQUIRED, 
+                       example = "user", extensions = @Extension(name = "x-hope-validation", properties = @ExtensionProperty(name = "blank", value = "false")), implementation = String.class)
+  )
+  protected List<@NotBlank @Size(max = 64) String> allNames;
+```
+
+### 示例 2：对象属性限制
+
+Protobuf 定义：
+
+```protobuf
+map<string, Pet> all_pets = 3 [(hope.swagger.field) = {
+        description: "我所有的宠物";
+
+        max_properties:{
+            value: 22
+        }
+        min_properties: {
+            value: 11
+        }
+    }];
+```
+
+生成的 Java 代码：
+
+```java
+@Size(
+      min = 11,
+      max = 22
+  )
+  @Schema(
+      description = "我所有的宠物",
+      maxProperties = 22,
+      minProperties = 11
+  )
+  protected Map<String, Pet> allPets;
+```
+
+## 参考资料
+
+1. [Swagger V3 - 数据类型](https://swagger.io/docs/specification/v3_0/data-models/data-types/)
+2. [Swagger V3 - 字典、哈希表与关联数组](https://swagger.io/docs/specification/v3_0/data-models/dictionaries/)

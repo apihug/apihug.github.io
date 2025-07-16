@@ -81,6 +81,7 @@ export const documentationNav = {
     {title: '如何使用 Enum', href: '/zhCN-docs/how/003_how_to_handle_enum'},
     {title: '如何定义api根目录', href: '/zhCN-docs/how/004_how_define_api_root_path'},
     {title: '有用内置小插件', href: '/zhCN-docs/how/005_helpful_inner_plugin'},
+    {title: '如何用好max/min length items', href: '/zhCN-docs/how/006_understand_max_min_length_items_properties'},
   ],
   Milestone: [
     {title: 'Index', href: '/zhCN-docs/milestone'},

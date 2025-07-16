@@ -1,0 +1,161 @@
+---
+title: What's the Difference Between max/min Length, Items, and Properties?
+description: Learn how to use these validation keywords properly and how ApiHug implements them according to Swagger standards.
+---
+
+import {TipInfo} from '@/components/Tip'
+
+In this guide, we will explore the differences between `max/min length`, `items`, and `properties` in schema definitions. We'll also explain how they relate to the `minimum` and `maximum` keywords.
+
+These keywords are commonly used when defining data types such as:
+
+<TipInfo>
+  1. Primitive Types (e.g., number, string)
+  2. Array Types
+  3. Dictionaries, HashMaps, and other Objects
+</TipInfo>
+
+## Official Definitions
+
+### Minimum and Maximum
+
+Use `minimum` and `maximum` to define the inclusive range of acceptable values for numeric types:
+
+```yaml
+type: integer
+minimum: 1
+maximum: 20
+```
+
+By default, the boundaries are **inclusive**:
+```
+minimum ≤ value ≤ maximum
+```
+
+To exclude a boundary, set `exclusiveMinimum` or `exclusiveMaximum` to `true`. For example, to define a floating-point number strictly greater than 0 and less than or equal to 50:
+
+```yaml
+type: number
+minimum: 0
+exclusiveMinimum: true
+maximum: 50
+```
+
+| Keyword                                   | Description             |
+|-------------------------------------------|-------------------------|
+| `exclusiveMinimum: false` or not included | `value ≥ minimum`       |
+| `exclusiveMinimum: true`                  | `value > minimum`       |
+| `exclusiveMaximum: false` or not included | `value ≤ maximum`       |
+| `exclusiveMaximum: true`                  | `value < maximum`       |
+
+### minLength and maxLength
+
+Use `minLength` and `maxLength` to restrict the length of strings:
+
+```yaml
+type: string
+minLength: 3
+maxLength: 20
+```
+
+### minItems and maxItems
+
+For arrays, use `minItems` and `maxItems` to define the minimum and maximum number of elements allowed:
+
+```yaml
+type: array
+items:
+  type: integer
+minItems: 1
+maxItems: 10
+```
+
+### minProperties and maxProperties
+
+Use `minProperties` and `maxProperties` to specify constraints on the number of properties in an object. This is especially useful when working with dynamic objects like dictionaries or maps:
+
+```yaml
+type: object
+minProperties: 2
+maxProperties: 10
+```
+
+## ApiHug Implementation
+
+ApiHug follows the Swagger 3.0+ specification for both API documentation generation and code generation.
+
+### Sample 1: Array Validation
+
+Protobuf definition:
+
+```protobuf
+repeated string all_names = 2 [(hope.swagger.field) = {
+        description: "all name list";
+        example: "user"
+        blank: FALSE;
+        max_length: {
+            value: 64
+        }
+        max_items:{
+            value: 22
+        }
+        min_items: {
+            value: 11
+        }
+    }];
+```
+
+Generated Java code:
+
+```java
+@Size(
+      min = 11,
+      max = 22
+  )
+  @ArraySchema(
+      minItems = 11,
+      maxItems = 22,
+      schema = @Schema(description = "all name list", 
+                       maxLength = 64, 
+                       requiredMode = Schema.RequiredMode.REQUIRED, 
+                       example = "user", extensions = @Extension(name = "x-hope-validation", properties = @ExtensionProperty(name = "blank", value = "false")), implementation = String.class)
+  )
+  protected List<@NotBlank @Size(max = 64) String> allNames;
+```
+
+### Sample 2: Object Property Constraints
+
+Protobuf definition:
+
+```protobuf
+map<string, Pet> all_pets = 3 [(hope.swagger.field) = {
+        description: "all my pets";
+
+        max_properties:{
+            value: 22
+        }
+        min_properties: {
+            value: 11
+        }
+    }];
+```
+
+Generated Java code:
+
+```java
+@Size(
+      min = 11,
+      max = 22
+  )
+  @Schema(
+      description = "all my pets",
+      maxProperties = 22,
+      minProperties = 11
+  )
+  protected Map<String, Pet> allPets;
+```
+
+## References
+
+1. [Swagger V3 - Data Types](https://swagger.io/docs/specification/v3_0/data-models/data-types/)
+2. [Swagger V3 - Dictionaries, HashMaps, and Associative Arrays](https://swagger.io/docs/specification/v3_0/data-models/dictionaries/)
