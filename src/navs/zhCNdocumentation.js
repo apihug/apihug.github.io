@@ -44,6 +44,7 @@ export const documentationNav = {
     {title: 'Spring 数据库', href: '/zhCN-docs/framework/spring-data'},
     {title: 'Spring 安全库', href: '/zhCN-docs/framework/spring-security'},
     {title: 'Spring Mock库', href: '/zhCN-docs/framework/spring-mock'},
+    {title: '关于合约 Contract', href: '/zhCN-docs/framework/all-about-contract'},
     {title: 'Spring 极简RBAC', href: '/zhCN-docs/framework/widget/authority'},
   ],
   "Kola": [

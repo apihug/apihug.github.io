@@ -155,6 +155,11 @@ map<string, Pet> all_pets = 3 [(hope.swagger.field) = {
   protected Map<String, Pet> allPets;
 ```
 
+<TipInfo>
+  1. 在 API 定义中应避免使用复杂的数据结构，以保持接口的清晰性和兼容性。
+  2. 在 API 的 Map 定义中，建议仅使用字符串作为键，以确保跨系统和语言的一致性与稳定性。
+</TipInfo>
+
 ## 参考资料
 
 1. [Swagger V3 - 数据类型](https://swagger.io/docs/specification/v3_0/data-models/data-types/)

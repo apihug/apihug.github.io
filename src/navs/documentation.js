@@ -44,6 +44,7 @@ export const documentationNav = {
     {title: 'Spring Data', href: '/docs/framework/spring-data'},
     {title: 'Spring Security', href: '/docs/framework/spring-security'},
     {title: 'Spring Mock', href: '/docs/framework/spring-mock'},
+    {title: 'All about contract', href: '/docs/framework/all-about-contract'},
     {title: 'Basic Authority', href: '/docs/framework/widget/authority'},
   ],
   "Kola": [

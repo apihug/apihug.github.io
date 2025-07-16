@@ -1,0 +1,51 @@
+
+---
+title: 为什么契约在内部和外部都如此重要
+description: ApiHug 如何通过契约消除内部与外部之间的鸿沟
+---
+
+  import { TipInfo } from '@/components/Tip'
+
+
+  ## 基础概念
+
+<TipInfo>
+  为什么契约在内部和外部通信中如此重要？
+</TipInfo>
+
+本质上，ApiHug 所要解决的是 API 的问题，API 是用于不同层级或系统之间通信的一种规范。
+
+换句话说，它就是一种**契约**：
+
+1. 在应用内部，用于后端与前端之间的通信；
+2. 在外部，则用于不同应用（微服务）或第三方系统之间的通信。
+
+
+## ApiHug 的实现方式
+
+ApiHug 在设计中广泛使用契约机制：
+
+1. ApiHug 严格按照 Swagger 标准进行 API 设计；
+2. ApiHug 使用 DSL 定义契约提供方，这能充分利用编译期静态检查，避免人为错误并提升可读性；
+3. 对于第三方系统的依赖，同样采用 DSL 进行定义；
+4. ApiHug 的测试工具 [Kola](/zhCN-docs/kola) 严格基于 API 设计原型执行测试；
+5. ApiHug 通过 [MCP](/zhCN-docs/mcp/001_start) 暴露 MCP 端点。
+
+以上所有功能均基于 ApiHug 的 API 设计元语言：**protobuf** 构建。
+
+在编译期和运行时阶段，你可以通过 `hope.common.service.contract.ContractAdapter` 轻松地自定义这些行为。
+
+该适配器提供了以下扩展点以供定制化使用：
+
+| 函数名               | 备注                                 |
+|-------------------|------------------------------------|
+| `moduleClassName` | 当前应用程序 proto 模块的类名。                |
+| `contract`        | 控制第三方模块（微服务 API 依赖）中暴露的 API 上下文信息。 |
+| `mcp`             | 基于 API 控制是否暴露 MCP 服务。              |
+
+
+
+## 参考资料
+
+1. [Introducing Spring Cloud Contract](https://docs.spring.io/spring-cloud-contract/reference/getting-started/introducing-spring-cloud-contract.html)
+2. [Consumer-Driven Contracts: A Service Evolution Pattern](https://martinfowler.com/articles/consumerDrivenContracts.html)

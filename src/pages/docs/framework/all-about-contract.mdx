@@ -1,0 +1,49 @@
+---
+title: Why Contract is so important no only inner but also external
+description: How ApiHug design use the contract to eliminate the gap inner and external
+---
+
+import { TipInfo } from '@/components/Tip'
+
+
+## Basic
+
+<TipInfo>
+  Why contract is so import in internal or external communication?
+</TipInfo>
+
+Basically what ApiHug try to solve is API, which is a specification use to communication between different layers or systems. 
+
+In other words, it is a contract:
+
+1. internal an application, it used to communicate between the backend and front-end
+2. external, between different applications(microservices) or 3rd-party system
+
+
+## ApiHug
+
+1. ApiHug implements API design strictly according to Swagger standards；
+2. ApiHug use DSL to define the contract supplier, which will leverage the most compile time static check avoid human mistake and readability
+3. For 3rd party system dependencies also use DSL definition
+4. ApiHug test [Kola](/docs/kola) strictly according to the api design proto
+5. ApiHug [MCP](/docs/mcp/001_start) expose the MCP endpoints 
+
+All those build base on ApiHug's Api design meta language: protobuf
+
+During the compile and runtime you can customize this behaviour easily with `hope.common.service.contract.ContractAdapter`
+
+it will supply those extension for customized:
+
+
+| function          | Remarks                                                                                 |
+|-------------------|-----------------------------------------------------------------------------------------|
+| `moduleClassName` | class name of this application's proto module.                                          |
+| `contract`        | Control the api context from the given 3rd-party module(microservice api dependencies). |
+| `mcp`             | Control the expose of MCP service base on API.                                          |
+
+
+
+## Refer
+
+1. [Introducing Spring Cloud Contract](https://docs.spring.io/spring-cloud-contract/reference/getting-started/introducing-spring-cloud-contract.html)
+2. [Consumer-Driven Contracts: A Service Evolution Pattern](https://martinfowler.com/articles/consumerDrivenContracts.html)
