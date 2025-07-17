@@ -43,6 +43,32 @@ ApiHug 在设计中广泛使用契约机制：
 | `mcp`             | 基于 API 控制是否暴露 MCP 服务。              |
 
 
+如何通过 DSL 管理跨应用或 MCP 暴露时的 ApiContext：
+
+1. 使用 `instance of` 将模块转换为指定的目标模块
+2. 利用 DSL 启用或禁用特定的服务或 API
+
+```java
+  //if module instanceof MyModule myModule: 
+  return myModule.service()
+          .apiContext()
+          .orderService(
+              svc -> {
+                // Keep all the methods of this service
+                svc.keepAll();
+                // All the method start with, feel free try other shortcut
+                svc.startsWith("add");
+                // Pick method one by one
+                svc.methods(
+                    methods -> {
+                      // Include this method
+                      methods.PlaceOrder();
+                      // Exclude this method, start with `_`
+                      methods._DeleteOrder();
+                    });
+              })
+          .build();
+```
 
 ## 参考资料
 

@@ -41,6 +41,32 @@ it will supply those extension for customized:
 | `contract`        | Control the api context from the given 3rd-party module(microservice api dependencies). |
 | `mcp`             | Control the expose of MCP service base on API.                                          |
 
+How to use DSL to control your ApiContext in API contracts between different applications or MCP exposures:
+
+1. Cast the module to your target module using `instance of`
+2. Use DSL to enable or disable specific services or APIs
+
+```java
+  //if module instanceof MyModule myModule: 
+  return myModule.service()
+          .apiContext()
+          .orderService(
+              svc -> {
+                // Keep all the methods of this service
+                svc.keepAll();
+                // All the method start with, feel free try other shortcut
+                svc.startsWith("add");
+                // Pick method one by one
+                svc.methods(
+                    methods -> {
+                      // Include this method
+                      methods.PlaceOrder();
+                      // Exclude this method, start with `_`
+                      methods._DeleteOrder();
+                    });
+              })
+          .build();
+```
 
 
 ## Refer
