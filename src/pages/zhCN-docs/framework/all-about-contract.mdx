@@ -34,6 +34,17 @@ ApiHug 在设计中广泛使用契约机制：
 
 在编译期和运行时阶段，你可以通过 `hope.common.service.contract.ContractAdapter` 轻松地自定义这些行为。
 
+ApiHug 采用 [service locator](https://www.oracle.com/java/technologies/service-locator.html)  在运行和编译时候加载你定制 Contract Adapter。
+
+需要您：
+
+1. 保持自定义 `ContractAdapter` 无状态，默认构建函数
+2. 在 `{APP-MODULE}/src/main/resources/META-INF` 下创建 文件 `hope.common.service.contract.ContractAdapter` 登记您 `ContractAdapter`:
+
+```
+#PKG-NAME#.infra.contract.MyContractAdapter
+```
+
 该适配器提供了以下扩展点以供定制化使用：
 
 | 函数名               | 备注                                 |

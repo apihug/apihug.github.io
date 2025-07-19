@@ -32,6 +32,17 @@ All those build base on ApiHug's Api design meta language: protobuf
 
 During the compile and runtime you can customize this behaviour easily with `hope.common.service.contract.ContractAdapter`
 
+ApiHug uses the [Service Locator](https://www.oracle.com/java/technologies/service-locator.html) pattern to load your custom `ContractAdapter` at both runtime and compile time.
+
+What you need to do:
+
+1. Keep your custom `ContractAdapter` stateless and provide a default constructor.
+2. Create a file named `hope.common.service.contract.ContractAdapter` under `{APP-MODULE}/src/main/resources/META-INF`, and register your `ContractAdapter` in it:
+
+```
+#PKG-NAME#.infra.contract.MyContractAdapter
+```
+
 it will supply those extension for customized:
 
 
