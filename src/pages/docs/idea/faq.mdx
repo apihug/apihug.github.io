@@ -1,83 +1,85 @@
 ---
-title: ApiHug Api design copilot FAQ
-description: Frequently asked question of the ApiHug Api Design copilot
+title: ApiHug API Design Copilot FAQ
+description: Frequently asked questions about the ApiHug API Design Copilot
 ---
 
 ## ProtoBuf
 
-### Proto 文件不能识别, can not recognize proto file
+### Proto file cannot be recognized
 
-目前IDE 支持的 `Proto buffer` 插件最流行有两个：
+Currently, there are two popular `Proto buffer` plugins supported by IDEs:
 
-1. IDE 自带的， 供应商是 `JetBrains s.r.o.` ✅✅✅
-2. 三方 `HIGAN` ❌❌❌
+1. Built-in IDE plugin, provided by `JetBrains s.r.o.` ✅✅✅
+2. Third-party `HIGAN` plugin ❌❌❌
 
-目前这两个插件是冲突的，只能支持之一。⚠️
+These two plugins conflict with each other and only one can be enabled at a time. ⚠️
 
-ApiHug Plugin 依赖 IDE 自带的 **Proto Editor** 插件，进行AST 语法树的解析，所以必须激活  `JetBrains s.r.o.` ✅ Proto插件:
+The ApiHug Plugin relies on the IDE's built-in **Proto Editor** plugin for AST parsing, so the `JetBrains s.r.o.` ✅ Proto plugin must be enabled:
 
 <img src={require('@/img/plugin/protobuf_plugin.png').default.src} alt="ApiHug plugin" width={986} height={712} className="rounded-lg" />
 
-### Proto 文件不能import, cannot recognize the proto import
+### Proto file import fails, cannot recognize the proto import
 
-ApiHug SDK proto 导入 `import "swagger/annotations.proto";` 报错：
+ApiHug SDK proto import `import "swagger/annotations.proto";` fails with an error:
 
-ApiHug SDK proto import `import "swagger/annotations.proto";` fail：
+ApiHug SDK proto import `import "swagger/annotations.proto";` fails:
 
 <img src={require('@/img/plugin/import_error.png').default.src} alt="ApiHug plugin SDK import error" width={880} height={361} className="rounded-lg" />
 
-**01: 编译项目, compile the project** (markdown or gradle task)
+**01: Compile the project** (via markdown or gradle task)
 
 <img src={require('@/img/plugin/2ways_build.png').default.src} alt="ApiHug 2 ways build project" width={1113} height={568} className="rounded-lg" />
 
-**02: 编译完成后， 查看proto 项目的 build缓存**， after compile success, check the project proto build cache:
+**02: After successful compilation, check the build cache of the proto project**:
 
 `{PROJECT}/{PROTO-MODULE}/build/extracted-include-protos`:
 
 <img src={require('@/img/plugin/2ways_build_success.png').default.src} alt="ApiHug success build" width={1202} height={535} className="rounded-lg" />
 
-**03： 如果还是没有引入**， 手动配置 proto import; if still not import then please add path manually：
+**03: If the import still fails**, manually configure the proto import path; if imports are still not recognized, please add the path manually:
 
-1. open `Settings` panel
-2. find  `Protocol Buffers`
-3. un-check `Configure Automatically`
-4. add the `{PROJECT}/{PROTO-MODULE}/build/extracted-include-protos` to the `Import Paths`:
+1. Open the `Settings` panel
+2. Locate `Protocol Buffers`
+3. Un-check `Configure Automatically`
+4. Add `{PROJECT}/{PROTO-MODULE}/build/extracted-include-protos` to the `Import Paths`:
+
+Since [Plugin](/docs/changelog/plugin) version 0.7.6, these predefined protos are included by the plugin.
 
 <img src={require('@/img/plugin/2ways_finally.png').default.src} alt="ApiHug import finally" width={1928} height={1041} className="rounded-lg" />
 
-最终所有 `import` 应该都变绿，  Eventually all the `import` should turn green!
+Eventually, all `import` statements should turn green!
 
-⚠️ sometime the official proto editor may crash, please pay attention to the crash notification!
+⚠️ Occasionally, the official proto editor may crash; please pay attention to any crash notifications.
 
-if even restart IDEA this broken still consistent, please report to us: [report issue](https://github.com/apihug/apihug-ide-plugin/issues/new/choose)
+If the issue persists even after restarting IDEA, please report it to us: [report issue](https://github.com/apihug/apihug-ide-plugin/issues/new/choose)
 
 ## Gradle
 
-### 不能识别Gradle, can not recognize as gradle project
+### Cannot recognize as Gradle project
 
-IDE 应该弹出 **Load Gradle Project**, 如果通知被被关闭， 打开 **Notification** 手动触发。
+The IDE should display a **Load Gradle Project** notification. If notifications are disabled, open the **Notification** panel to trigger it manually.
 
-IDE should pop up a notification: **Load Gradle Project**， if notification pop up was forbidden, then please open the **Notification** panel to load it manually!
+IDE should pop up a notification: **Load Gradle Project**; if the notification was disabled, please open the **Notification** panel to load it manually!
 
 <img src={require('@/img/plugin/gradle_loader.png').default.src} alt="ApiHug Load gradle project" width={740} height={428} className="rounded-lg" />
 
-### Gradle 编译报错, gradle compile failure
+### Gradle compile failure
 
 1. [report issue](https://github.com/apihug/apihug-ide-plugin/issues/new/choose)
-2. [Homepage](https://github.com/apihug/apihug.com) find QR code to join our chat group.
+2. Visit the [Homepage](https://github.com/apihug/apihug.com) to find the QR code and join our chat group.
 
 ## API Design tree not present/refresh
 
-1. refresh the tree
-2. rebuild the tree(heavy), recompile and then refresh
+1. Refresh the tree
+2. Rebuild the tree (heavy operation): recompile and then refresh
 
 <img src={require('@/img/plugin/api-tree-rebuild.png').default.src} alt="ApiHug Rebuild" width={678} height={518} className="rounded-lg" />
 
-if the error still consistent, then  [report issue](https://github.com/apihug/apihug-ide-plugin/issues/new/choose)!
+If the error persists, please [report issue](https://github.com/apihug/apihug-ide-plugin/issues/new/choose)!
 
 ## Check version
 
-Check the ApiHug IDE plugin version installed:
+Check the installed version of the ApiHug IDE plugin:
 
 Top Menu: `ApiHug` -> `About`:
 
@@ -85,7 +87,7 @@ Top Menu: `ApiHug` -> `About`:
 
 ## Plugin 0.2+ issue
 
-[Milestone 20240222](/docs/milestone/milestone-20240222) Especially Spring boot upgrade!
+[Milestone 20240222](/docs/milestone/milestone-20240222) — Includes Spring Boot upgrade!
 
 ## Latest
 
