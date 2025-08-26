@@ -26,6 +26,32 @@ Java 版本对应关系:
 | 21      | 17           | 必须设置为 `<=17` |
 | 17      | 21           | 默认或 `<=21`   |
 
+项目工具链java 版本`{project-root}/gradle/java.gradle`:
+
+```groovy
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+```
+
+Gradle JVM 版本, 在启动编译时会输出:
+
+```
+Java version: 19.0.1
+Gradle version: 8.14.3
+Current dir: /user/home/project/myproject
+Spring Boot version: 3.5.5
+Spring Dependency version: 1.1.7
+Spring Ai version: 1.0.0
+Spring Cloud version: 2024.0.1
+ApiHug version: 1.4.3-M8
+All Modules: [project ':sample-proto',':sample-app']
+```
+
+当面每个模块都可以在自己的 `build.gradle` 覆盖新的 java 版本。
+
 
 ## ProtoBuf
 

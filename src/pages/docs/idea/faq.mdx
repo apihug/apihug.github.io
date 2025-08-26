@@ -28,6 +28,32 @@ Java version:
 | 17      | 21              | Default or `<=21` |
 
 
+Project toolchain Java version `{project-root}/gradle/java.gradle`:
+
+```groovy
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+```
+
+Gradle JVM version, which will be printed when starting compilation:
+
+```
+Java version: 19.0.1
+Gradle version: 8.14.3
+Current dir: /user/home/project/myproject
+Spring Boot version: 3.5.5
+Spring Dependency version: 1.1.7
+Spring Ai version: 1.0.0
+Spring Cloud version: 2024.0.1
+ApiHug version: 1.4.3-M8
+All Modules: [project ':sample-proto',':sample-app']
+```
+
+Each module can override the Java version in its own `build.gradle`.
+
 
 ## ProtoBuf
 
