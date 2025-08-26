@@ -10,21 +10,22 @@ description: Frequently asked questions about the ApiHug API Design Copilot
 JVM version compatibility is critical for successful proto module compilation.
 
 Two JVM versions are involved:
+
 1. The toolchain version defined in the project's **gradle/java.gradle** file.
 2. The JVM version of the build environment (used by Gradle at runtime).
 
 A version mismatch between these can cause the protobuf wire compiler to fail silently.
 
 To prevent issues:
-- Ensure the proto module's target compilation version is <= build environment JVM version.
+- Ensure the proto module's target compilation version is `<=` build environment JVM version.
 
 Java version:
 
-| Project | Compile (gradle) | Proto Module      |
-|---------|------------------|-------------------|
-| 21      | 21               | Default or `<=21` |
-| 21      | 17               | `<=17`            |
-| 17      | 21               | Default or `<=21` |
+| Project | Compile(gradle) | Proto Module      |
+|---------|-----------------|-------------------|
+| 21      | 21              | Default or `<=21` |
+| 21      | 17              | `<=17`            |
+| 17      | 21              | Default or `<=21` |
 
 
 
