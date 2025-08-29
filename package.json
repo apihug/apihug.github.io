@@ -16,7 +16,7 @@
     "@docsearch/react": "^3.3.3",
     "@headlessui/react": "^2.0.3",
     "@heroicons/react": "^2.1.1",
-    "@mdx-js/loader": "^2.3.0",
+    "@mdx-js/loader": "^3.0.1",
     "@mdx-js/react": "^2.3.0",
     "@silvenon/remark-smartypants": "^1.0.0",
     "@sindresorhus/slugify": "^2.2.0",
