@@ -7,6 +7,10 @@ import { TipInfo } from '@/components/Tip'
 
 The security framework provides authentication, authorization, and protection against common attacks.
 
+
+<TipInfo>️️⚠️ Apihug Security is not compatible with Spring Security at runtime.</TipInfo>
+
+
 **ApiHug** offers a minimalist and efficient security solution, different from traditional frameworks like Apache Shiro or Spring Security.
 
 It is still based on resource (API) permission management, combined with roles, creating a very simple RBAC (Role-Based Access Control) structure that is ready to use out of the box.
@@ -38,7 +42,44 @@ Configuration path: `hope.security`; Configuration object: `HopeSecurityProperti
 | `jwt.tokenValidityInSeconds`              | Default validity time, 7 days.                       |
 
 
+
+## Disable Spring Security
+
+<TipInfo>️️⚠️ Apihug Security is not compatible with Spring Security at runtime.</TipInfo>
+
+The simplest way to disable Spring Security is to remove its **dependency** from the project. 
+
+By doing this, we’ll remove all security-related configurations and defaults provided by Spring Security:
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>
+    <version>...</version>
+</dependency>
+```
+
+Removing this dependency eliminates all Spring Security features from the application.
+
+
+But if you want leverage some Spring security components, we recommend you to disable the spring security autoconfiguration manually:
+
+**Excluding Spring Security Auto-Configuration**
+
+Spring Boot automatically configures security when we include spring-boot-starter-security in our classpath. To disable it, exclude the `auto-configuration` by adding the following property to `application.properties`:
+
+```properties
+spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+```
+
+If we want to disable Spring Security completely, we should use `spring.autoconfigure.exclude` without creating a `SecurityConfiguration` class. 
+
+Manually configuring the Spring Security class overrides the `application.properties` configuration, so exclusion in the `application.properties` has no effect when both are used together.
+
+
+
 <TipInfo>To be done 🏗️</TipInfo>
+
 
 ## Refer
 

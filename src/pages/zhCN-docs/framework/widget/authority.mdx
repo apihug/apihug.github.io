@@ -3,6 +3,8 @@ title: 极简 Authentication & Authorization
 description: Hope 实现Authentication & Authorization, JWT, RBAC
 ---
 
+import { TipInfo } from '@/components/Tip'
+
 ## Authentication
 
 ### JWT
@@ -135,6 +137,39 @@ ORDER_MODIFY:order:modify
 ```
 
 ㊗️ so enjoy!
+
+
+## 禁用 Spring Security
+
+<TipInfo>⚠️ Apihug Security 与 Spring Security 在运行时不兼容。</TipInfo>
+
+禁用 Spring Security 最简单的方法是从项目中移除其 **依赖项**。
+
+通过移除以下依赖，可以清除项目中所有由 Spring Security 提供的安全配置和默认设置：
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>
+    <version>...</version>
+</dependency>
+```
+
+移除该依赖后，应用程序中将不再包含任何 Spring Security 的功能。
+
+但如果您仍希望使用部分 Spring Security 的组件，我们建议您手动禁用其自动配置功能：
+
+**排除 Spring Security 自动配置**
+
+当项目类路径中包含 `spring-boot-starter-security` 时，Spring Boot 会自动启用安全配置。若要禁用该自动配置，可在 `application.properties` 文件中添加如下配置：
+
+```properties
+spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+```
+
+如果您希望完全禁用 Spring Security，建议仅通过 `spring.autoconfigure.exclude` 配置实现，而不要创建 `SecurityConfiguration` 类。
+
+请注意：手动定义 Spring Security 配置类会覆盖 `application.properties` 中的配置，因此当两者同时存在时，`application.properties` 中的排除配置将失效。
 
 ## Reference
 
