@@ -250,6 +250,59 @@ default Page<Account> queryPlatformAccount(QueryPlatformAccountRequest request, 
 }
 ```
 
+## 实体持久化状态
+
+下表描述了 Spring Data 提供的用于判断实体是否为新实体的策略：
+
+| 策略                                | 说明                                                                                                                                                                                                                                                                                                |
+|-----------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`@Id` 属性检查（默认方式）**              | 默认情况下，Spring Data 会检查给定实体的标识符属性。如果该标识符属性为 `null`，或对于基本类型为 `0`，则认为该实体是新的。否则，认为该实体不是新的。                                                                                                                                                                                                             |
+| **`@Version` 属性检查**               | 如果存在使用 `@Version` 注解的属性且其值为 `null`，或者对于基本类型的版本属性其值为 `0`，则认为该实体是新的。如果版本属性存在但具有其他值，则认为该实体不是新的。如果不存在版本属性，Spring Data 将回退到检查标识符属性。                                                                                                                                                                    |
+| **实现 `Persistable` 接口**           | 如果实体实现了 `Persistable` 接口，Spring Data 会将新实体的判断委托给实体的 `isNew(...)` 方法。详情请参见 [Javadoc](https://docs.spring.io/spring-data/commons/docs/current/api/org/springframework/data/domain/Persistable.html)。<br><br>_注意：如果使用 `AccessType.PROPERTY`，`Persistable` 的属性可能会被检测并持久化。为避免此情况，请使用 `@Transient` 注解。_ |
+| **提供自定义的 `EntityInformation` 实现** | 您可以通过创建特定模块仓库工厂的子类并重写 `getEntityInformation(...)` 方法，来定制仓库基础实现中使用的 `EntityInformation` 抽象。然后需要将该自定义的模块特定仓库工厂实现注册为 Spring Bean。请注意，这种情况很少需要。                                                                                                                                                       |
+
+在 ApiHug 中，有两种方式可以使实体具备可识别性：
+
+1. 使用 `wires: [ALL]` 或 `wires: [IDENTIFIABLE]` 配置。
+2. 通过将单个列标记为 `id: true`（每个表仅允许一个这样的列）来定义自定义 **ID** 列。
+
+您可以选择其中**一种**方式，但**不能同时使用两种**，以将实体标识为可识别的，从而确保仓库能够正确处理 **CRUD** 操作。
+
+当使用自定义 ID 列时（例如，使用用户 ID 作为主键），我们如何判断该实体是否为新实体？
+
+默认情况下，如果一个新的实体实例包含 ID，仓库会将其视为 **更新** 操作，这将导致无法插入新记录。为解决此问题，从 **`1.4.4-RELEASE`** 版本开始，ApiHug 通过集成 Spring Data 的 `Persistable` 接口，提供了对新实体检测的内置支持。
+
+ApiHug 会自动为您的实体注入辅助逻辑以支持此行为：
+
+```java
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Persistable;
+
+public final class YourEntity implements Persistable<String> {
+    
+  @Transient
+  private transient boolean __isNew;
+  
+  private String myId;
+  
+  @Override
+  public String getId() {
+    return myId;
+  }
+
+  @Override
+  public boolean isNew() {
+    return __isNew;
+  }
+
+  public YourEntity asNew() {
+    __isNew = true;
+    return this;
+  }
+}
+```
+
+由于此类 ID 通常从一开始就由业务逻辑分配，通过 `isNew()` 方法可以明确控制操作应被视为 **插入** 还是 **更新**，从而确保正确的持久化行为。
 
 ## Multi Data Source
 
@@ -265,3 +318,5 @@ default Page<Account> queryPlatformAccount(QueryPlatformAccountRequest request, 
 5. [Spring Data Using jOOQ](https://docs.spring.io/spring-boot/reference/data/sql.html#data.sql.jooq)
 6. [JPQL](https://www.javatpoint.com/jpa-jpql-introduction)
 7. [HQL](https://www.javatpoint.com/hql)
+8. [Spring - Entity State Detection Strategies](https://docs.spring.io/spring-data/relational/reference/repositories/core-concepts.html#is-new-state-detection)
+9. [Spring JPA - Entity State-detection Strategies](https://docs.spring.io/spring-data/jpa/reference/jpa/entity-persistence.html#jpa.entity-persistence.saving-entities.strategies)

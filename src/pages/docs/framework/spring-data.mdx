@@ -245,6 +245,62 @@ default Page<Account> queryPlatformAccount(QueryPlatformAccountRequest request, 
 ```
 
 
+
+## Entity Persistable Status
+
+The following table describes the strategies that Spring Data offers for detecting whether an entity is new:
+
+| value                                                     | comment                                                                                                                                                                                                                                                                                                                                                                                                           |
+|-----------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`@Id`-Property inspection (the default)**               | By default, Spring Data inspects the identifier property of the given entity. If the identifier property is `null` or `0` in case of primitive types, then the entity is assumed to be new. Otherwise, it is assumed to not be new.                                                                                                                                                                               |
+| **`@Version`-Property inspection**                        | If a property annotated with `@Version` is present and `null`, or in case of a version property of primitive type `0` the entity is considered new. If the version property is present but has a different value, the entity is considered to not be new. If no version property is present Spring Data falls back to inspection of the identifier property.                                                      |
+| **Implementing `Persistable`**                            | If an entity implements `Persistable`, Spring Data delegates the new detection to the `isNew(…)` method of the entity. See the [Javadoc](https://docs.spring.io/spring-data/commons/docs/current/api/org/springframework/data/domain/Persistable.html) for details.<br><br>_Note: Properties of `Persistable` will get detected and persisted if you use `AccessType.PROPERTY`. To avoid that, use `@Transient`._ |
+| **Providing a custom `EntityInformation` implementation** | You can customize the `EntityInformation` abstraction used in the repository base implementation by creating a subclass of the module specific repository factory and overriding the `getEntityInformation(…)` method. You then have to register the custom implementation of module specific repository factory as a Spring bean. Note that this should rarely be necessary.                                     |
+
+In ApiHug, there are two ways to make an entity identifiable:
+
+1. Use the `wires: [ALL]` or `wires: [IDENTIFIABLE]` configuration.
+2. Define a custom **ID** column by marking a single column with `id: true` (exactly one such column per table).
+
+You may choose **either** approach, but **not both**, to designate an entity as identifiable—this ensures proper **CRUD** handling by the repository.
+
+When using a custom ID column—such as a user-defined primary key like a user ID—how do we determine whether the entity is new?
+
+By default, if a new entity instance includes an ID, the repository treats it as an **update** operation, which can prevent insertion of new records. To address this, starting from **`1.4.4-RELEASE`**, ApiHug provides built-in support for more precise new-entity detection by integrating Spring Data’s `Persistable` interface.
+
+ApiHug automatically wires helper logic into your entity to support this behavior:
+
+```java
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Persistable;
+
+public final class YourEntity implements Persistable<String> {
+    
+  @Transient
+  private transient boolean __isNew;
+  
+  private String myId;
+  
+  @Override
+  public String getId() {
+    return myId;
+  }
+
+  @Override
+  public boolean isNew() {
+    return __isNew;
+  }
+
+  public YourEntity asNew() {
+    __isNew = true;
+    return this;
+  }
+}
+```
+
+Since such IDs are typically assigned by business logic from the outset, the `isNew()` method allows explicit control over whether the operation should be treated as an **insert** or **update**, ensuring correct persistence behavior.
+
+
 ## Multi Data Source
 
 <TipInfo>To be done 🏗️</TipInfo>
@@ -259,3 +315,5 @@ default Page<Account> queryPlatformAccount(QueryPlatformAccountRequest request, 
 5. [Spring Data Using jOOQ](https://docs.spring.io/spring-boot/reference/data/sql.html#data.sql.jooq)
 6. [JPQL](https://www.javatpoint.com/jpa-jpql-introduction)
 7. [HQL](https://www.javatpoint.com/hql)
+8. [Spring - Entity State Detection Strategies](https://docs.spring.io/spring-data/relational/reference/repositories/core-concepts.html#is-new-state-detection)
+9. [Spring JPA - Entity State-detection Strategies](https://docs.spring.io/spring-data/jpa/reference/jpa/entity-persistence.html#jpa.entity-persistence.saving-entities.strategies)
