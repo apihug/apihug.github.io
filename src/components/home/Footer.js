@@ -12,6 +12,9 @@ const footerNav = [
       { title: 'GitHub', href: 'https://github.com/apihug/apihug.com/' },
       { title: 'YouTube', href: 'https://youtube.com/@ApiHug' },
     ],
+    Others:[
+      { title:'沪ICP备2022018771号-7', href:'https://beian.miit.gov.cn/' }
+    ]
   },
 ]
 
