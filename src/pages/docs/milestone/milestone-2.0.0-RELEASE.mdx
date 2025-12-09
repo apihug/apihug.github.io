@@ -1,0 +1,150 @@
+---
+title: Milestone 2.0.0-RELEASE
+description: SDK [2.0.0-RELEASE]
+---
+
+import {TipGood} from '@/components/Tip'
+
+<TipGood>
+  `2.0.0-RELEASE` is a major milestone for ApiHug, introducing numerous **breaking changes** to pave the way for a next-generation, **LLM-friendly** API specification and tooling ecosystem.
+</TipGood>
+
+😆 Guide：
+
+1. [ApiHug101-Bilibili](https://space.bilibili.com/666522636)
+2. [ApiHug101 Youtube](https://youtube.com/@ApiHug?si=C1yw0poHA01zbmyj)
+
+<a target="_blank" href="https://search.maven.org/artifact/com.apihug/it-bom"><img
+  src="https://img.shields.io/maven-central/v/com.apihug/it-bom.svg?label=Maven%20Central"/></a>
+
+[ApiHug - API design Copilot](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
+
+## SDK [2.0.0-RELEASE] - 2025-12-10
+
+- Migrated JavaPoet from Square to Palantir fork
+- Replaced Google’s protobuf parser with Square’s Wire engine
+- Laid groundwork for Protobuf Schema Catalog support
+
+## Plugin [1.0.0] - 2025-12-10
+
+- Upgraded to SDK 2.0.0-RELEASE
+- Removed legacy Protocol Buffer plugin dependencies
+- Adopted a lightweight, pure Wire-based protobuf compiler
+- Removed AI-related components for a leaner, more focused design
+- Cached metadata in human-readable text format—LLM-friendly
+- Various bug fixes
+
+
+## New Feature
+
+1. **Polymorphism support** via Protocol Buffers’ `oneof` construct.
+2. **Compact OpenAPI output** by leveraging OAS `allOf` to unwrap and simplify response wrappers.
+3. **Ultra-fast, lightweight compiler** for rapid generation and iteration.
+4. **Rich metadata export** to enable advanced tooling and integrations.
+5. **LLM-ready specifications** — laying the foundation for specification-driven development (TBD).
+
+
+## Upgrade steps
+
+Refer [apihug-demo/libs.versions.toml](https://github.com/apihug/apihug-demo/blob/main/gradle/libs.versions.toml)
+
+1. Upgrade ApiHug SDK: `{PROJECT_ROOT}/gradle/libs.versions.toml`  find  `apihug = "1.0.0-RELEASE"`  please upgrade to  `2.0.0-RELEASE`+
+2. Upgrade ApiHug IDEA plugin to `1.0.0`+ [ApiHug - API design Copilot](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
+3. Make sure spring boot is `<4.0`, better `3.8~` as the spring boot 4.0 has break change!!
+4. Update your command line, now the lite compile will automatically run before build, so no need to specify `wire` or `stub` command
+5. structure change:
+
+
+### Wire
+
+Expected project source structure for Kola contract tests
+
+```
+src/
+├── main/
+│   ├── java/          // Production Java source code
+│   └── resources/     // Production resources
+├── test/
+│   ├── java/          // Standard unit/integration tests (JUnit, etc.)
+│   └── resources/     // Resources for standard tests
+└── test-kola/
+    ├── java/          // Auto-generated Java test classes (compiled and executed)
+    ├── groovy/        // Groovy DSL files (treated as resources; NOT compiled)
+    └── resources/     // Additional test resources (e.g., contracts, fixtures, configs)
+```
+
+**Notes:**
+
+- The `test-kola/groovy` directory contains human-authored Groovy DSL scripts that define test contracts or behaviors. These files are **not compiled** by Gradle.
+- They are included in the `testKola` source set's resources so they are copied to the build output directory, enabling a custom code generator to read them at build time.
+- The `test-kola/java` directory contains Java test classes generated from the Groovy DSL. These are compiled and executed by the `testKola` Gradle task using JUnit Platform.
+
+
+### Stub
+
+**Production Source Layout**
+
+The application's production code is intentionally split across multiple  
+directories under `src/main/` for clarity and maintainability:
+
+```
+src/main/
+  ├── java/      → Hand-written business logic, services, controllers, etc.
+  ├── api/       → Generated DTOs, REST interfaces
+  ├── trait/     → Generated or shared mixin/trait classes
+  ├── mcp/       → Generated microservice contract or protocol code
+  └── domain/    → Core domain models, aggregates, value objects
+```
+
+Despite this physical separation, **all these sources belong to the same  
+production module** and must be compiled together into a single JAR.
+
+
+**Test Source Layout**
+
+Mirror the same logical structure in test code for organizational symmetry:
+
+```
+src/test/
+  ├── java/      → Unit/integration tests for core logic
+  ├── api/       → Contract/guardian tests for API layer
+  ├── trait/     → Tests for trait/mixin behavior
+  ├── mcp/       → Validation tests for protocol contracts
+  └── domain/    → Domain model invariant and behavior tests
+```
+
+All test sources are part of the standard `test` source set and run together  
+via the `test` task. They share the same classpath (main + test output) and  
+dependencies (JUnit, Mockito, etc.).
+
+
+### Proto
+
+```
+// old
+import "extend/version.proto";
+import "swagger/annotations.proto";
+import "extend/domain.proto";
+
+// new 
+import "apihug/protobuf/extend/version.proto";
+import "apihug/protobuf/swagger/annotations.proto";
+import "apihug/protobuf/extend/domain.proto";
+```
+
+
+**Syntax**
+
+1. Polymorphism support via `oneof` — OAS (`allof` ~~`anyof`~~)
+2. Stream definition support === gRPC (server-side not yet implemented): definition, implementation...
+3. Support for upload and downloader definitions (server-side not yet implemented)
+4. Optimization for single-response definitions (non-reference types)
+5. Definition of complex types
+6. Schema definition
+7. Support for `internal`/`external`/`hide` API markers
+
+
+### Gradle
+
+1. `wire` projects support the `protoImport` syntax to import third-party proto dependencies
+2. `stub` projects support the `wireImport` syntax to import wire module dependencies; using `implementation` causes no syntax error but results in empty compilation for the stub command

@@ -1,0 +1,139 @@
+---
+title: Milestone 2.0.0-RELEASE
+description: SDK [2.0.0-RELEASE]
+---
+
+import {TipGood} from '@/components/Tip'
+
+<TipGood>
+  `2.0.0-RELEASE` 是 ApiHug 的一个重要里程碑版本，引入了多项**破坏性变更**，旨在构建面向下一代、**大语言模型（LLM）友好**的 API 规范与工具生态。
+</TipGood>
+
+😆 快速入门指南：
+
+1. [ApiHug101 - 哔哩哔哩](https://space.bilibili.com/666522636)
+2. [ApiHug101 - YouTube](https://youtube.com/@ApiHug?si=C1yw0poHA01zbmyj)
+
+<a target="_blank" href="https://search.maven.org/artifact/com.apihug/it-bom">
+  <img src="https://img.shields.io/maven-central/v/com.apihug/it-bom.svg?label=Maven%20Central"/>
+</a>
+
+[ApiHug - API 设计智能助手（IntelliJ 插件）](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
+
+## SDK [2.0.0-RELEASE] - 2025-12-10
+
+- 将 JavaPoet 从 Square 迁移至 Palantir 分支版本  
+- 使用 Square 的 Wire 引擎替代 Google 的 Protobuf 解析器  
+- 初步支持 Protobuf Schema Catalog 功能  
+
+## 插件 [1.0.0] - 2025-12-10
+
+- 升级至 SDK 2.0.0-RELEASE  
+- 移除旧版 Protocol Buffer 插件依赖  
+- 采用轻量级、纯 Wire 驱动的 Protobuf 编译器  
+- 移除 AI 相关组件，聚焦核心功能  
+- 元数据以人类可读的文本格式缓存，提升 LLM 友好性  
+- 多项 Bug 修复  
+
+## 新特性亮点
+
+1. **多态支持**：通过 Protocol Buffers 的 `oneof` 语法实现。  
+2. **精简 OpenAPI 输出**：利用 OAS `allOf` 展开并简化响应包装结构。  
+3. **极速轻量编译器**：显著提升生成与迭代效率。  
+4. **丰富的元数据导出能力**：为高级工具链和集成提供支撑。  
+5. **LLM 就绪的规范格式**：为未来规范驱动开发（Specification-Driven Development）奠定基础（待完善）。  
+
+## 升级步骤
+
+请参考 [apihug-demo/libs.versions.toml](https://github.com/apihug/apihug-demo/blob/main/gradle/libs.versions.toml)
+
+1. **升级 ApiHug SDK**：在 `{PROJECT_ROOT}/gradle/libs.versions.toml` 中将 `apihug = "1.0.0-RELEASE"` 更新为 `2.0.0-RELEASE` 或更高版本。  
+2. **升级 IntelliJ IDEA 插件** 至 `1.0.0+`：[ApiHug - API 设计智能助手](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)  
+3. **确保 Spring Boot 版本 < 4.0**，推荐使用 `3.8.x` 系列，因 Spring Boot 4.0 存在破坏性变更。  
+4. **更新构建命令**：轻量编译器现已在构建前自动运行，无需再显式指定 `wire` 或 `stub` 命令。  
+5. **项目结构变更如下**：
+
+### Wire 模块
+
+Kola 合约测试的预期项目源码结构：
+
+```
+src/
+├── main/
+│   ├── java/          // 生产环境 Java 源码
+│   └── resources/     // 生产环境资源文件
+├── test/
+│   ├── java/          // 标准单元/集成测试（如 JUnit）
+│   └── resources/     // 标准测试资源
+└── test-kola/
+├── java/          // 自动生成的 Java 测试类（编译并执行）
+├── groovy/        // Groovy DSL 脚本（作为资源处理，**不编译**）
+└── resources/     // 额外测试资源（如合约、夹具、配置等）
+```
+
+**说明：**
+
+- `test-kola/groovy` 目录包含人工编写的 Groovy DSL 脚本，用于定义测试契约或行为，**不会被 Gradle 编译**。  
+- 这些脚本作为 `testKola` 源集的资源被复制到构建输出目录，供自定义代码生成器在构建时读取。  
+- `test-kola/java` 目录包含由 Groovy DSL 生成的 Java 测试类，由 `testKola` Gradle 任务基于 JUnit Platform 编译并执行。
+
+### Stub 模块
+
+**生产源码布局**
+
+为提升可读性与可维护性，应用的生产代码按逻辑拆分至 `src/main/` 下多个子目录：
+
+```
+src/main/
+├── java/      → 手写业务逻辑（服务、控制器等）
+├── api/       → 自动生成的 DTO 与 REST 接口
+├── trait/     → 自动生成或共享的 Mixin/Trait 类
+├── mcp/       → 自动生成的微服务契约或协议代码
+└── domain/    → 核心领域模型（聚合根、值对象等）
+```
+
+尽管物理路径分离，**所有源码均属于同一生产模块**，需一并编译打包为单一 JAR。
+
+**测试源码布局**
+
+测试代码采用对称结构，保持逻辑一致性：
+
+```
+src/test/
+├── java/      → 核心逻辑的单元/集成测试
+├── api/       → API 层契约/守卫测试
+├── trait/     → Trait/Mixin 行为验证
+├── mcp/       → 协议契约校验测试
+└── domain/    → 领域模型不变性与行为测试
+```
+
+所有测试源码均属于标准 `test` 源集，通过 `test` 任务统一执行，共享主模块与测试模块的类路径及依赖（如 JUnit、Mockito 等）。
+
+### Proto 变更
+
+```protobuf
+// 旧路径
+import "extend/version.proto";
+import "swagger/annotations.proto";
+import "extend/domain.proto";
+
+// 新路径
+import "apihug/protobuf/extend/version.proto";
+import "apihug/protobuf/swagger/annotations.proto";
+import "apihug/protobuf/extend/domain.proto";
+```
+
+**语法增强**
+
+1. 支持通过 `oneof` 实现多态（OpenAPI 映射为 `allOf`，**非** `anyOf`）
+2. 支持流式定义（语义等同于 gRPC，服务端暂未实现）：包括定义与实现
+3. 支持上传/下载接口定义（服务端暂未实现）
+4. 优化单响应类型定义（非引用类型）
+5. 支持复杂类型定义
+6. 支持 Schema 定义
+7. 支持 `internal` / `external` / `hide` 等 API 可见性标记
+
+### Gradle 配置
+
+1. `wire` 项目支持 `protoImport` 语法，用于引入第三方 Protobuf 依赖。
+2. `stub` 项目应使用 `wireImport` 语法引入 Wire 模块依赖；若误用 `implementation`，虽无语法错误，但会导致 `stub` 命令生成内容为空。
