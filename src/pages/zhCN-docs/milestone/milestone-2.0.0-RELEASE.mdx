@@ -6,7 +6,8 @@ description: SDK [2.0.0-RELEASE]
 import {TipGood} from '@/components/Tip'
 
 <TipGood>
-  `2.0.0-RELEASE` 是 ApiHug 的一个重要里程碑版本，引入了多项**破坏性变更**，旨在构建面向下一代、**大语言模型（LLM）友好**的 API 规范与工具生态。
+  `2.0.0-RELEASE` 是 ApiHug 的一个重要里程碑版本，引入了多项**破坏性变更**，旨在构建面向下一代、**大语言模型（LLM）友好**的
+  API 规范与工具生态。
 </TipGood>
 
 😆 快速入门指南：
@@ -22,35 +23,43 @@ import {TipGood} from '@/components/Tip'
 
 ## SDK [2.0.0-RELEASE] - 2025-12-10
 
-- 将 JavaPoet 从 Square 迁移至 Palantir 分支版本  
-- 使用 Square 的 Wire 引擎替代 Google 的 Protobuf 解析器  
-- 初步支持 Protobuf Schema Catalog 功能  
+- 将 JavaPoet 从 Square 迁移至 Palantir 分支版本
+- 使用 Square 的 Wire 引擎替代 Google 的 Protobuf 解析器
+- 初步支持 Protobuf Schema Catalog 功能
 
 ## 插件 [1.0.0] - 2025-12-10
 
-- 升级至 SDK 2.0.0-RELEASE  
-- 移除旧版 Protocol Buffer 插件依赖  
-- 采用轻量级、纯 Wire 驱动的 Protobuf 编译器  
-- 移除 AI 相关组件，聚焦核心功能  
-- 元数据以人类可读的文本格式缓存，提升 LLM 友好性  
-- 多项 Bug 修复  
+- 升级至 SDK 2.0.0-RELEASE
+- 移除旧版 Protocol Buffer 插件依赖
+- 采用轻量级、纯 Wire 驱动的 Protobuf 编译器
+- 移除 AI 相关组件，聚焦核心功能
+- 元数据以人类可读的文本格式缓存，提升 LLM 友好性
+- 多项 Bug 修复
+
+⚠️⚠️⚠️ **请勿升级至 Spring Boot 4.0 及以上版本（截至 2025 年 12 月）** —— 当前 SDK 尚未兼容 Spring Boot 4.0 引入的**破坏性变更**。⚠️⚠️⚠️
+
+强行升级可能导致大量难以排查的构建或运行时错误，严重影响开发效率。
+
+如需了解 Spring Boot 4.0 中的具体破坏性变更，请参考官方迁移指南：  
+
+[Spring Boot 4.0 迁移指南](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.0-Migration-Guide)
 
 ## 新特性亮点
 
-1. **多态支持**：通过 Protocol Buffers 的 `oneof` 语法实现。  
-2. **精简 OpenAPI 输出**：利用 OAS `allOf` 展开并简化响应包装结构。  
-3. **极速轻量编译器**：显著提升生成与迭代效率。  
-4. **丰富的元数据导出能力**：为高级工具链和集成提供支撑。  
-5. **LLM 就绪的规范格式**：为未来规范驱动开发（Specification-Driven Development）奠定基础（待完善）。  
+1. **多态支持**：通过 Protocol Buffers 的 `oneof` 语法实现。
+2. **精简 OpenAPI 输出**：利用 OAS `allOf` 展开并简化响应包装结构。
+3. **极速轻量编译器**：显著提升生成与迭代效率。
+4. **丰富的元数据导出能力**：为高级工具链和集成提供支撑。
+5. **LLM 就绪的规范格式**：为未来规范驱动开发（Specification-Driven Development）奠定基础（待完善）。
 
 ## 升级步骤
 
 请参考 [apihug-demo/libs.versions.toml](https://github.com/apihug/apihug-demo/blob/main/gradle/libs.versions.toml)
 
-1. **升级 ApiHug SDK**：在 `{PROJECT_ROOT}/gradle/libs.versions.toml` 中将 `apihug = "1.0.0-RELEASE"` 更新为 `2.0.0-RELEASE` 或更高版本。  
-2. **升级 IntelliJ IDEA 插件** 至 `1.0.0+`：[ApiHug - API 设计智能助手](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)  
-3. **确保 Spring Boot 版本 < 4.0**，推荐使用 `3.8.x` 系列，因 Spring Boot 4.0 存在破坏性变更。  
-4. **更新构建命令**：轻量编译器现已在构建前自动运行，无需再显式指定 `wire` 或 `stub` 命令。  
+1. **升级 ApiHug SDK**：在 `{PROJECT_ROOT}/gradle/libs.versions.toml` 中将 `apihug = "1.0.0-RELEASE"` 更新为 `2.0.0-RELEASE` 或更高版本。
+2. **升级 IntelliJ IDEA 插件** 至 `1.0.0+`：[ApiHug - API 设计智能助手](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
+3. **确保 Spring Boot 版本 < 4.0**，推荐使用 `3.8.x` 系列，因 Spring Boot 4.0 存在破坏性变更。
+4. **更新构建命令**：轻量编译器现已在构建前自动运行，无需再显式指定 `wire` 或 `stub` 命令。
 5. **项目结构变更如下**：
 
 ### Wire 模块
@@ -73,8 +82,8 @@ src/
 
 **说明：**
 
-- `test-kola/groovy` 目录包含人工编写的 Groovy DSL 脚本，用于定义测试契约或行为，**不会被 Gradle 编译**。  
-- 这些脚本作为 `testKola` 源集的资源被复制到构建输出目录，供自定义代码生成器在构建时读取。  
+- `test-kola/groovy` 目录包含人工编写的 Groovy DSL 脚本，用于定义测试契约或行为，**不会被 Gradle 编译**。
+- 这些脚本作为 `testKola` 源集的资源被复制到构建输出目录，供自定义代码生成器在构建时读取。
 - `test-kola/java` 目录包含由 Groovy DSL 生成的 Java 测试类，由 `testKola` Gradle 任务基于 JUnit Platform 编译并执行。
 
 ### Stub 模块
