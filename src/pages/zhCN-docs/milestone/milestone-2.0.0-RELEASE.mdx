@@ -64,27 +64,30 @@ import {TipGood} from '@/components/Tip'
 
 ### Wire 模块
 
-Kola 合约测试的预期项目源码结构：
+模块结构
 
 ```
 src/
 ├── main/
-│   ├── java/          // 生产环境 Java 源码
-│   └── resources/     // 生产环境资源文件
+│   ├── java/        → 手写的核心业务逻辑代码  
+│   ├── api/         → 由 Wire 编译器生成的 Java 类（用于生产环境）  
+│   └── proto/       → `.proto` 协议定义文件（作为资源包含，此处不编译为 Java）  
+│
 ├── test/
-│   ├── java/          // 标准单元/集成测试（如 JUnit）
-│   └── resources/     // 标准测试资源
+│   ├── java/        → 标准的单元测试与集成测试  
+│   └── api/         → API 契约/守卫测试（在 `test` 阶段编译并执行）  
+│
 └── test-kola/
-├── java/          // 自动生成的 Java 测试类（编译并执行）
-├── groovy/        // Groovy DSL 脚本（作为资源处理，**不编译**）
-└── resources/     // 额外测试资源（如合约、夹具、配置等）
+    ├── java/        → 自动生成的 Java 测试类（通过 JUnit Platform 编译并执行）  
+    ├── groovy/      → 人工编写的 Groovy DSL 脚本（作为资源处理，**不编译**）  
+    └── resources/   → 其他测试资源（如契约、测试数据、配置等）  
 ```
 
-**说明：**
+#### 说明
 
-- `test-kola/groovy` 目录包含人工编写的 Groovy DSL 脚本，用于定义测试契约或行为，**不会被 Gradle 编译**。
-- 这些脚本作为 `testKola` 源集的资源被复制到构建输出目录，供自定义代码生成器在构建时读取。
-- `test-kola/java` 目录包含由 Groovy DSL 生成的 Java 测试类，由 `testKola` Gradle 任务基于 JUnit Platform 编译并执行。
+- `test-kola/groovy` 目录中的 Groovy DSL 脚本由开发者编写，用于定义测试契约或行为，**不会被 Gradle 编译**。
+- 构建过程中，这些脚本作为资源被复制到 `testKola` 源集的输出目录，供自定义代码生成器在构建时读取。
+- 基于这些 DSL 脚本生成的 Java 测试类位于 `test-kola/java`，由 `testKola` Gradle 任务编译，并通过 JUnit Platform 执行。
 
 ### Stub 模块
 
@@ -134,7 +137,7 @@ import "apihug/protobuf/extend/domain.proto";
 
 **语法增强**
 
-1. 支持通过 `oneof` 实现多态（OpenAPI 映射为 `allOf`，**非** `anyOf`）
+1. 支持通过 `oneof` 实现多态（OpenAPI 映射为 `allOf`）
 2. 支持流式定义（语义等同于 gRPC，服务端暂未实现）：包括定义与实现
 3. 支持上传/下载接口定义（服务端暂未实现）
 4. 优化单响应类型定义（非引用类型）

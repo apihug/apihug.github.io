@@ -64,27 +64,31 @@ Refer [apihug-demo/libs.versions.toml](https://github.com/apihug/apihug-demo/blo
 
 ### Wire
 
-Expected project source structure for Kola contract tests
+Module Structure
 
 ```
 src/
 ├── main/
-│   ├── java/          // Production Java source code
-│   └── resources/     // Production resources
+│   ├── java/        → Hand-written core application logic  
+│   ├── api/         → Generated Java classes (via Wire compiler, production-ready)  
+│   └── proto/       → `.proto` definition files (included as resources; not compiled here)  
+│
 ├── test/
-│   ├── java/          // Standard unit/integration tests (JUnit, etc.)
-│   └── resources/     // Resources for standard tests
+│   ├── java/        → Standard unit and integration tests  
+│   └── api/         → API contract/guardian tests (compiled and run during `test`)  
+│
 └── test-kola/
-    ├── java/          // Auto-generated Java test classes (compiled and executed)
-    ├── groovy/        // Groovy DSL files (treated as resources; NOT compiled)
-    └── resources/     // Additional test resources (e.g., contracts, fixtures, configs)
+    ├── java/        → Auto-generated Java test classes (compiled & executed via JUnit Platform)  
+    ├── groovy/      → Human-authored Groovy DSL scripts (treated as resources, **not compiled**)  
+    └── resources/   → Additional test assets (e.g., contracts, fixtures, configs)  
 ```
 
-**Notes:**
+#### Notes
 
-- The `test-kola/groovy` directory contains human-authored Groovy DSL scripts that define test contracts or behaviors. These files are **not compiled** by Gradle.
-- They are included in the `testKola` source set's resources so they are copied to the build output directory, enabling a custom code generator to read them at build time.
-- The `test-kola/java` directory contains Java test classes generated from the Groovy DSL. These are compiled and executed by the `testKola` Gradle task using JUnit Platform.
+- The `test-kola/groovy` directory contains handwritten Groovy DSL scripts that define test contracts or behaviors. These are **not compiled** by Gradle.
+- During the build, these Groovy scripts are copied as resources into the `testKola` source set output, where a custom code generator reads them to produce Java test classes.
+- The generated Java tests in `test-kola/java` are compiled and executed as part of the `testKola` Gradle task using the JUnit Platform.
+
 
 
 ### Stub
@@ -142,7 +146,7 @@ import "apihug/protobuf/extend/domain.proto";
 
 **Syntax**
 
-1. Polymorphism support via `oneof` — OAS (`allof` ~~`anyof`~~)
+1. Polymorphism support via `oneof` — OAS
 2. Stream definition support === gRPC (server-side not yet implemented): definition, implementation...
 3. Support for upload and downloader definitions (server-side not yet implemented)
 4. Optimization for single-response definitions (non-reference types)
