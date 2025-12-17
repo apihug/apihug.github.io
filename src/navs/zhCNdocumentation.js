@@ -57,6 +57,7 @@ export const documentationNav = {
   ],
   "Tool Chain": [
     {title: '介绍', href: '/zhCN-docs/tool'},
+    {title: 'REPL', href: '/zhCN-docs/tool/apihug-repl'},
     {title: 'Lint', href: '/zhCN-docs/tool/apihug-lint'},
     {title: 'Wire', href: '/zhCN-docs/tool/gradle-wire'},
     {title: 'Stub', href: '/zhCN-docs/tool/gradle-stub'},

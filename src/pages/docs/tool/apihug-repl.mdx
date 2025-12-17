@@ -1,0 +1,130 @@
+---
+title: ApiHug REPL
+description: ApiHug Read-Eval-Print Loop
+---
+
+Updated **2025-12-18**
+
+import { TipInfo } from '@/components/Tip'
+
+<TipInfo>ApiHug command-line tools REPL (Read-Eval-Print Loop)</TipInfo>
+
+<a target="_blank" href="https://search.maven.org/artifact/com.apihug/it-bom"><img src="https://img.shields.io/maven-central/v/com.apihug/it-bom.svg?label=Maven%20Central"/></a>
+
+[ApiHug - API Design Copilot](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
+
+## REPL
+
+Starting with SDK version `2.0.2-RELEASE`, ApiHug introduces a REPL (Read-Eval-Print Loop) to streamline command-line interactions.
+
+### Setup Steps
+
+**Step 1**: Update your `gradle/libs.versions.toml` file by adding the following line:
+
+```toml
+[versions]
+# make sure 2.0.2+
+apihugVersion = "2.0.2-RELEASE"
+
+
+[plugins]
+# Hug plugin
+hope-wire = { id = "com.apihug.wire", version.ref = "apihugVersion" }
+hope-stub = { id = "com.apihug.stub", version.ref = "apihugVersion" }
+# TODO: Add this:
+hope-repl = { id = "com.apihug.repl", version.ref = "apihugVersion" }
+```
+
+**Step 2**: Update your `build.gradle` file:
+
+```groovy
+plugins {
+    // Other plugins...
+    // TODO: Add or uncomment the following line:
+    alias(libs.plugins.hope.repl)
+
+    // If you need to rename the proto package, use:
+    // id("hope.rename")
+}
+```
+
+**Step 3**: Initialize the REPL:
+
+```bash
+./gradlew :hope
+```
+
+**Step 4**: Launch the command-line interface:
+
+The initialization script generates two executable files: `apihug.bat` (Windows) and `apihug` (Unix-like systems). Run the appropriate one for your OS to start the REPL:
+
+```
+Starting ApiHug REPL...
+
+ ________  ________  ___  ___  ___  ___  ___  ________
+|\   __  \|\   __  \|\  \|\  \|\  \|\  \|\  \|\   ____\
+\ \  \|\  \ \  \|\  \ \  \ \  \\\  \ \  \\\  \ \  \___|
+ \ \   __  \ \   ____\ \  \ \   __  \ \  \\\  \ \  \  ___
+  \ \  \ \  \ \  \___|\ \  \ \  \ \  \ \  \\\  \ \  \|\  \
+   \ \__\ \__\ \__\    \ \__\ \__\ \__\ \_______\ \_______\
+    \|__|\|__|\|__|     \|__|\|__|\|__|\|_______|\|_______|
+
+2025-12-17 15:51:43 : Started REPL in 2.646 seconds (process running for 3.31)
+apihug> ls
+┌──────────────┬────┐
+│Module Name   │Type│
+├──────────────┼────┤
+│same-app      │STUB│
+│same-app-proto│WIRE│
+└──────────────┴────┘
+
+apihug> cd --module-name same-app-proto 
+Entered module: same-app-proto
+apihug:same-app-proto> pwd
+┌───────────┬─────────────────────────────────────────────────────────┐
+│Property   │Value                                                    │
+├───────────┼─────────────────────────────────────────────────────────┤
+│Module Name│same-app-proto                                           │
+│Type       │WIRE                                                     │
+│Directory  │D:\Aaron\workspace\projects\ais\okai2\same\same-app-proto│
+└───────────┴─────────────────────────────────────────────────────────┘
+```
+
+You can type `help` at any time to view all available commands. Enjoy!
+
+## FAQ
+
+### "Cannot resolve external dependency" error
+
+If you encounter the following error:
+
+```
+* What went wrong:
+Execution failed for task ':hope'.
+> Could not resolve all files for configuration ':detachedConfiguration1'.
+   > Cannot resolve external dependency com.apihug:it-repl:2.0.2-RELEASE because no repositories are defined.
+     Required by:
+         root project :
+```
+
+This occurs because older project templates lack repository configuration in the root `build.gradle`. To resolve it, add the following block:
+
+```groovy
+// New addition
+repositories {
+    mavenLocal()
+    mavenCentral()
+
+    maven { url "https://repo.spring.io/libs-release" }
+    maven { url "https://repo.spring.io/milestone" }
+}
+
+// ---- Other configurations
+configure(subprojects) {
+}
+```
+
+## TBD
+
+1. Integration with our LLM specification
+2. Simplified commands for enhanced interaction

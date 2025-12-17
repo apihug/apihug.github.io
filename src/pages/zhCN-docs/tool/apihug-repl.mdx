@@ -1,0 +1,129 @@
+title: ApiHug REPL
+description: ApiHug 命令行工具
+---
+
+更新于 **2025-12-18**
+
+import { TipInfo } from '@/components/Tip'
+
+<TipInfo>ApiHug 命令行工具 REPL（Read-Eval-Print Loop）</TipInfo>
+
+<a target="_blank" href="https://search.maven.org/artifact/com.apihug/it-bom"><img src="https://img.shields.io/maven-central/v/com.apihug/it-bom.svg?label=Maven%20Central"/></a>
+
+[ApiHug - API 设计 Copilot](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
+
+## REPL
+
+从 SDK 版本 `2.0.2-RELEASE` 起，ApiHug 引入了 REPL（Read-Eval-Print Loop），以简化命令行操作。
+
+### 设置步骤
+
+**步骤 1**：在您的 `gradle/libs.versions.toml` 文件中添加以下内容：
+
+```toml
+[versions]
+# make sure 2.0.2+
+apihugVersion = "2.0.2-RELEASE"
+
+
+[plugins]
+# Hug 插件
+hope-wire = { id = "com.apihug.wire", version.ref = "apihugVersion" }
+hope-stub = { id = "com.apihug.stub", version.ref = "apihugVersion" }
+# TODO: 添加以下行：
+hope-repl = { id = "com.apihug.repl", version.ref = "apihugVersion" }
+```
+
+**步骤 2**：更新您的 `build.gradle` 文件：
+
+```groovy
+plugins {
+    // 其他插件...
+    // TODO: 添加或取消注释以下行：
+    alias(libs.plugins.hope.repl)
+
+    // 如果需要重命名 proto 包名，请使用：
+    // id("hope.rename")
+}
+```
+
+**步骤 3**：初始化 REPL：
+
+```bash
+./gradlew :hope
+```
+
+**步骤 4**：启动命令行界面：
+
+初始化脚本会生成两个可执行文件：`apihug.bat`（Windows）和 `apihug`（类 Unix 系统）。根据您的操作系统运行相应命令以启动 REPL：
+
+```
+Starting ApiHug REPL...
+
+ ________  ________  ___  ___  ___  ___  ___  ________
+|\   __  \|\   __  \|\  \|\  \|\  \|\  \|\  \|\   ____\
+\ \  \|\  \ \  \|\  \ \  \ \  \\\  \ \  \\\  \ \  \___|
+ \ \   __  \ \   ____\ \  \ \   __  \ \  \\\  \ \  \  ___
+  \ \  \ \  \ \  \___|\ \  \ \  \ \  \ \  \\\  \ \  \|\  \
+   \ \__\ \__\ \__\    \ \__\ \__\ \__\ \_______\ \_______\
+    \|__|\|__|\|__|     \|__|\|__|\|__|\|_______|\|_______|
+
+2025-12-17 15:51:43 : Started REPL in 2.646 seconds (process running for 3.31)
+apihug> ls
+┌──────────────┬────┐
+│Module Name   │Type│
+├──────────────┼────┤
+│same-app      │STUB│
+│same-app-proto│WIRE│
+└──────────────┴────┘
+
+apihug> cd --module-name same-app-proto 
+Entered module: same-app-proto
+apihug:same-app-proto> pwd
+┌───────────┬─────────────────────────────────────────────────────────┐
+│Property   │Value                                                    │
+├───────────┼─────────────────────────────────────────────────────────┤
+│Module Name│same-app-proto                                           │
+│Type       │WIRE                                                     │
+│Directory  │D:\Aaron\workspace\projects\ais\okai2\same\same-app-proto│
+└───────────┴─────────────────────────────────────────────────────────┘
+```
+
+您随时可以输入 `help` 查看所有可用命令。祝您使用愉快！
+
+## 常见问题（FAQ）
+
+### "Cannot resolve external dependency" 错误
+
+如果您遇到以下错误：
+
+```
+* What went wrong:
+Execution failed for task ':hope'.
+> Could not resolve all files for configuration ':detachedConfiguration1'.
+   > Cannot resolve external dependency com.apihug:it-repl:2.0.2-RELEASE because no repositories are defined.
+     Required by:
+         root project :
+```
+
+这是因为旧版项目模板未在根目录的 `build.gradle` 中配置仓库地址。请添加以下代码块以解决此问题：
+
+```groovy
+// 新增内容
+repositories {
+    mavenLocal()
+    mavenCentral()
+
+    maven { url "https://repo.spring.io/libs-release" }
+    maven { url "https://repo.spring.io/milestone" }
+}
+
+// ---- 其他配置
+configure(subprojects) {
+}
+```
+
+## 待办事项（TBD）
+
+1. 集成我们的 LLM 规范
+2. 提供更简洁的交互命令
