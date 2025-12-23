@@ -70,6 +70,12 @@ export const documentationNav = {
   "MCP": [
     {title: 'Intro', href: '/docs/mcp/001_start'},
   ],
+  "Spec": [
+    {title: 'API', href: '/docs/spec/swagger'},
+    {title: 'Domain', href: '/docs/spec/domain'},
+    {title: 'Constant', href: '/docs/spec/constant'},
+    {title: 'Mock', href: '/docs/spec/mock'},
+  ],
   "UI": [
     {title: 'Intro', href: '/docs/ui'},
     {title: 'Proto', href: '/docs/ui/001_proto'},
@@ -85,14 +91,14 @@ export const documentationNav = {
     {title: 'Useful Built-in Mini Plugins', href: '/docs/how/005_helpful_inner_plugin'},
     {title: 'How to use the max/min length items', href: '/docs/how/006_understand_max_min_length_items_properties'},
   ],
-  Milestone:[
+  Milestone: [
     {title: 'Index', href: '/docs/milestone'},
     {title: 'Milestone-2.0.0', href: '/docs/milestone/milestone-2.0.0-RELEASE'},
     {title: 'Upgrade-20250515', href: '/docs/milestone/upgrade-1.3.8-RELEASE'},
     {title: 'Milestone-20240510', href: '/docs/milestone/milestone-20240510'},
     {title: 'Milestone-20240222', href: '/docs/milestone/milestone-20240222'},
   ],
-  "ChangeLog":[
+  "ChangeLog": [
     {title: 'Index', href: '/docs/changelog'},
     {title: 'SDK', href: '/docs/changelog/sdk'},
     {title: 'Plugin', href: '/docs/changelog/plugin'},

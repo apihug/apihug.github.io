@@ -70,6 +70,12 @@ export const documentationNav = {
   "MCP": [
     {title: '介绍', href: '/zhCN-docs/mcp/001_start'},
   ],
+  "Spec": [
+    {title: 'API', href: '/zhCN-docs/spec/swagger'},
+    {title: 'Domain', href: '/zhCN-docs/spec/domain'},
+    {title: 'Constant', href: '/zhCN-docs/spec/constant'},
+    {title: 'Mock', href: '/zhCN-docs/spec/mock'},
+  ],
   "UI": [
     {title: '介绍', href: '/zhCN-docs/ui'},
     {title: '协议', href: '/zhCN-docs/ui/001_proto'},
