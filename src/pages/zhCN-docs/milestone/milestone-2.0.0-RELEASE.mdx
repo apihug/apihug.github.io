@@ -40,7 +40,7 @@ import {TipGood} from '@/components/Tip'
 
 强行升级可能导致大量难以排查的构建或运行时错误，严重影响开发效率。
 
-如需了解 Spring Boot 4.0 中的具体破坏性变更，请参考官方迁移指南：  
+如需了解 Spring Boot 4.0 中的具体破坏性变更，请参考官方迁移指南：
 
 [Spring Boot 4.0 迁移指南](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.0-Migration-Guide)
 
@@ -62,66 +62,134 @@ import {TipGood} from '@/components/Tip'
 4. **更新构建命令**：轻量编译器现已在构建前自动运行，无需再显式指定 `wire` 或 `stub` 命令。
 5. **项目结构变更如下**：
 
-### Wire 模块
+## Wire 模块
 
-模块结构
+### 生成目录与手写目录
 
-```
-src/
-├── main/
-│   ├── java/        → 手写的核心业务逻辑代码  
-│   ├── api/         → 由 Wire 编译器生成的 Java 类（用于生产环境）  
-│   └── proto/       → `.proto` 协议定义文件（作为资源包含，此处不编译为 Java）  
-│
-├── test/
-│   ├── java/        → 标准的单元测试与集成测试  
-│   └── api/         → API 契约/守卫测试（在 `test` 阶段编译并执行）  
-│
-└── test-kola/
-    ├── java/        → 自动生成的 Java 测试类（通过 JUnit Platform 编译并执行）  
-    ├── groovy/      → 人工编写的 Groovy DSL 脚本（作为资源处理，**不编译**）  
-    └── resources/   → 其他测试资源（如契约、测试数据、配置等）  
-```
+- **生成目录（`_*_`）**：凡是名称被前后下划线包裹的目录（例如 `_api_`），均由 apihug 工具生成，属于**只读区域**。
+- 请勿在这些目录中手工修改代码。
+- 生成过程可能会覆盖其中的文件，如需修改应通过调整生成配置或上游契约来完成。
+- **手写目录**：`java`、`proto` 等普通目录用于存放开发者手写的源码与 Schema。
+- Java 应用代码与测试应放在 `java` 目录下。
+- Protocol Buffer 定义（`.proto` 文件）应放在 `proto` 目录下。
 
-#### 说明
+### 生产代码目录（`src/main`）
 
-- `test-kola/groovy` 目录中的 Groovy DSL 脚本由开发者编写，用于定义测试契约或行为，**不会被 Gradle 编译**。
-- 构建过程中，这些脚本作为资源被复制到 `testKola` 源集的输出目录，供自定义代码生成器在构建时读取。
-- 基于这些 DSL 脚本生成的 Java 测试类位于 `test-kola/java`，由 `testKola` Gradle 任务编译，并通过 JUnit Platform 执行。
+生产环境相关源码布局如下：
 
-### Stub 模块
-
-**生产源码布局**
-
-为提升可读性与可维护性，应用的生产代码按逻辑拆分至 `src/main/` 下多个子目录：
-
-```
+```text
 src/main/
-├── java/      → 手写业务逻辑（服务、控制器等）
-├── api/       → 自动生成的 DTO 与 REST 接口
-├── trait/     → 自动生成或共享的 Mixin/Trait 类
-├── mcp/       → 自动生成的微服务契约或协议代码
-└── domain/    → 核心领域模型（聚合根、值对象等）
+  java/        → 核心应用逻辑（手写 Java 代码）
+  _api_/       → 基于 Wire/契约生成的 Java 类（生产代码，只读）
+  proto/       → `.proto` Schema 文件（作为资源参与代码生成）
 ```
 
-尽管物理路径分离，**所有源码均属于同一生产模块**，需一并编译打包为单一 JAR。
+Gradle 的配置约定：
 
-**测试源码布局**
+- `src/main/_api_` 会被加入 `sourceSets.main.java.srcDirs`，作为主 Java 源的一部分参与编译。
+- `src/main/proto` 会被加入 `sourceSets.main.resources.srcDir`，作为资源输出，方便生成器或工具在构建时读取 `.proto` 文件。
 
-测试代码采用对称结构，保持逻辑一致性：
+### 测试代码目录（`src/test`）
 
-```
+测试代码沿用相同的目录约定：
+
+```text
 src/test/
-├── java/      → 核心逻辑的单元/集成测试
-├── api/       → API 层契约/守卫测试
-├── trait/     → Trait/Mixin 行为验证
-├── mcp/       → 协议契约校验测试
-└── domain/    → 领域模型不变性与行为测试
+  java/        → 常规单元测试与集成测试（JUnit 等）
+  _api_/       → API 守卫/契约测试，作为 `test` 任务的一部分编译与执行
 ```
 
-所有测试源码均属于标准 `test` 源集，通过 `test` 任务统一执行，共享主模块与测试模块的类路径及依赖（如 JUnit、Mockito 等）。
+`src/test/_api_` 会被加入 `sourceSets.test.java.srcDirs`，与标准测试源码一起编译和运行。
 
-### Proto 变更
+### Kola 契约测试目录（`src/test-kola`）
+
+Kola 测试通过单独的 Source Set 与 Task，支持契约式的端到端测试：
+
+```text
+src/
+  main/
+    java/          // 生产环境 Java 源码
+    resources/     // 生产环境资源
+  test/
+    java/          // 常规单元/集成测试（JUnit 等）
+    resources/     // 常规测试资源
+  test-kola/
+    java/          // 自动生成的 Java 测试类（编译并执行）
+    groovy/        // Groovy DSL 脚本（作为资源，不参与编译）
+    resources/     // 额外测试资源（契约、样例数据、配置等）
+```
+
+Gradle 中定义了 `testKola` Source Set：
+
+- `src/test-kola/java`：用于存放生成的 Java 测试类。
+- `src/test-kola/resources` 与 `src/test-kola/groovy`：均注册为资源目录。
+- `groovy` 下的 DSL 文件不会被编译，而是由代码生成器或测试工具在构建过程中读取。
+- `testKola` 的类路径包含 `main` 与 `test` 两个 Source Set 的输出，方便复用公共工具类与基础测试类。
+
+同时定义了专用的 `testKola` Gradle 任务，仅运行 Kola 生成的测试（基于 JUnit Platform）；默认的 `test` 任务同样启用 JUnit Platform，以保持一致性。
+
+### 使用建议
+
+- **不要直接修改 `_api_` 目录中的生成代码**；如需变更，请调整 proto/契约并重新生成。
+- **业务逻辑建议集中在 `src/main/java`，测试集中在 `src/test/java`**，保持结构清晰。
+- **将契约与 Schema 放在 `src/main/proto`，Kola DSL 放在 `src/test-kola/groovy`**，避免不同类型的文件混放。
+- 常规单元/集成测试使用 `test` 任务，契约式端到端验证使用 `testKola` 任务，有利于分层执行与排查问题。
+
+---
+
+
+## Stub 模块
+
+### 生成目录与手写目录
+
+- **生成目录（`_*_`）**：凡是名称被前后下划线包裹的目录（例如 `_api_`、`_mcp_`、`_domain_`、`_cloud_`），均由 apihug 工具生成，属于**只读区域**。
+- 请勿在这些目录中手工修改代码。
+- 代码会在生成过程中被覆盖，只能通过调整生成配置/输入来间接修改。
+- **手写目录**：`java`、`trait` 等普通目录用于存放开发者手写的源码。
+- 业务逻辑、服务、控制器以及自定义的 trait 类应放在这些目录中。
+
+### 生产代码目录（`src/main`）
+
+生产环境相关源码按职责拆分到多个目录中：
+
+```text
+src/main/
+  java/        → 手写业务逻辑、服务、控制器等
+  _api_/       → 生成的 DTO 与 REST 接口（apihug 生成，只读）
+  trait/       → 可由开发者自定义和复用的 trait/mixin 类
+  _mcp_/       → 生成的微服务契约或协议代码（只读）
+  _domain_/    → 生成的核心领域模型、聚合、值对象等（只读）
+  _cloud_/     → 生成的云端/集成相关 stub、端点或适配器（只读）
+```
+
+虽然物理上拆分在多个子目录中，但**这些目录共同组成同一个生产模块**。Gradle 会通过
+`sourceSets.main.java.srcDirs` 将上述目录全部加入编译路径，最终打包为同一个 JAR。
+
+### 测试代码目录（`src/test`）
+
+测试代码在结构上尽量镜像生产目录，方便按领域组织测试用例：
+
+```text
+src/test/
+  java/        → 核心逻辑的单元测试与集成测试
+  _api_/       → API 层的契约/守卫测试（通常依赖生成的 DTO）
+  trait/       → trait/mixin 行为相关的测试
+  _mcp_/       → 协议契约的校验测试
+  _domain_/    → 领域模型不变式与行为测试
+  _cloud_/     → 云端/集成契约测试及相关生成 stub
+```
+
+上述测试目录均通过 `sourceSets.test.java.srcDirs` 注册到 Gradle 中，作为标准 `test` Source Set 的一部分，
+由默认的 `test` 任务统一编译和执行，并共享同一套（main + test 输出以及测试依赖）类路径。
+
+### 使用建议
+
+- **不要直接修改生成目录**（`_api_`、`_mcp_`、`_domain_`、`_cloud_`）中的代码，如需变更，请调整契约/模型或生成配置并重新生成。
+- **业务与自定义逻辑尽量集中在 `java` 与 `trait`**，以避免在重新生成时被覆盖。
+- **测试代码按生产目录进行“就近”组织**，在 `src/test` 下选择对应的子目录，保持结构一致性，便于维护和定位。
+
+
+## Proto 变更
 
 ```protobuf
 // 旧路径
@@ -145,7 +213,7 @@ import "apihug/protobuf/extend/domain.proto";
 6. 支持 Schema 定义
 7. 支持 `internal` / `external` / `hide` 等 API 可见性标记
 
-### Gradle 配置
+## Gradle 配置
 
 1. `wire` 项目支持 `protoImport` 语法，用于引入第三方 Protobuf 依赖。
 2. `stub` 项目应使用 `wireImport` 语法引入 Wire 模块依赖；若误用 `implementation`，虽无语法错误，但会导致 `stub` 命令生成内容为空。
