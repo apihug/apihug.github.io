@@ -136,18 +136,19 @@ enum UserError {
     }
   }];
 }
+```
 
 ---
 
 ### 3.3 Error 字段
 
-| 字段 | 类型 | 取值 | 说明 |
-|---|---|---|---|
-| `title` | string | - | 错误标题 |
-| `tips` | string | - | 处理建议 |
+| 字段            | 类型           | 取值                        | 说明            |
+|---------------|--------------|---------------------------|---------------|
+| `title`       | string       | -                         | 错误标题          |
+| `tips`        | string       | -                         | 处理建议          |
 | `http_status` | HttpStatus枚举 | NOT_FOUND/BAD_REQUEST/... | HTTP状态码（写枚举名） |
-| `phase` | Phase枚举 | CONTROLLER/SERVICE/DOMAIN | 错误层次 |
-| `severity` | Severity枚举 | LOW/WARN/ERROR/FATAL | 严重程度 |
+| `phase`       | Phase枚举      | CONTROLLER/SERVICE/DOMAIN | 错误层次          |
+| `severity`    | Severity枚举   | LOW/WARN/ERROR/FATAL      | 严重程度          |
 
 **HttpStatus 常用值**: BAD_REQUEST(400) | UNAUTHORIZED(401) | FORBIDDEN(403) | NOT_FOUND(404) | CONFLICT(409) | INTERNAL_SERVER_ERROR(500)
 
@@ -159,13 +160,13 @@ enum UserError {
 
 ## 四、关键类型
 
-| 写法 | 类型 | 错误示例 | 正确示例 |
-|---|---|---|---|
-| `code` | int32 | - | `code: 10001` |
-| `message` | string | - | `message: "user_not_found"` |
-| `http_status` | 枚举 | ❌ `http_status: 404` | ✅ `http_status: NOT_FOUND` |
-| `phase` | 枚举 | ❌ `phase: "SERVICE"` | ✅ `phase: SERVICE` |
-| `severity` | 枚举 | ❌ `severity: 2` | ✅ `severity: ERROR` |
+| 写法            | 类型     | 错误示例                 | 正确示例                        |
+|---------------|--------|----------------------|-----------------------------|
+| `code`        | int32  | -                    | `code: 10001`               |
+| `message`     | string | -                    | `message: "user_not_found"` |
+| `http_status` | 枚举     | ❌ `http_status: 404` | ✅ `http_status: NOT_FOUND`  |
+| `phase`       | 枚举     | ❌ `phase: "SERVICE"` | ✅ `phase: SERVICE`          |
+| `severity`    | 枚举     | ❌ `severity: 2`      | ✅ `severity: ERROR`         |
 
 ---
 

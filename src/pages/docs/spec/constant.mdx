@@ -92,12 +92,12 @@ enum OrderStatusEnum {
 
 ## 2. Field Description
 
-| Field         | Type      | Required | Description               |
-|------------|---------|----|------------------|
-| `code`     | int32   | Yes  | Business code, unique within the same enum     |
-| `message`  | string  | Yes  | Primary language message (English), defaults to enum name |
-| `message2` | string  | No  | Secondary language message (Chinese)       |
-| `error`    | Error message | No  | Error extension info (only for error codes)   |
+| Field      | Type          | Required | Description                                               |
+|------------|---------------|----------|-----------------------------------------------------------|
+| `code`     | int32         | Yes      | Business code, unique within the same enum                |
+| `message`  | string        | Yes      | Primary language message (English), defaults to enum name |
+| `message2` | string        | No       | Secondary language message (Chinese)                      |
+| `error`    | Error message | No       | Error extension info (only for error codes)               |
 
 **Note**: `cn_message` (field=3) was deprecated on 2024-05-08, please use `message2`
 
@@ -136,18 +136,18 @@ enum UserError {
     }
   }];
 }
+```
 
----
 
 ### 3.3 Error Fields
 
-| Field | Type | Values | Description |
-|---|---|---|---|
-| `title` | string | - | Error title |
-| `tips` | string | - | Handling suggestion |
+| Field         | Type            | Values                    | Description                        |
+|---------------|-----------------|---------------------------|------------------------------------|
+| `title`       | string          | -                         | Error title                        |
+| `tips`        | string          | -                         | Handling suggestion                |
 | `http_status` | HttpStatus enum | NOT_FOUND/BAD_REQUEST/... | HTTP status code (write enum name) |
-| `phase` | Phase enum | CONTROLLER/SERVICE/DOMAIN | Error layer |
-| `severity` | Severity enum | LOW/WARN/ERROR/FATAL | Severity level |
+| `phase`       | Phase enum      | CONTROLLER/SERVICE/DOMAIN | Error layer                        |
+| `severity`    | Severity enum   | LOW/WARN/ERROR/FATAL      | Severity level                     |
 
 **HttpStatus Common Values**: BAD_REQUEST(400) | UNAUTHORIZED(401) | FORBIDDEN(403) | NOT_FOUND(404) | CONFLICT(409) | INTERNAL_SERVER_ERROR(500)
 
@@ -159,13 +159,13 @@ enum UserError {
 
 ## 4. Key Types
 
-| Syntax | Type | Wrong Example | Correct Example |
-|---|---|---|---|
-| `code` | int32 | - | `code: 10001` |
-| `message` | string | - | `message: "user_not_found"` |
-| `http_status` | enum | ❌ `http_status: 404` | ✅ `http_status: NOT_FOUND` |
-| `phase` | enum | ❌ `phase: "SERVICE"` | ✅ `phase: SERVICE` |
-| `severity` | enum | ❌ `severity: 2` | ✅ `severity: ERROR` |
+| Syntax        | Type   | Wrong Example        | Correct Example             |
+|---------------|--------|----------------------|-----------------------------|
+| `code`        | int32  | -                    | `code: 10001`               |
+| `message`     | string | -                    | `message: "user_not_found"` |
+| `http_status` | enum   | ❌ `http_status: 404` | ✅ `http_status: NOT_FOUND`  |
+| `phase`       | enum   | ❌ `phase: "SERVICE"` | ✅ `phase: SERVICE`          |
+| `severity`    | enum   | ❌ `severity: 2`      | ✅ `severity: ERROR`         |
 
 ---
 
