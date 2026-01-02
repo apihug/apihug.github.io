@@ -29,8 +29,6 @@ apihugVersion = "2.0.2-RELEASE"
 
 [plugins]
 # Hug 插件
-hope-wire = { id = "com.apihug.wire", version.ref = "apihugVersion" }
-hope-stub = { id = "com.apihug.stub", version.ref = "apihugVersion" }
 # TODO: 添加以下行：
 hope-repl = { id = "com.apihug.repl", version.ref = "apihugVersion" }
 ```
@@ -75,7 +73,6 @@ apihug> ls
 │Module Name   │Type│
 ├──────────────┼────┤
 │same-app      │STUB│
-│same-app-proto│WIRE│
 └──────────────┴────┘
 
 apihug> cd --module-name same-app-proto 

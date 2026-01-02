@@ -1,115 +1,296 @@
 ---
 title: 枚举类型规范
-description: proto 枚举类型生成
+description: 枚举与错误扩展使用手册
 ---
 
-## 枚举与错误元数据设计规范
+为枚举值添加业务编码、多语言文案、错误元数据。
 
-本说明描述在枚举上如何使用 `extend/constant.proto` 中的扩展字段，为每个枚举值附加业务编码、多语言文案以及错误相关信息。
+**扩展包**: `apihug/protobuf/extend/constant.proto`  
+**作用域**: EnumValue  
+**场景**: 业务枚举、错误码
 
-### 1. 使用场景
-- 为业务枚举值配置稳定的业务编码（code）。
-- 为枚举值补充多语言文案说明。
-- 为错误相关枚举值补充 HTTP 状态码、错误严重程度、所属层次等元数据。
+---
 
-主要依赖：
-- `apihug/protobuf/extend/constant.proto`
-- 扩展点：`extend google.protobuf.EnumValueOptions { Meta field = 37020; }`
+## ⚠️ 禁止规则
 
-### 2. 基本用法
-
-1. 定义普通业务枚举时，为每个枚举值添加 `Meta` 信息：
-   ```proto
-   syntax = "proto3";
-   package your.package;
-
-   import "apihug/protobuf/extend/constant.proto";
-
-   enum OrderStatus {
-     UNKNOWN = 0 [(hope.constant.field) = {
-       code: 0;
-       message: "unknown";
-       message2: "未知";
-     }];
-
-     CREATED = 1 [(hope.constant.field) = {
-       code: 1;
-       message: "created";
-       message2: "已创建";
-     }];
-   }
-   ```
-2. 扩展挂在“枚举值”上，而不是枚举本身或其它消息。
-
-### 3. Meta 字段说明
-
-`Meta` 用于描述枚举值的通用信息：
-
-- `code` (int32)
-  - 枚举值的业务编码。
-  - 在同一个枚举类型内应保持唯一且稳定，通常从 1 开始。
-- `message` (string)
-  - 主语言文案，例如英文或约定的主语种。
-  - 适合直接用于日志、界面文案或 API 返回。
-- `message2` (string)
-  - 第二语言文案，例如中文。
-  - 若业务暂不需要多语言，可省略。
-- `error` (`Error`)
-  - 当该枚举值用作错误码时，用于补充错误相关的元数据（见下一节）。
-
-如果不配置 `Meta`，框架可以按默认规则推断，但为了可读性和稳定性，推荐为新代码显式设置。
-
-### 4. 错误相关扩展：Error
-
-当枚举用于错误码（例如业务错误、系统错误）时，可在 `Meta.error` 中描述错误信息：
+**NEVER** 在 proto 文件中添加任何 file-level option 声明：
 
 ```proto
-enum UserError {
-  USER_NOT_FOUND = 1 [(hope.constant.field) = {
-    code: 10001;
-    message: "user_not_found";
-    message2: "用户不存在";
-    error: {
-      title: "User not found";
-      tips: "检查用户ID是否正确，或联系管理员";
-      http_status: NOT_FOUND;
-      phase: SERVICE;
-      severity: ERROR;
-    };
+// ❌ 禁止使用以下 option（依赖默认代码生成配置）
+option java_package = "...";
+option java_multiple_files = true;
+option go_package = "...";
+```
+
+所有代码生成配置由构建系统自动管理，**严格禁止**手动添加任何文件级 option。
+
+---
+
+## 一、导入与语法
+
+### 1.1 导入
+
+```proto
+import "apihug/protobuf/extend/constant.proto";
+```
+
+### 1.2 基本语法
+
+```proto
+ENUM_NAME = 序号 [(hope.constant.field) = {
+  code: 业务编码;  // int32
+  message: "英文";  // string
+  message2: "中文";  // string
+}];
+```
+
+### 1.3 快速示例
+
+```proto
+syntax = "proto3";
+package com.example.order;
+
+import "apihug/protobuf/extend/constant.proto";
+
+enum OrderStatusEnum {
+  PLACED = 0 [(hope.constant.field) = {
+    code: 1,
+    message: "Placed",
+    message2: "已经下单"
+  }];
+  
+  APPROVED = 1 [(hope.constant.field) = {
+    code: 2,
+    message: "Approved",
+    message2: "已经审批"
+  }];
+  
+  DELIVERED = 2 [(hope.constant.field) = {
+    code: 4,
+    message: "Delivered",
+    message2: "已经发货"
   }];
 }
 ```
 
-- `title` (string)
-  - 错误标题，简洁描述问题类型。
-- `tips` (string)
-  - 处理该错误时可以给出的提示信息，可使用中文自然语言。
-- `http_status` (`HttpStatus` 枚举)
-  - 对应的 HTTP 状态码，例如 `BAD_REQUEST`、`UNAUTHORIZED`、`NOT_FOUND`、`INTERNAL_SERVER_ERROR` 等。
-- `phase` (`Phase` 枚举)
-  - 错误主要出现的层次：
-    - `CONTROLLER`：接口/表示层。
-    - `SERVICE`：服务/应用层。
-    - `DOMAIN`：领域模型层。
-- `severity` (`Severity` 枚举)
-  - 错误严重程度：
-    - `LOW`：低影响。
-    - `WARN`：警告，可重试。
-    - `ERROR`：正常业务无法继续。
-    - `FATAL`：严重错误，可能破坏数据或需要人工介入。
+----
 
-### 5. HttpStatus 使用建议
+## 二、字段说明
 
-- 为表示客户端输入问题的错误选择 4xx 状态码，例如：
-  - 参数不合法：`BAD_REQUEST` (400)。
-  - 未登录或权限不足：`UNAUTHORIZED` (401) 或 `FORBIDDEN` (403)。
-  - 资源不存在：`NOT_FOUND` (404)。
-- 为表示服务端处理问题的错误选择 5xx 状态码，例如：
-  - 一般服务内部错误：`INTERNAL_SERVER_ERROR` (500)。
+| 字段         | 类型      | 必填 | 说明               |
+|------------|---------|----|------------------|
+| `code`     | int32   | 是  | 业务编码，同一枚举内唯一     |
+| `message`  | string  | 是  | 主语言文案（英文），默认为枚举名 |
+| `message2` | string  | 否  | 第二语言文案（中文）       |
+| `error`    | Error消息 | 否  | 错误扩展信息（仅错误码使用）   |
 
-### 6. 建模建议
+**注意**: `cn_message` (field=3) 已于 2024-05-08 废弃，请使用 `message2`
 
-1. 为每个枚举值分配清晰、稳定的 `code`，避免随意复用或修改已有编码。
-2. 为需要呈现给用户或外部系统的枚举值，补充合适的 `message` / `message2` 文案。
-3. 对作为错误码使用的枚举值，完整设置 `error` 字段，方便统一处理和排查问题。
-4. 在选择 `HttpStatus` 时，以标准 HTTP 语义为基础，避免过度使用 200/500 作为通用状态。
+---
+
+## 三、错误码扩展
+
+### 3.1 Error 语法
+
+```proto
+error: {
+  title: "错误标题";  // string
+  tips: "处理提示";  // string
+  http_status: HTTP状态码枚举;  // 枚举名（NOT_FOUND）
+  phase: 层次枚举;  // CONTROLLER/SERVICE/DOMAIN
+  severity: 严重度枚举;  // LOW/WARN/ERROR/FATAL
+}
+```
+
+### 3.2 示例
+
+```proto
+import "apihug/protobuf/extend/constant.proto";
+
+enum UserError {
+  USER_NOT_FOUND = 1 [(hope.constant.field) = {
+    code: 10001,
+    message: "user_not_found",
+    message2: "用户不存在"
+    error: {
+      title: "User Not Found",
+      tips: "检查用户ID是否正确",
+      http_status: NOT_FOUND,  // ❌ 不要写 404
+      phase: SERVICE,
+      severity: ERROR
+    }
+  }];
+}
+
+---
+
+### 3.3 Error 字段
+
+| 字段 | 类型 | 取值 | 说明 |
+|---|---|---|---|
+| `title` | string | - | 错误标题 |
+| `tips` | string | - | 处理建议 |
+| `http_status` | HttpStatus枚举 | NOT_FOUND/BAD_REQUEST/... | HTTP状态码（写枚举名） |
+| `phase` | Phase枚举 | CONTROLLER/SERVICE/DOMAIN | 错误层次 |
+| `severity` | Severity枚举 | LOW/WARN/ERROR/FATAL | 严重程度 |
+
+**HttpStatus 常用值**: BAD_REQUEST(400) | UNAUTHORIZED(401) | FORBIDDEN(403) | NOT_FOUND(404) | CONFLICT(409) | INTERNAL_SERVER_ERROR(500)
+
+**Phase**: CONTROLLER(表单层) | SERVICE(服务层) | DOMAIN(领域层)
+
+**Severity**: LOW(无影响) | WARN(可重试) | ERROR(业务中断) | FATAL(数据损坏)
+
+---
+
+## 四、关键类型
+
+| 写法 | 类型 | 错误示例 | 正确示例 |
+|---|---|---|---|
+| `code` | int32 | - | `code: 10001` |
+| `message` | string | - | `message: "user_not_found"` |
+| `http_status` | 枚举 | ❌ `http_status: 404` | ✅ `http_status: NOT_FOUND` |
+| `phase` | 枚举 | ❌ `phase: "SERVICE"` | ✅ `phase: SERVICE` |
+| `severity` | 枚举 | ❌ `severity: 2` | ✅ `severity: ERROR` |
+
+---
+
+## 五、完整示例
+
+```proto
+syntax = "proto3";
+package com.example.user;
+
+import "apihug/protobuf/extend/constant.proto";
+import "apihug/protobuf/swagger/annotations.proto";
+
+// 权限枚举
+enum Authority {
+  option (hope.swagger.enm) = {
+    title: "Authority enum";
+    description: "系统权限";
+  };
+
+  USER_CREATE = 0 [(hope.constant.field) = {
+    code: 1001,
+    message: "user:create",
+    message2: "创建用户"
+  }];
+  
+  USER_DELETE = 1 [(hope.constant.field) = {
+    code: 1002,
+    message: "user:delete",
+    message2: "删除用户"
+  }];
+}
+
+// 错误码枚举
+enum UserError {
+  USER_NOT_FOUND = 0 [(hope.constant.field) = {
+    code: 10001,
+    message: "user_not_found",
+    message2: "用户不存在"
+    error: {
+      title: "User Not Found",
+      tips: "检查用户ID是否正确",
+      http_status: NOT_FOUND,
+      phase: SERVICE,
+      severity: ERROR
+    }
+  }];
+
+  PASSWORD_INVALID = 1 [(hope.constant.field) = {
+    code: 10002,
+    message: "password_invalid",
+    message2: "密码错误"
+    error: {
+      title: "Invalid Password",
+      tips: "密码错误次数过多将锁定账户",
+      http_status: UNAUTHORIZED,
+      phase: CONTROLLER,
+      severity: WARN
+    }
+  }];
+}
+```
+
+---
+
+## 六、常见错误
+
+### 错误 1: 类型混淆
+
+❌ **错误**:
+```proto
+error: {
+  http_status: 404,      // 不要写数字
+  phase: "SERVICE",      // 不要加引号
+  severity: 2            // 不要写序号
+}
+```
+
+✅ **正确**:
+```proto
+error: {
+  http_status: NOT_FOUND,  // 枚举名
+  phase: SERVICE,
+  severity: ERROR
+}
+```
+
+### 错误 2: code 重复
+
+❌ **错误**:
+```proto
+enum UserError {
+  ERROR_1 = 0 [(hope.constant.field) = {code: 10001}];
+  ERROR_2 = 1 [(hope.constant.field) = {code: 10001}];  // code 重复
+}
+```
+
+✅ **正确**:
+```proto
+enum UserError {
+  ERROR_1 = 0 [(hope.constant.field) = {code: 10001}];
+  ERROR_2 = 1 [(hope.constant.field) = {code: 10002}];  // code 唯一
+}
+```
+
+---
+
+## 七、快速参考
+
+### 基本模板
+
+```proto
+syntax = "proto3";
+package 你的包名;
+
+import "apihug/protobuf/extend/constant.proto";
+
+enum 枚举名 {
+  值名 = 序号 [(hope.constant.field) = {
+    code: 业务码,
+    message: "英文",
+    message2: "中文"
+  }];
+}
+```
+
+### 错误码模板
+
+```proto
+enum 错误枚举名 {
+  错误名 = 序号 [(hope.constant.field) = {
+    code: 错误码,
+    message: "标识符",
+    message2: "中文描述"
+    error: {
+      title: "标题",
+      tips: "提示",
+      http_status: HTTP状态,
+      phase: 层次,
+      severity: 严重度
+    }
+  }];
+}
+```

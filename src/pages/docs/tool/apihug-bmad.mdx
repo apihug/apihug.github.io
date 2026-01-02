@@ -1,0 +1,315 @@
+---
+title: ApiHug BMAD
+description: AI-Driven Agile Development Methodology Based on ApiHug
+---
+
+Updated on **2026-01-03**
+
+import {TipInfo} from '@/components/Tip'
+
+<TipInfo>ApiHug BMAD - Breakthrough Method for Agile AI Driven Development</TipInfo>
+
+<a target="_blank" href="https://search.maven.org/artifact/com.apihug/it-bom"><img
+  src="https://img.shields.io/maven-central/v/com.apihug/it-bom.svg?label=Maven%20Central"/></a>
+
+[ApiHug - API Design Copilot](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
+
+---
+
+## Overview
+
+**BMAD** (Breakthrough Method for Agile AI Driven Development) is an AI-driven agile development methodology based on ApiHug specifications, implementing automated generation from requirements to code through **Agents** (intelligent agents) and **Workflows** (workflows).
+
+**Core Capabilities**:
+- Automatically generate Proto files (API/Domain/Enum)
+- End-to-end development process automation
+- Code specification review and optimization suggestions
+- Service layer implementation based on specifications
+
+**Prerequisites**: Must install [ApiHug REPL](/docs/tool/apihug-repl) first
+
+---
+
+## 1. Installation and Configuration
+
+### 1.1 Installation Steps
+
+```shell
+# 1. Start REPL
+./apihug
+
+# 2. Execute installation command
+apihug> install
+```
+
+**Guided Installation Process**:
+1. Select installation directory (default: current directory)
+2. Select IDE type (Cursor/Codex/Windsurf, etc.)
+3. Configure TTS (Text-to-Speech, optional)
+4. Install core Agents and Workflows
+5. Generate IDE configuration files
+
+### 1.2 Installation Command Details
+
+```shell
+install --help
+
+NAME
+  install - Install or update BMAD core agents and tools
+
+SYNOPSIS
+  install [OPTIONS]
+
+OPTIONS
+  --directory <String>
+    Installation directory path
+    [Default: . (current directory)]
+
+  --quick-update <boolean>
+    Quick update mode (preserve existing configuration)
+    [Default: false]
+
+  --compile-agents <boolean>
+    Only recompile Agents (do not modify configuration)
+    [Default: false]
+
+  --modify <boolean>
+    Modify existing BMAD installation
+    [Default: false]
+
+  --enable-tts <boolean>
+    Enable TTS text-to-speech
+    [Default: false]
+
+  --ides <String>
+    Specify IDE list (comma-separated)
+    Supported: cursor,codex,windsurf,claude
+    [Example: --ides cursor,codex]
+```
+
+**Common Installation Scenarios**:
+
+```shell
+# Full installation (interactive)
+install
+
+# Specify directory and IDE
+install --directory ~/projects/my-api --ides cursor
+
+# Quick update (preserve configuration)
+install --quick-update true
+
+# Only recompile Agents
+install --compile-agents true
+```
+
+---
+
+## 2. Workflows
+
+### 2.1 Available Workflows
+
+| Workflow Path                               | Function Description                | Use Case                                                                 |
+|---------------------------------------------|-------------------------------------|--------------------------------------------------------------------------|
+| `/bmad:bmw:workflows:apihug-proto-design`   | Proto design workflow               | Automatically generate API/Domain/Enum proto files based on requirements |
+| `/bmad:bmw:workflows:apihug-end-to-end`     | End-to-end development process      | Complete process from requirement analysis to code implementation        |
+| `/bmad:bmw:workflows:apihug-project-review` | Project review workflow             | Code specification check, architecture optimization suggestions          |
+| `/bmad:bmw:workflows:apihug-app-implement`  | Application implementation workflow | Generate Service layer business code based on proto                      |
+
+### 2.2 Workflow Usage Examples
+
+#### Proto Design Workflow
+
+**Trigger Method**: Enter `/bmad:bmw:workflows:apihug-proto-design` in IDE
+
+**Input**:
+```
+Requirement: User management module
+- Need user registration interface
+- Need user login interface
+- Need user information query interface
+- User status includes: active, disabled, deleted
+```
+
+**Output**:
+```proto
+// Automatically generate API layer
+service UserService {
+  option (hope.swagger.svc) = {path: "/user"};
+  
+  rpc Register(RegisterRequest) returns (UserResponse) {...}
+  rpc Login(LoginRequest) returns (TokenResponse) {...}
+  rpc GetUser(GetUserRequest) returns (UserResponse) {...}
+}
+
+// Automatically generate Domain layer
+message UserEntity {
+  option (hope.persistence.table) = {
+    name: "USER",
+    wires: [IDENTIFIABLE, AUDITABLE]
+  };
+  // ...
+}
+
+// Automatically generate Enum layer
+enum UserStatus {
+  ACTIVE = 0 [(hope.constant.field) = {code: 1, message: "Active"}];
+  DISABLED = 1 [(hope.constant.field) = {code: 2, message: "Disabled"}];
+  DELETED = 2 [(hope.constant.field) = {code: 3, message: "Deleted"}];
+}
+```
+
+#### End-to-End Development Process
+
+**Use Case**: Complete feature module development
+
+**Process Steps**:
+1. Requirement analysis → Generate proto definitions
+2. Generate database table structure (Liquibase)
+3. Generate API interface code
+4. Generate Service layer skeleton
+5. Generate unit test templates
+
+#### Project Review Workflow
+
+**Check Items**:
+- ✅ Whether Proto files comply with ApiHug specifications
+- ✅ Whether cross-layer references exist (API ↔ Domain)
+- ✅ Whether enum definitions are complete (code/message/message2)
+- ✅ Whether deprecated Wrapper types are used
+- ✅ Whether permission configuration is reasonable
+
+---
+
+## 3. Agents (Intelligent Agents)
+
+### 3.1 ApiHug Agent
+
+**Path**: `/bmad:bmw:agents:apihug`
+
+**Functions**:
+- Interactive Proto file writing assistance
+- Real-time specification checking and suggestions
+- Auto-completion and error correction
+- Context-based code generation
+
+**Usage Example**:
+
+```
+User: Help me create an order management API
+
+Agent: I will create an order management API for you, including the following content:
+
+1. Service definition (OrderService)
+2. Request/Response messages (CreateOrderRequest/OrderResponse)
+3. Order status enum (OrderStatus)
+4. Order entity (OrderEntity)
+
+Do you need to include the following functions?
+- Order creation
+- Order query
+- Order cancellation
+- Order status update
+
+User: Yes, include all
+
+Agent: [Automatically generate complete proto files]
+```
+
+---
+
+## 4. Spec-Driven Development Specifications
+
+BMAD is based on ApiHug's three-layer specification system, ensuring consistency and accuracy of generated code.
+
+### 4.1 Core Specification Documents
+
+| Specification                        | Scope                        | Documentation Link                  |
+|--------------------------------------|------------------------------|-------------------------------------|
+| **API Directive Specification**      | Service/Method/Message/Field | [View Details](/docs/spec/swagger)  |
+| **Database Directive Specification** | Entity/Column                | [View Details](/docs/spec/domain)   |
+| **Enum Type Specification**          | Enum/EnumValue               | [View Details](/docs/spec/constant) |
+
+### 4.2 Specification Mandatory Constraints
+
+**Forbid Cross-layer References**:
+```proto
+// ❌ Wrong: API layer referencing Domain layer
+import "com/example/domain/entities/user.proto";
+
+// ✅ Correct: API layer referencing Infra layer enums
+import "com/example/infra/constants/user_constant.proto";
+```
+
+**Forbid Wrapper Types**:
+```proto
+// ❌ Wrong
+google.protobuf.Int32Value user_id = 1;
+
+// ✅ Correct
+int32 user_id = 1;
+```
+
+---
+
+## 5. Best Practices
+
+### 5.1 Workflow Selection Guide
+
+```
+New feature development → apihug-end-to-end
+API design only → apihug-proto-design
+Code refactoring → apihug-project-review
+Business logic implementation → apihug-app-implement
+Interactive writing → apihug agent
+```
+
+### 5.2 Common Questions
+
+**Q1**: Generated code from Workflow doesn't meet expectations?
+**A1**: Use `apihug-project-review` for review, adjust according to suggestions
+
+**Q2**: How to customize Workflow behavior?
+**A2**: Use `install --modify true` to modify configuration
+
+**Q3**: Which IDEs are supported?
+**A3**: Cursor, Codex, Windsurf, Claude Desktop and other IDEs that support MCP
+
+---
+
+## 6. Upgrade and Maintenance
+
+### 6.1 Version Update
+
+```shell
+# Quick update (preserve configuration)
+apihug> install --quick-update true
+
+# Complete reinstallation
+apihug> install --modify true
+```
+
+### 6.2 Recompile Agents
+
+```shell
+# Only recompile Agents (configuration unchanged)
+apihug> install --compile-agents true
+```
+
+---
+
+## Reference Resources
+
+### Official Resources
+1. [BMAD Methodology GitHub](https://github.com/bmad-code-org/BMAD-METHOD)
+2. [ApiHug REPL Documentation](/docs/tool/apihug-repl)
+3. [ApiHug Specification Overview](/docs/spec)
+
+### Specification Documentation
+1. [API Directive Specification](/docs/spec/swagger)
+2. [Database Directive Specification](/docs/spec/domain)
+3. [Enum Type Specification](/docs/spec/constant)
+
+### Tool Plugins
+- [ApiHug IDEA Plugin](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
+- [MCP Integration Documentation](/docs/mcp/001_start)

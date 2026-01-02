@@ -1,0 +1,317 @@
+---
+title: ApiHug BMAD
+description: 基于 ApiHug 的 AI 驱动敏捷开发方法论
+---
+
+更新于 **2026-01-03**
+
+import {TipInfo} from '@/components/Tip'
+
+<TipInfo>BMAD - Breakthrough Method for Agile AI Driven Development</TipInfo>
+
+<a target="_blank" href="https://search.maven.org/artifact/com.apihug/it-bom"><img
+  src="https://img.shields.io/maven-central/v/com.apihug/it-bom.svg?label=Maven%20Central"/></a>
+
+[ApiHug - API 设计 Copilot](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
+
+---
+
+## 概述
+
+**BMAD** (Breakthrough Method for Agile AI Driven Development) 是基于 ApiHug 规范的 AI 驱动敏捷开发方法论，通过 **Agents**（智能代理）和 **Workflows**（工作流）实现从需求到代码的自动化生成。
+
+**核心能力**:
+- 自动生成 Proto 文件（API/Domain/Enum）
+- 端到端开发流程自动化
+- 代码规范审查与优化建议
+- 基于规范的 Service 层实现
+
+**前置条件**: 必须先安装 [ApiHug REPL](/zhCN-docs/tool/apihug-repl)
+
+---
+
+## 一、安装配置
+
+### 1.1 安装步骤
+
+```shell
+# 1. 启动 REPL
+./apihug
+
+# 2. 执行安装命令
+apihug> install
+```
+
+**引导式安装流程**:
+1. 选择安装目录（默认当前目录）
+2. 选择 IDE 类型（Cursor/Codex/Windsurf 等）
+3. 配置 TTS（语音合成，可选）
+4. 安装核心 Agents 和 Workflows
+5. 生成 IDE 配置文件
+
+### 1.2 安装命令详解
+
+```shell
+install --help
+
+NAME
+  install - Install or update BMAD core agents and tools
+
+SYNOPSIS
+  install [OPTIONS]
+
+OPTIONS
+  --directory <String>
+    安装目录路径
+    [默认: . (当前目录)]
+
+  --quick-update <boolean>
+    快速更新模式（保留现有配置）
+    [默认: false]
+
+  --compile-agents <boolean>
+    仅重新编译 Agents（不修改配置）
+    [默认: false]
+
+  --modify <boolean>
+    修改现有 BMAD 安装
+    [默认: false]
+
+  --enable-tts <boolean>
+    启用 TTS 语音合成
+    [默认: false]
+
+  --ides <String>
+    指定 IDE 列表（逗号分隔）
+    支持: cursor,codex,windsurf,claude
+    [示例: --ides cursor,codex]
+```
+
+**常用安装场景**:
+
+```shell
+# 完整安装（交互式）
+install
+
+# 指定目录和 IDE
+install --directory ~/projects/my-api --ides cursor
+
+# 快速更新（保留配置）
+install --quick-update true
+
+# 仅重新编译 Agents
+install --compile-agents true
+```
+
+---
+
+## 二、Workflows（工作流）
+
+### 2.1 可用 Workflows
+
+| Workflow 路径                                 | 功能描述        | 使用场景                              |
+|---------------------------------------------|-------------|-----------------------------------|
+| `/bmad:bmw:workflows:apihug-proto-design`   | Proto 设计工作流 | 根据需求自动生成 API/Domain/Enum proto 文件 |
+| `/bmad:bmw:workflows:apihug-end-to-end`     | 端到端开发流程     | 从需求分析到代码实现的完整流程                   |
+| `/bmad:bmw:workflows:apihug-project-review` | 项目审查工作流     | 代码规范检查、架构优化建议                     |
+| `/bmad:bmw:workflows:apihug-app-implement`  | 应用实现工作流     | 基于 proto 生成 Service 层业务代码         |
+
+### 2.2 Workflow 使用示例
+
+#### Proto 设计工作流
+
+**触发方式**: 在 IDE 中输入 `/bmad:bmw:workflows:apihug-proto-design`
+
+**输入**:
+```
+需求：用户管理模块
+- 需要用户注册接口
+- 需要用户登录接口
+- 需要用户信息查询接口
+- 用户状态包括：激活、禁用、删除
+```
+
+**输出**:
+```proto
+// 自动生成 API 层
+service UserService {
+  option (hope.swagger.svc) = {path: "/user"};
+  
+  rpc Register(RegisterRequest) returns (UserResponse) {...}
+  rpc Login(LoginRequest) returns (TokenResponse) {...}
+  rpc GetUser(GetUserRequest) returns (UserResponse) {...}
+}
+
+// 自动生成 Domain 层
+message UserEntity {
+  option (hope.persistence.table) = {
+    name: "USER",
+    wires: [IDENTIFIABLE, AUDITABLE]
+  };
+  // ...
+}
+
+// 自动生成 Enum 层
+enum UserStatus {
+  ACTIVE = 0 [(hope.constant.field) = {code: 1, message: "Active"}];
+  DISABLED = 1 [(hope.constant.field) = {code: 2, message: "Disabled"}];
+  DELETED = 2 [(hope.constant.field) = {code: 3, message: "Deleted"}];
+}
+```
+
+#### 端到端开发流程
+
+**适用场景**: 完整功能模块开发
+
+**流程步骤**:
+1. 需求分析 → 生成 proto 定义
+2. 生成数据库表结构（Liquibase）
+3. 生成 API 接口代码
+4. 生成 Service 层骨架
+5. 生成单元测试模板
+
+#### 项目审查工作流
+
+**检查项**:
+- ✅ Proto 文件是否符合 ApiHug 规范
+- ✅ 是否存在跨层引用（API ↔ Domain）
+- ✅ 枚举定义是否完整（code/message/message2）
+- ✅ 是否使用了废弃的 Wrapper 类型
+- ✅ 权限配置是否合理
+
+---
+
+## 三、Agents（智能代理）
+
+### 3.1 ApiHug Agent
+
+**路径**: `/bmad:bmw:agents:apihug`
+
+**功能**:
+- 交互式 Proto 文件编写辅助
+- 实时规范检查和建议
+- 自动补全和错误修正
+- 基于上下文的代码生成
+
+**使用示例**:
+
+```
+User: 帮我创建一个订单管理的 API
+
+Agent: 我将为您创建订单管理 API，包含以下内容：
+
+1. Service 定义（OrderService）
+2. 请求/响应消息（CreateOrderRequest/OrderResponse）
+3. 订单状态枚举（OrderStatus）
+4. 订单实体（OrderEntity）
+
+是否需要包含以下功能？
+- 订单创建
+- 订单查询
+- 订单取消
+- 订单状态更新
+
+User: 是的，全部包含
+
+Agent: [自动生成完整的 proto 文件]
+```
+
+---
+
+## 四、Spec-Driven 开发规范
+
+BMAD 基于 ApiHug 三层规范体系，确保生成代码的一致性和准确性。
+
+### 4.1 核心规范文档
+
+| 规范           | 作用域                          | 文档链接                             |
+|--------------|------------------------------|----------------------------------|
+| **API 指令规范** | Service/Method/Message/Field | [查看详情](/zhCN-docs/spec/swagger)  |
+| **数据库指令规范**  | Entity/Column                | [查看详情](/zhCN-docs/spec/domain)   |
+| **枚举类型规范**   | Enum/EnumValue               | [查看详情](/zhCN-docs/spec/constant) |
+
+### 4.2 规范强制约束
+
+**禁止跨层引用**:
+```proto
+// ❌ 错误：API 层引用 Domain 层
+import "com/example/domain/entities/user.proto";
+
+// ✅ 正确：API 层引用 Infra 层枚举
+import "com/example/infra/constants/user_constant.proto";
+```
+
+**禁止 Wrapper 类型**:
+```proto
+// ❌ 错误
+google.protobuf.Int32Value user_id = 1;
+
+// ✅ 正确
+int32 user_id = 1;
+```
+
+---
+
+## 五、最佳实践
+
+### 5.1 Workflow 选择指南
+
+```
+新功能开发 → apihug-end-to-end
+仅设计 API → apihug-proto-design
+代码重构 → apihug-project-review
+业务逻辑实现 → apihug-app-implement
+交互式编写 → apihug agent
+```
+
+### 5.2 常见问题
+
+**Q1**: Workflow 生成的代码不符合预期？
+**A1**: 使用 `apihug-project-review` 审查，根据建议调整
+
+**Q2**: 如何自定义 Workflow 行为？
+**A2**: 使用 `install --modify true` 修改配置
+
+**Q3**: 支持哪些 IDE？
+**A3**: Cursor, Codex, Windsurf, Claude Desktop 等支持 MCP 的 IDE
+
+---
+
+## 六、升级与维护
+
+### 6.1 版本更新
+
+```shell
+# 快速更新（保留配置）
+apihug> install --quick-update true
+
+# 完整重装
+apihug> install --modify true
+```
+
+### 6.2 重新编译 Agents
+
+```shell
+# 仅重新编译 Agents（配置不变）
+apihug> install --compile-agents true
+```
+
+---
+
+## 参考资源
+
+### 官方资源
+1. [BMAD 方法论 GitHub](https://github.com/bmad-code-org/BMAD-METHOD)
+2. [ApiHug REPL 文档](/zhCN-docs/tool/apihug-repl)
+3. [ApiHug 规范总览](/zhCN-docs/spec)
+
+### 规范文档
+1. [API 指令规范](/zhCN-docs/spec/swagger)
+2. [数据库指令规范](/zhCN-docs/spec/domain)
+3. [枚举类型规范](/zhCN-docs/spec/constant)
+
+### 工具插件
+- [ApiHug IDEA Plugin](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
+- [MCP 集成文档](/docs/mcp/001_start)
+
+

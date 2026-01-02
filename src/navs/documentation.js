@@ -57,6 +57,7 @@ export const documentationNav = {
   ],
   "Tool Chain": [
     {title: 'Intro', href: '/docs/tool'},
+    {title: 'BMAD', href: '/docs/tool/apihug-bmad'},
     {title: 'REPL', href: '/docs/tool/apihug-repl'},
     {title: 'Lint', href: '/docs/tool/apihug-lint'},
     {title: 'Wire', href: '/docs/tool/gradle-wire'},
@@ -71,10 +72,10 @@ export const documentationNav = {
     {title: 'Intro', href: '/docs/mcp/001_start'},
   ],
   "Spec": [
+    {title: 'Vibe', href: '/docs/spec/index'},
     {title: 'API', href: '/docs/spec/swagger'},
     {title: 'Domain', href: '/docs/spec/domain'},
     {title: 'Constant', href: '/docs/spec/constant'},
-    {title: 'Mock', href: '/docs/spec/mock'},
   ],
   "UI": [
     {title: 'Intro', href: '/docs/ui'},

@@ -1,0 +1,213 @@
+---
+title: ApiHug 2.0 LLM Optimization Specification
+description: ApiHug 2.0 Architecture Design and Spec-Driven Development Guide for Large Language Models
+---
+
+Updated on **2026-01-03**
+
+## Overview
+
+ApiHug 2.0 is optimized for LLM (Large Language Model) driven development workflows through **simplified protocol types**, **unified plugin context**, and **Spec-Driven development specifications**, significantly improving the accuracy and consistency of AI code generation.
+
+---
+
+## 1. LLM Optimization Principles
+
+### 1.1 Protocol Type Simplification
+
+**Background**: Wrapper types (like `google.protobuf.Int32Value`) increase the burden of LLM understanding and easily lead to chaotic code generation.
+
+**Mandatory Specification**: Use native proto3 basic types
+
+| ❌ Deprecated Type             | ✅ Standard Type |
+|-------------------------------|-----------------|
+| `google.protobuf.Int32Value`  | `int32`         |
+| `google.protobuf.Int64Value`  | `int64`         |
+| `google.protobuf.UInt64Value` | `uint64`        |
+| `google.protobuf.DoubleValue` | `double`        |
+| `hope.common.BoolType`        | `bool`          |
+
+**Example**:
+```proto
+// ❌ Wrong approach
+message OldRequest {
+  google.protobuf.Int32Value user_id = 1;
+  hope.common.BoolType is_active = 2;
+}
+
+// ✅ Correct approach
+message NewRequest {
+  int32 user_id = 1;
+  bool is_active = 2;
+}
+```
+
+---
+
+### 1.2 Unified Plugin Context
+
+**Version Requirement**: SDK ≥ **2.1.0-RELEASE**
+
+**Architecture Changes**:
+- ❌ Deprecated independent plugins: `com.apihug.wire`, `com.apihug.stub`
+- ❌ Deprecated separate modules: `proto` module + `app` module
+- ✅ Unified plugin: `com.apihug.hope`
+- ✅ Single module: All code in one `app` module
+
+**Advantages**:
+- Reduce context switching, IDE can establish coherent code context
+- Simplify build configuration, reduce LLM understanding difficulty
+- Unified code generation path, improve AI accuracy
+
+#### Configuration Example
+
+**gradle/libs.versions.toml**:
+```toml
+[versions]
+apihugVersion = "2.1.0-RELEASE"
+
+[plugins]
+# ❌ Deprecated (removed)
+# hope-wire = { id = "com.apihug.wire", version.ref = "apihugVersion" }
+# hope-stub = { id = "com.apihug.stub", version.ref = "apihugVersion" }
+
+# ✅ Unified plugin
+hope = { id = "com.apihug.hope", version.ref = "apihugVersion" }
+hope-repl = { id = "com.apihug.repl", version.ref = "apihugVersion" }
+```
+
+**build.gradle**:
+```groovy
+plugins {
+    id "java"
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dependency)
+    alias(libs.plugins.hope)           // ✅ Unified plugin
+    alias(libs.plugins.liquibase)
+}
+
+hope {
+    debug = false
+    verbose = false
+    
+    // Optional features
+    // enableFrontVue = true   // Vue.js frontend generation
+    // enableMcp = true        // MCP experimental feature
+}
+```
+
+**Detailed Configuration Reference**:
+- [Hope Plugin Documentation](/docs/tool/gradle-stub)
+- [Vue Integration Guide](/docs/ui/002_vue)
+- [MCP Experimental Feature](/docs/mcp/001_start)
+
+---
+
+## 2. Spec-Driven Development Specifications
+
+ApiHug defines three core specifications based on Protocol Buffers extension capabilities:
+
+### 2.1 Core Specification Documents
+
+| Specification Name                   | Scope                        | Documentation Link                  |
+|--------------------------------------|------------------------------|-------------------------------------|
+| **API Directive Specification**      | Service/Method/Message/Field | [View Details](/docs/spec/swagger)  |
+| **Database Directive Specification** | Domain Entity/Column         | [View Details](/docs/spec/domain)   |
+| **Enum Type Specification**          | Enum/EnumValue               | [View Details](/docs/spec/constant) |
+
+### 2.2 Specification Layer Description
+
+```
+┌─────────────────────────────────────────┐
+│          API Layer (api/)                  │
+│  - RESTful interface definition                      │
+│  - OpenAPI/Swagger documentation                 │
+│  - Request/Response DTO                         │
+└─────────────┬───────────────────────────┘
+              │
+              │ Forbid cross-layer reference
+              │
+┌─────────────┴───────────────────────────┐
+│        Domain Layer (domain/)              │
+│  - JPA Entity                      │
+│  - Database table structure                          │
+│  - DDL/Liquibase                        │
+└─────────────┬───────────────────────────┘
+              │
+              │ Allow shared reference
+              │
+┌─────────────┴───────────────────────────┐
+│        Infra Layer (infra/)                │
+│  - Enum constants                       │
+│  - Error codes                   │
+│  - Global configuration                              │
+└─────────────────────────────────────────┘
+```
+
+**Architecture Principles**:
+- ✅ API layer and Domain layer can reference Infra layer enums
+- ✅ Same layer can reference each other
+- ❌ **Strictly forbidden** API layer referencing Domain layer (or reverse reference)
+
+---
+
+## 3. BMAD AI Driven Development
+
+### 3.1 BMAD Introduction
+
+**BMAD (Breakthrough Method for Agile AI Driven Development)**: AI-driven development methodology based on ApiHug specifications.
+
+**Prerequisites**: Requires installation of [ApiHug REPL](/docs/tool/apihug-repl)
+
+### 3.2 Available Workflows and Agents
+
+| Path                                        | Description                         | Use Cases                                             |
+|---------------------------------------------|-------------------------------------|-------------------------------------------------------|
+| `/bmad:bmw:workflows:apihug-proto-design`   | Proto design workflow               | Auto-generate API/Domain/Enum proto files             |
+| `/bmad:bmw:workflows:apihug-end-to-end`     | End-to-end development process      | Complete implementation from requirements to code     |
+| `/bmad:bmw:workflows:apihug-project-review` | Project review workflow             | Code specification check and optimization suggestions |
+| `/bmad:bmw:workflows:apihug-app-implement`  | Application implementation workflow | Generate Service layer code based on proto            |
+| `/bmad:bmw:agents:apihug`                   | ApiHug intelligent agent            | Interactive proto file writing assistance             |
+
+**Detailed Usage**:
+- [ApiHug BMAD Documentation](/docs/tool/apihug-bmad)
+- [BMAD Methodology](https://github.com/bmad-code-org/BMAD-METHOD)
+
+---
+
+## 4. Best Practices
+
+### 4.1 LLM-Friendly Proto Writing Specifications
+
+1. **Use basic types**: Avoid Wrapper types (`Int32Value`, etc.)
+2. **Clear naming**: Follow `PascalCase` (messages) and `snake_case` (fields)
+3. **Complete comments**: Use `description` field instead of proto comments
+4. **Layer isolation**: Strictly follow the three-layer architecture of API/Domain/Infra
+
+### 4.2 Version Migration Checklist
+
+To upgrade to 2.1.0+ execute:
+
+- [ ] Remove `hope-wire` and `hope-stub` from `gradle/libs.versions.toml`
+- [ ] Replace plugin in `build.gradle` with `alias(libs.plugins.hope)`
+- [ ] Merge `proto` module into `app` module
+- [ ] Check and remove all Wrapper type references
+- [ ] Run `./gradlew clean build` to verify build
+
+---
+
+## Reference Resources
+
+### Tool Documentation
+1. [ApiHug REPL - Command Line Tool](/docs/tool/apihug-repl)
+2. [ApiHug BMAD - AI Development Method](/docs/tool/apihug-bmad)
+
+### Specification Documentation
+1. [API Directive Specification](/docs/spec/swagger)
+2. [Database Directive Specification](/docs/spec/domain)
+3. [Enum Type Specification](/docs/spec/constant)
+
+### External Resources
+- [BMAD Methodology GitHub](https://github.com/bmad-code-org/BMAD-METHOD)
+- [Protocol Buffers Official Documentation](https://protobuf.dev/)
+- [OpenAPI Specification](https://spec.openapis.org/oas/latest.html) 

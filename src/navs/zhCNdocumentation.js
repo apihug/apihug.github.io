@@ -58,6 +58,7 @@ export const documentationNav = {
   "Tool Chain": [
     {title: '介绍', href: '/zhCN-docs/tool'},
     {title: 'REPL', href: '/zhCN-docs/tool/apihug-repl'},
+    {title: 'BMAD', href: '/zhCN-docs/tool/apihug-bmad'},
     {title: 'Lint', href: '/zhCN-docs/tool/apihug-lint'},
     {title: 'Wire', href: '/zhCN-docs/tool/gradle-wire'},
     {title: 'Stub', href: '/zhCN-docs/tool/gradle-stub'},
@@ -71,10 +72,10 @@ export const documentationNav = {
     {title: '介绍', href: '/zhCN-docs/mcp/001_start'},
   ],
   "Spec": [
+    {title: 'Vibe', href: '/zhCN-docs/spec/index'},
     {title: 'API', href: '/zhCN-docs/spec/swagger'},
     {title: 'Domain', href: '/zhCN-docs/spec/domain'},
     {title: 'Constant', href: '/zhCN-docs/spec/constant'},
-    {title: 'Mock', href: '/zhCN-docs/spec/mock'},
   ],
   "UI": [
     {title: '介绍', href: '/zhCN-docs/ui'},

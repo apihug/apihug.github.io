@@ -1,0 +1,213 @@
+---
+title: ApiHug 2.0 LLM 优化规范
+description: ApiHug 2.0 面向大模型的架构设计与 Spec-Driven 开发指南
+---
+
+更新于 **2026-01-03**
+
+## 概述
+
+ApiHug 2.0 专为 LLM（大语言模型）驱动的开发流程优化设计，通过 **简化协议类型**、**统一插件上下文** 和 **Spec-Driven 开发规范**，大幅提升 AI 代码生成的准确性和一致性。
+
+---
+
+## 一、LLM 优化原则
+
+### 1.1 协议类型简化
+
+**背景**: Wrapper 类型（如 `google.protobuf.Int32Value`）增加 LLM 理解负担，易导致代码生成混乱。
+
+**强制规范**: 使用原生 proto3 基础类型
+
+| ❌ 废弃类型                        | ✅ 标准类型   |
+|-------------------------------|----------|
+| `google.protobuf.Int32Value`  | `int32`  |
+| `google.protobuf.Int64Value`  | `int64`  |
+| `google.protobuf.UInt64Value` | `uint64` |
+| `google.protobuf.DoubleValue` | `double` |
+| `hope.common.BoolType`        | `bool`   |
+
+**示例**:
+```proto
+// ❌ 错误写法
+message OldRequest {
+  google.protobuf.Int32Value user_id = 1;
+  hope.common.BoolType is_active = 2;
+}
+
+// ✅ 正确写法
+message NewRequest {
+  int32 user_id = 1;
+  bool is_active = 2;
+}
+```
+
+---
+
+### 1.2 统一插件上下文
+
+**版本要求**: SDK ≥ **2.1.0-RELEASE**
+
+**架构变更**:
+- ❌ 废弃独立插件: `com.apihug.wire`, `com.apihug.stub`
+- ❌ 废弃分离模块: `proto` 模块 + `app` 模块
+- ✅ 统一插件: `com.apihug.hope`
+- ✅ 单一模块: 所有代码在一个 `app` 模块中
+
+**优势**:
+- 减少上下文切换，IDE 可建立连贯的代码上下文
+- 简化构建配置，降低 LLM 理解难度
+- 统一代码生成路径，提高 AI 准确性
+
+#### 配置示例
+
+**gradle/libs.versions.toml**:
+```toml
+[versions]
+apihugVersion = "2.1.0-RELEASE"
+
+[plugins]
+# ❌ 废弃（已移除）
+# hope-wire = { id = "com.apihug.wire", version.ref = "apihugVersion" }
+# hope-stub = { id = "com.apihug.stub", version.ref = "apihugVersion" }
+
+# ✅ 统一插件
+hope = { id = "com.apihug.hope", version.ref = "apihugVersion" }
+hope-repl = { id = "com.apihug.repl", version.ref = "apihugVersion" }
+```
+
+**build.gradle**:
+```groovy
+plugins {
+    id "java"
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dependency)
+    alias(libs.plugins.hope)           // ✅ 统一插件
+    alias(libs.plugins.liquibase)
+}
+
+hope {
+    debug = false
+    verbose = false
+    
+    // 可选特性
+    // enableFrontVue = true   // Vue.js 前端生成
+    // enableMcp = true        // MCP 实验性特性
+}
+```
+
+**详细配置参考**:
+- [Hope Plugin 文档](/zhCN-docs/tool/gradle-stub)
+- [Vue 集成指南](/docs/ui/002_vue)
+- [MCP 实验特性](/docs/mcp/001_start)
+
+---
+
+## 二、Spec-Driven 开发规范
+
+ApiHug 基于 Protocol Buffers 扩展能力，定义了三层核心规范：
+
+### 2.1 核心规范文档
+
+| 规范名称         | 作用域                          | 文档链接                             |
+|--------------|------------------------------|----------------------------------|
+| **API 指令规范** | Service/Method/Message/Field | [查看详情](/zhCN-docs/spec/swagger)  |
+| **数据库指令规范**  | Domain Entity/Column         | [查看详情](/zhCN-docs/spec/domain)   |
+| **枚举类型规范**   | Enum/EnumValue               | [查看详情](/zhCN-docs/spec/constant) |
+
+### 2.2 规范层次说明
+
+```
+┌─────────────────────────────────────────┐
+│          API 层 (api/)                  │
+│  - RESTful 接口定义                      │
+│  - OpenAPI/Swagger 文档                 │
+│  - 请求/响应 DTO                         │
+└─────────────┬───────────────────────────┘
+              │
+              │ 禁止跨层引用
+              │
+┌─────────────┴───────────────────────────┐
+│        Domain 层 (domain/)              │
+│  - JPA Entity 实体                      │
+│  - 数据库表结构                          │
+│  - DDL/Liquibase                        │
+└─────────────┬───────────────────────────┘
+              │
+              │ 允许共享引用
+              │
+┌─────────────┴───────────────────────────┐
+│        Infra 层 (infra/)                │
+│  - 枚举常量 (Enum)                       │
+│  - 错误码 (Error Code)                   │
+│  - 全局配置                              │
+└─────────────────────────────────────────┘
+```
+
+**架构原则**:
+- ✅ API 层和 Domain 层可引用 Infra 层枚举
+- ✅ 同层内可相互引用
+- ❌ **严禁** API 层引用 Domain 层（或反向引用）
+
+---
+
+## 三、BMAD AI 驱动开发
+
+### 3.1 BMAD 简介
+
+**BMAD (Breakthrough Method for Agile AI Driven Development)**: 基于 ApiHug 规范的 AI 驱动开发方法论。
+
+**前置条件**: 需安装 [ApiHug REPL](/zhCN-docs/tool/apihug-repl)
+
+### 3.2 可用 Workflow 和 Agent
+
+| 路径                                          | 描述          | 使用场景                          |
+|---------------------------------------------|-------------|-------------------------------|
+| `/bmad:bmw:workflows:apihug-proto-design`   | Proto 设计工作流 | 自动生成 API/Domain/Enum proto 文件 |
+| `/bmad:bmw:workflows:apihug-end-to-end`     | 端到端开发流程     | 从需求到代码的完整实现                   |
+| `/bmad:bmw:workflows:apihug-project-review` | 项目审查工作流     | 代码规范检查和优化建议                   |
+| `/bmad:bmw:workflows:apihug-app-implement`  | 应用实现工作流     | 基于 proto 生成 Service 层代码       |
+| `/bmad:bmw:agents:apihug`                   | ApiHug 智能代理 | 交互式 proto 文件编写辅助              |
+
+**详细使用**:
+- [ApiHug BMAD 文档](/zhCN-docs/tool/apihug-bmad)
+- [BMAD 方法论](https://github.com/bmad-code-org/BMAD-METHOD)
+
+---
+
+## 四、最佳实践
+
+### 4.1 LLM 友好的 Proto 编写规范
+
+1. **使用基础类型**: 避免 Wrapper 类型（`Int32Value` 等）
+2. **清晰命名**: 遵循 `PascalCase`（消息）和 `snake_case`（字段）
+3. **完整注释**: 使用 `description` 字段而非 proto 注释
+4. **分层隔离**: 严格遵守 API/Domain/Infra 三层架构
+
+### 4.2 版本迁移检查清单
+
+升级到 2.1.0+ 时需执行：
+
+- [ ] 移除 `gradle/libs.versions.toml` 中的 `hope-wire` 和 `hope-stub`
+- [ ] 在 `build.gradle` 中将插件替换为 `alias(libs.plugins.hope)`
+- [ ] 合并 `proto` 模块到 `app` 模块
+- [ ] 检查并移除所有 Wrapper 类型引用
+- [ ] 运行 `./gradlew clean build` 验证构建
+
+---
+
+## 参考资源
+
+### 工具文档
+1. [ApiHug REPL - 命令行工具](/zhCN-docs/tool/apihug-repl)
+2. [ApiHug BMAD - AI 开发方法](/zhCN-docs/tool/apihug-bmad)
+
+### 规范文档
+1. [API 指令规范](/zhCN-docs/spec/swagger)
+2. [数据库指令规范](/zhCN-docs/spec/domain)
+3. [枚举类型规范](/zhCN-docs/spec/constant)
+
+### 外部资源
+- [BMAD 方法论 GitHub](https://github.com/bmad-code-org/BMAD-METHOD)
+- [Protocol Buffers 官方文档](https://protobuf.dev/)
+- [OpenAPI 规范](https://spec.openapis.org/oas/latest.html) 
