@@ -72,7 +72,7 @@ export const documentationNav = {
     {title: '介绍', href: '/zhCN-docs/mcp/001_start'},
   ],
   "Spec": [
-    {title: 'Vibe', href: '/zhCN-docs/spec/index'},
+    {title: 'Vibe', href: '/zhCN-docs/spec'},
     {title: 'API', href: '/zhCN-docs/spec/swagger'},
     {title: 'Domain', href: '/zhCN-docs/spec/domain'},
     {title: 'Constant', href: '/zhCN-docs/spec/constant'},

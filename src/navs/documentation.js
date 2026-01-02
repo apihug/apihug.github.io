@@ -72,7 +72,7 @@ export const documentationNav = {
     {title: 'Intro', href: '/docs/mcp/001_start'},
   ],
   "Spec": [
-    {title: 'Vibe', href: '/docs/spec/index'},
+    {title: 'Vibe', href: '/docs/spec'},
     {title: 'API', href: '/docs/spec/swagger'},
     {title: 'Domain', href: '/docs/spec/domain'},
     {title: 'Constant', href: '/docs/spec/constant'},
