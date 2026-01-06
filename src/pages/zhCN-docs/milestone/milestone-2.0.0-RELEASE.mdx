@@ -10,16 +10,21 @@ import {TipGood} from '@/components/Tip'
   API 规范与工具生态。
 </TipGood>
 
-😆 快速入门指南：
 
-1. [ApiHug101 - 哔哩哔哩](https://space.bilibili.com/666522636)
-2. [ApiHug101 - YouTube](https://youtube.com/@ApiHug?si=C1yw0poHA01zbmyj)
+<a target="_blank" href="https://search.maven.org/artifact/com.apihug/it-bom"><img
+  src="https://img.shields.io/maven-central/v/com.apihug/it-bom.svg?label=Maven%20Central"/></a>
 
-<a target="_blank" href="https://search.maven.org/artifact/com.apihug/it-bom">
-  <img src="https://img.shields.io/maven-central/v/com.apihug/it-bom.svg?label=Maven%20Central"/>
-</a>
 
-[ApiHug - API 设计智能助手（IntelliJ 插件）](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
+<div>
+  <iframe
+    src="https://plugins.jetbrains.com/embeddable/card/23534"
+    border="0"
+    height={'319px'}
+    width={'384px'}
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
 
 ## SDK [2.0.0-RELEASE] - 2025-12-10
 
@@ -62,44 +67,51 @@ import {TipGood} from '@/components/Tip'
 4. **更新构建命令**：轻量编译器现已在构建前自动运行，无需再显式指定 `wire` 或 `stub` 命令。
 5. **项目结构变更如下**：
 
-## Wire 模块
+## 模块
 
 ### 生成目录与手写目录
 
-- **生成目录（`_*_`）**：凡是名称被前后下划线包裹的目录（例如 `_api_`），均由 apihug 工具生成，属于**只读区域**。
+- **生成目录（`src/generated`）**：均由 apihug 工具生成，属于**只读区域**。
 - 请勿在这些目录中手工修改代码。
 - 生成过程可能会覆盖其中的文件，如需修改应通过调整生成配置或上游契约来完成。
 - **手写目录**：`java`、`proto` 等普通目录用于存放开发者手写的源码与 Schema。
 - Java 应用代码与测试应放在 `java` 目录下。
 - Protocol Buffer 定义（`.proto` 文件）应放在 `proto` 目录下。
 
-### 生产代码目录（`src/main`）
+### 生产代码目录
 
 生产环境相关源码布局如下：
 
 ```text
-src/main/
-  java/        → 核心应用逻辑（手写 Java 代码）
-  _api_/       → 基于 Wire/契约生成的 Java 类（生产代码，只读）
-  proto/       → `.proto` Schema 文件（作为资源参与代码生成）
+{module}/
+├── src/main/
+│   ├── proto/                         → Proto 定义（手写）
+│   │   └── {package_name}/
+│   │       ├── api/                   → API 定义
+│   │       ├── domain/                → 领域实体
+│   │       └── infra/                 → 基础设施（枚举、错误）
+│   ├── java/                          → 手写业务
+│   ├── trait/                         → Repository扩展
+│   └── resources/
+│       └── hope-wire.json             → 模块配置
+├── src/generated/main/                → 生成代码（只读）
+│   ├── api/                           → API接口
+│   ├── domain/                        → 领域实体
+│   ├── wire/                          → DTO对象
+│   ├── mcp/                           → 微服务契约
+│   └── cloud/                         → 云适配器
+├── src/test/
+│   ├── java/                          → 单元测试
+│   └── trait/                         → 测试扩展
+└── src/generated/test/                → 生成测试代码（只读）
+    ├── api/                           → API契约测试
+    └── ...
 ```
 
 Gradle 的配置约定：
 
-- `src/main/_api_` 会被加入 `sourceSets.main.java.srcDirs`，作为主 Java 源的一部分参与编译。
+- `src/generated/main` 各个子模块会被加入 `sourceSets.main.java.srcDirs`，作为主 Java 源的一部分参与编译。
 - `src/main/proto` 会被加入 `sourceSets.main.resources.srcDir`，作为资源输出，方便生成器或工具在构建时读取 `.proto` 文件。
-
-### 测试代码目录（`src/test`）
-
-测试代码沿用相同的目录约定：
-
-```text
-src/test/
-  java/        → 常规单元测试与集成测试（JUnit 等）
-  _api_/       → API 守卫/契约测试，作为 `test` 任务的一部分编译与执行
-```
-
-`src/test/_api_` 会被加入 `sourceSets.test.java.srcDirs`，与标准测试源码一起编译和运行。
 
 ### Kola 契约测试目录（`src/test-kola`）
 
@@ -130,7 +142,7 @@ Gradle 中定义了 `testKola` Source Set：
 
 ### 使用建议
 
-- **不要直接修改 `_api_` 目录中的生成代码**；如需变更，请调整 proto/契约并重新生成。
+- **不要直接修改 `src/generated` 目录中的生成代码**；如需变更，请调整 proto/契约并重新生成。
 - **业务逻辑建议集中在 `src/main/java`，测试集中在 `src/test/java`**，保持结构清晰。
 - **将契约与 Schema 放在 `src/main/proto`，Kola DSL 放在 `src/test-kola/groovy`**，避免不同类型的文件混放。
 - 常规单元/集成测试使用 `test` 任务，契约式端到端验证使用 `testKola` 任务，有利于分层执行与排查问题。
@@ -140,54 +152,7 @@ Gradle 中定义了 `testKola` Source Set：
 
 ## Stub 模块
 
-### 生成目录与手写目录
-
-- **生成目录（`_*_`）**：凡是名称被前后下划线包裹的目录（例如 `_api_`、`_mcp_`、`_domain_`、`_cloud_`），均由 apihug 工具生成，属于**只读区域**。
-- 请勿在这些目录中手工修改代码。
-- 代码会在生成过程中被覆盖，只能通过调整生成配置/输入来间接修改。
-- **手写目录**：`java`、`trait` 等普通目录用于存放开发者手写的源码。
-- 业务逻辑、服务、控制器以及自定义的 trait 类应放在这些目录中。
-
-### 生产代码目录（`src/main`）
-
-生产环境相关源码按职责拆分到多个目录中：
-
-```text
-src/main/
-  java/        → 手写业务逻辑、服务、控制器等
-  _api_/       → 生成的 DTO 与 REST 接口（apihug 生成，只读）
-  trait/       → 可由开发者自定义和复用的 trait/mixin 类
-  _mcp_/       → 生成的微服务契约或协议代码（只读）
-  _domain_/    → 生成的核心领域模型、聚合、值对象等（只读）
-  _cloud_/     → 生成的云端/集成相关 stub、端点或适配器（只读）
-```
-
-虽然物理上拆分在多个子目录中，但**这些目录共同组成同一个生产模块**。Gradle 会通过
-`sourceSets.main.java.srcDirs` 将上述目录全部加入编译路径，最终打包为同一个 JAR。
-
-### 测试代码目录（`src/test`）
-
-测试代码在结构上尽量镜像生产目录，方便按领域组织测试用例：
-
-```text
-src/test/
-  java/        → 核心逻辑的单元测试与集成测试
-  _api_/       → API 层的契约/守卫测试（通常依赖生成的 DTO）
-  trait/       → trait/mixin 行为相关的测试
-  _mcp_/       → 协议契约的校验测试
-  _domain_/    → 领域模型不变式与行为测试
-  _cloud_/     → 云端/集成契约测试及相关生成 stub
-```
-
-上述测试目录均通过 `sourceSets.test.java.srcDirs` 注册到 Gradle 中，作为标准 `test` Source Set 的一部分，
-由默认的 `test` 任务统一编译和执行，并共享同一套（main + test 输出以及测试依赖）类路径。
-
-### 使用建议
-
-- **不要直接修改生成目录**（`_api_`、`_mcp_`、`_domain_`、`_cloud_`）中的代码，如需变更，请调整契约/模型或生成配置并重新生成。
-- **业务与自定义逻辑尽量集中在 `java` 与 `trait`**，以避免在重新生成时被覆盖。
-- **测试代码按生产目录进行“就近”组织**，在 `src/test` 下选择对应的子目录，保持结构一致性，便于维护和定位。
-
+自 SDK `2.1.4-RELEASE` 合并为一个模块， 不再有 `stub` 模块或命令!
 
 ## Proto 变更
 
@@ -217,3 +182,11 @@ import "apihug/protobuf/extend/domain.proto";
 
 1. `wire` 项目支持 `protoImport` 语法，用于引入第三方 Protobuf 依赖。
 2. `stub` 项目应使用 `wireImport` 语法引入 Wire 模块依赖；若误用 `implementation`，虽无语法错误，但会导致 `stub` 命令生成内容为空。
+
+
+## 参考
+
+😆 快速入门指南：
+
+1. [ApiHug101 - 哔哩哔哩](https://space.bilibili.com/666522636)
+2. [ApiHug101 - YouTube](https://youtube.com/@ApiHug?si=C1yw0poHA01zbmyj)

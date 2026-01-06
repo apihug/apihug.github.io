@@ -3,229 +3,183 @@ title: Milestone 2.0.0-RELEASE
 description: SDK [2.0.0-RELEASE]
 ---
 
-import {TipGood} from '@/components/Tip'
+import { TipGood } from '@/components/Tip'
 
 <TipGood>
-  `2.0.0-RELEASE` is a major milestone for ApiHug, introducing numerous **breaking changes** to pave the way for a next-generation, **LLM-friendly** API specification and tooling ecosystem.
+  `2.0.0-RELEASE` marks a pivotal milestone for ApiHug, introducing **breaking changes** designed to establish a next-generation, **Large Language Model (LLM)-friendly** API specification and tooling ecosystem.
 </TipGood>
 
-😆 Guide：
+<a target="_blank" href="https://search.maven.org/artifact/com.apihug/it-bom">
+  <img src="https://img.shields.io/maven-central/v/com.apihug/it-bom.svg?label=Maven%20Central"/>
+</a>
 
-1. [ApiHug101-Bilibili](https://space.bilibili.com/666522636)
-2. [ApiHug101 Youtube](https://youtube.com/@ApiHug?si=C1yw0poHA01zbmyj)
+<div>
+  <iframe
+    src="https://plugins.jetbrains.com/embeddable/card/23534"
+    border="0"
+    height="319px"
+    width="384px"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
 
-<a target="_blank" href="https://search.maven.org/artifact/com.apihug/it-bom"><img
-  src="https://img.shields.io/maven-central/v/com.apihug/it-bom.svg?label=Maven%20Central"/></a>
+## SDK [2.0.0-RELEASE] – December 10, 2025
 
-[ApiHug - API design Copilot](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
+- Migrated JavaPoet from Square to the Palantir fork  
+- Replaced Google’s Protobuf parser with Square’s Wire engine  
+- Initial support for Protobuf Schema Catalog
 
-## SDK [2.0.0-RELEASE] - 2025-12-10
+## Plugin [1.0.0] – December 10, 2025
 
-- Migrated JavaPoet from Square to Palantir fork
-- Replaced Google’s protobuf parser with Square’s Wire engine
-- Laid groundwork for Protobuf Schema Catalog support
-
-## Plugin [1.0.0] - 2025-12-10
-
-- Upgraded to SDK 2.0.0-RELEASE
-- Removed legacy Protocol Buffer plugin dependencies
-- Adopted a lightweight, pure Wire-based protobuf compiler
-- Removed AI-related components for a leaner, more focused design
-- Cached metadata in human-readable text format—LLM-friendly
+- Upgraded to SDK `2.0.0-RELEASE`  
+- Removed legacy Protocol Buffer plugin dependencies  
+- Adopted a lightweight, pure Wire-driven Protobuf compiler  
+- Removed AI-related components to focus on core functionality  
+- Cached metadata in human-readable text format to improve LLM compatibility  
 - Various bug fixes
 
-⚠️⚠️⚠️ **Do NOT upgrade to Spring Boot 4.0+ (as of December 2025)** — the SDK is **not yet compatible** due to breaking changes introduced in Spring Boot 4.0. ⚠️⚠️⚠️
+⚠️⚠️⚠️ **Do NOT upgrade to Spring Boot 4.0 or later (as of December 2025)** — the current SDK is **not yet compatible** with the **breaking changes** introduced in Spring Boot 4.0. ⚠️⚠️⚠️
 
-Attempting to do so may result in severe and difficult-to-diagnose build or runtime errors.
+Forcing an upgrade may result in obscure build or runtime errors that severely impact development velocity.
 
-For details on the extensive breaking changes, please refer to the official:  
-
+For details on Spring Boot 4.0 breaking changes, refer to the official migration guide:  
 [Spring Boot 4.0 Migration Guide](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.0-Migration-Guide)
 
-## New Feature
+## Key New Features
 
-1. **Polymorphism support** via Protocol Buffers’ `oneof` construct.
-2. **Compact OpenAPI output** by leveraging OAS `allOf` to unwrap and simplify response wrappers.
-3. **Ultra-fast, lightweight compiler** for rapid generation and iteration.
-4. **Rich metadata export** to enable advanced tooling and integrations.
-5. **LLM-ready specifications** — laying the foundation for specification-driven development (TBD).
+1. **Polymorphism Support**: Implemented via Protocol Buffers’ `oneof` syntax.  
+2. **Streamlined OpenAPI Output**: Uses OAS `allOf` to flatten and simplify response wrappers.  
+3. **Ultra-Fast Lightweight Compiler**: Dramatically improves generation and iteration speed.  
+4. **Rich Metadata Export**: Enables advanced toolchain integration.  
+5. **LLM-Ready Specification Format**: Lays the foundation for future Specification-Driven Development (work in progress).
 
+## Upgrade Instructions
 
-## Upgrade steps
+Refer to: [apihug-demo/libs.versions.toml](https://github.com/apihug/apihug-demo/blob/main/gradle/libs.versions.toml)
 
-Refer [apihug-demo/libs.versions.toml](https://github.com/apihug/apihug-demo/blob/main/gradle/libs.versions.toml)
+1. **Upgrade ApiHug SDK**: In `{PROJECT_ROOT}/gradle/libs.versions.toml`, update `apihug = "1.0.0-RELEASE"` to `2.0.0-RELEASE` or higher.  
+2. **Upgrade IntelliJ IDEA Plugin** to version `1.0.0+`:  
+   [ApiHug – API Design Copilot](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)  
+3. **Ensure Spring Boot version < 4.0** — we recommend the `3.8.x` series due to breaking changes in Spring Boot 4.0.  
+4. **Update build commands**: The lightweight compiler now runs automatically before builds; explicit `wire` or `stub` commands are no longer needed.  
+5. **Project structure has changed as follows**:
 
-1. Upgrade ApiHug SDK: `{PROJECT_ROOT}/gradle/libs.versions.toml`  find  `apihug = "1.0.0-RELEASE"`  please upgrade to  `2.0.0-RELEASE`+
-2. Upgrade ApiHug IDEA plugin to `1.0.0`+ [ApiHug - API design Copilot](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
-3. Make sure spring boot is `<4.0`, better `3.8~` as the spring boot 4.0 has break change!!
-4. Update your command line, now the lite compile will automatically run before build, so no need to specify `wire` or `stub` command
-5. structure change:
+## Project Structure
 
+### Generated vs. Handwritten Directories
 
-## Wire
+- **Generated directories (`src/generated`)** are **read-only** and managed entirely by ApiHug tooling.  
+  - Do **not** manually edit files in these directories—changes will be overwritten.  
+  - To customize output, modify source `.proto` contracts or generator configuration instead.  
+- **Handwritten directories** (`java`, `proto`, etc.) contain developer-authored code and schemas.  
+  - Business logic belongs in `src/main/java`.  
+  - Protocol Buffer definitions (`.proto` files) belong in `src/main/proto`.
 
+### Production Source Layout
 
-### Generated vs hand-written directories
-
-- **Generated directories (`_*_`)**: any directory whose name is wrapped with leading and trailing underscores
-(for example `_api_`) is created by the apihug tools and is **read-only**.
-- Do **not** edit files in these directories by hand.
-- They are regenerated by tooling and may be overwritten at any time.
-- **Hand-written directories**: plain-named directories such as `java` and `proto` are intended for developer-authored
-source code and schemas.
-- Java application code and tests should live under `java`.
-- Protocol Buffer definitions (`.proto` files) should live under `proto`.
-
-### Production sources (`src/main`)
-
-The production source layout is:
-
-```text
-src/main/
-  java/        → Core application logic (hand-written Java code)
-  _api_/       → Java classes generated from Wire/contract definitions (production code, read-only)
-  proto/       → `.proto` schema files (treated as resources for code generation)
+```
+{module}/
+├── src/main/
+│   ├── proto/                         → Handwritten .proto definitions
+│   │   └── {package_name}/
+│   │       ├── api/                   → API contracts
+│   │       ├── domain/                → Domain entities
+│   │       └── infra/                 → Infrastructure (enums, errors)
+│   ├── java/                          → Handwritten business logic
+│   ├── trait/                         → Repository extensions
+│   └── resources/
+│       └── hope-wire.json             → Module configuration
+├── src/generated/main/                → Generated code (read-only)
+│   ├── api/                           → API interfaces
+│   ├── domain/                        → Domain models
+│   ├── wire/                          → DTOs
+│   ├── mcp/                           → Microservice contracts
+│   └── cloud/                         → Cloud adapters
+├── src/test/
+│   ├── java/                          → Unit/integration tests
+│   └── trait/                         → Test extensions
+└── src/generated/test/                → Generated test code (read-only)
+├── api/                           → Contract-based API tests
+└── ...
 ```
 
-Gradle is configured so that:
+**Gradle conventions**:
+- Subdirectories under `src/generated/main` are added to `sourceSets.main.java.srcDirs` and compiled as part of the main Java sources.
+- `src/main/proto` is registered as a resource directory (`sourceSets.main.resources.srcDir`) so `.proto` files are available at build time.
 
-- `src/main/_api_` is added to `sourceSets.main.java.srcDirs` and compiled as part of the main Java sources.
-- `src/main/proto` is added to `sourceSets.main.resources.srcDir` and included as resources, allowing code generators
-or tools to read the `.proto` files at build time.
+### Kola Contract Test Directory (`src/test-kola`)
 
-### Test sources (`src/test`)
+Kola enables contract-based end-to-end testing via a dedicated source set and task:
 
-The test layout extends the same conventions to test code:
-
-```text
-src/test/
-  java/        → Standard unit & integration tests (JUnit, etc.)
-  _api_/       → API guardian/contract tests compiled and run as part of the `test` task
 ```
-
-Gradle is configured so that `src/test/_api_` is added to `sourceSets.test.java.srcDirs`, meaning these tests are
-compiled and executed together with the standard test sources.
-
-### Kola contract tests (`src/test-kola`)
-
-Kola tests use a dedicated source set and task to model contract-style, end-to-end tests.
-
-```text
 src/
   main/
     java/          // Production Java source code
     resources/     // Production resources
   test/
-    java/          // Standard unit/integration tests (JUnit, etc.)
-    resources/     // Resources for standard tests
+    java/          // Standard unit and integration tests (e.g., JUnit)
+    resources/     // Test resources for standard tests
   test-kola/
     java/          // Auto-generated Java test classes (compiled and executed)
-    groovy/        // Groovy DSL files (treated as resources; NOT compiled)
-    resources/     // Additional test resources (contracts, fixtures, configs)
+    groovy/        // Groovy DSL scripts (treated as resources; not compiled)
+    resources/     // Additional test assets (contracts, sample data, configurations, etc.)
 ```
 
-The Gradle configuration defines a `testKola` source set:
+Gradle defines a `testKola` source set:
+- `src/test-kola/java`: Contains generated test classes.
+- `src/test-kola/groovy` and `src/test-kola/resources`: Registered as resource directories.
+- Groovy DSL files are **not compiled**—they’re consumed by generators or test runners at build time.
+- The `testKola` classpath includes outputs from both `main` and `test`, enabling reuse of utilities and base classes.
 
-- `src/test-kola/java` is used for generated Java test classes.
-- `src/test-kola/resources` and `src/test-kola/groovy` are both registered as resource directories.
-- Groovy DSL files in `groovy` are **not compiled**; they are read by generators or test tooling at build time.
-- The `testKola` classpath includes outputs from both `main` and `test` source sets, so helper utilities and base
-test classes can be reused.
+A dedicated `testKola` Gradle task runs only Kola-generated tests (via JUnit Platform). The default `test` task also uses JUnit Platform for consistency.
 
-A dedicated `testKola` Gradle task runs only the Kola-generated tests using JUnit Platform, while the standard `test`
-task also uses JUnit Platform for consistency.
+### Best Practices
 
-### Practical guidelines
-
-- **Never modify generated `_api_` sources by hand**; instead, change proto/contracts and re-run generation.
-- **Keep business logic in `src/main/java`** and tests in `src/test/java`.
-- **Place contract definitions and schemas in `src/main/proto`**, and Kola DSL scripts in `src/test-kola/groovy`.
-- Use `test` for regular unit/integration tests and `testKola` for contract-style, end-to-end verification.
+- **Never edit files in `src/generated`**—update source contracts and regenerate instead.  
+- Keep **business logic in `src/main/java`** and **tests in `src/test/java`** for clarity.  
+- Place **Protobuf contracts in `src/main/proto`** and **Kola DSL scripts in `src/test-kola/groovy`** to avoid mixing concerns.  
+- Use `./gradlew test` for standard tests and `./gradlew testKola` for contract validation—this enables layered execution and easier debugging.
 
 ---
 
-## Stub
+## Stub Module
 
-### Generated vs hand-written directories
+As of SDK `2.1.4-RELEASE`, the `stub` module has been merged into the main module. There is **no longer a separate `stub` module or command**.
 
-- **Generated directories (`_*_`)**: any directory whose name is wrapped with leading and trailing underscores
-(for example `_api_`, `_mcp_`, `_domain_`, `_cloud_`) is created by the apihug tools and is **read-only**.
-- Do **not** edit files in these directories by hand.
-- They are regenerated by tooling and may be overwritten at any time.
-- **Hand-written directories**: plain-named directories such as `java` and `trait` are intended for developer-authored
-source code.
-- Business logic, services, controllers, and custom traits should live here.
+## Protobuf Path Changes
 
-### Production sources (`src/main`)
-
-The production source layout is intentionally split across several directories:
-
-```text
-src/main/
-  java/        → Hand-written business logic, services, controllers, etc.
-  _api_/       → Generated DTOs and REST interfaces (apihug-generated, read-only)
-  trait/       → Shared mixin/trait classes that can be customized by developers
-  _mcp_/       → Generated microservice contract or protocol code (read-only)
-  _domain_/    → Generated core domain models, aggregates, value objects (read-only)
-  _cloud_/     → Generated cloud/integration stubs, endpoints, or adapters (read-only)
-```
-
-Although the sources are physically split across multiple directories, **they all belong to the same production
-module**. Gradle is configured to add these directories to `sourceSets.main.java.srcDirs`, so all of them are
-compiled together into a single JAR.
-
-### Test sources (`src/test`)
-
-The test layout mirrors the production structure to keep tests close to the code they validate:
-
-```text
-src/test/
-  java/        → Unit and integration tests for core logic
-  _api_/       → Contract/guardian tests for the API layer (often using generated DTOs)
-  trait/       → Tests for trait/mixin behavior
-  _mcp_/       → Validation tests for protocol contracts
-  _domain_/    → Domain model invariant and behavior tests
-  _cloud_/     → Cloud/integration contract tests and generated stubs
-```
-
-All of these directories are registered in `sourceSets.test.java.srcDirs`, so the tests are compiled and executed
-as part of the standard Gradle `test` task and share the same classpath (main + test outputs and test dependencies).
-
-### Practical guidelines
-
-- **Never modify generated directories** (`_api_`, `_mcp_`, `_domain_`, `_cloud_`). Instead, change the underlying
-contract or generation inputs and re-run the generator.
-- **Place custom logic in `java` and `trait`** so that changes are stable across code generation runs.
-- **Create tests in the matching directory** under `src/test` to keep production and test code aligned in structure.
-
-
-## Proto
-
-```
-// old
+```protobuf
+// Old paths
 import "extend/version.proto";
 import "swagger/annotations.proto";
 import "extend/domain.proto";
 
-// new 
+// New paths
 import "apihug/protobuf/extend/version.proto";
 import "apihug/protobuf/swagger/annotations.proto";
 import "apihug/protobuf/extend/domain.proto";
 ```
 
+### Syntax Enhancements
 
-**Syntax**
+1. Polymorphism via `oneof` (mapped to OpenAPI `allOf`)
+2. Stream definitions (semantically equivalent to gRPC streams; server-side support pending)
+3. Upload/download endpoint definitions (server-side support pending)
+4. Improved single-response type definitions (for non-reference types)
+5. Support for complex type definitions
+6. Schema definition capabilities
+7. API visibility markers: `internal`, `external`, `hide`
 
-1. Polymorphism support via `oneof` — OAS
-2. Stream definition support === gRPC (server-side not yet implemented): definition, implementation...
-3. Support for upload and downloader definitions (server-side not yet implemented)
-4. Optimization for single-response definitions (non-reference types)
-5. Definition of complex types
-6. Schema definition
-7. Support for `internal`/`external`/`hide` API markers
+## Gradle Configuration
 
+1. `wire` projects support the `protoImport` syntax for including third-party Protobuf dependencies.
+2. Projects previously using `stub` should now use `wireImport` to declare Wire module dependencies.  
+⚠️ Using `implementation` instead of `wireImport` will **not** cause a build error but will result in **empty stub generation**.
 
-## Gradle
+## References
 
-1. `wire` projects support the `protoImport` syntax to import third-party proto dependencies
-2. `stub` projects support the `wireImport` syntax to import wire module dependencies; using `implementation` causes no syntax error but results in empty compilation for the stub command
+😆 Quick Start Guides:
+
+1. [ApiHug101 – Bilibili](https://space.bilibili.com/666522636)
+2. [ApiHug101 – YouTube](https://youtube.com/@ApiHug?si=C1yw0poHA01zbmyj)
