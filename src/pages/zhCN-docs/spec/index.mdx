@@ -113,7 +113,8 @@ plugins {
     alias(libs.plugins.spring.boot)
     alias(libs.plugins.spring.dependency)
     alias(libs.plugins.hope)           // ✅ 统一插件
-    alias(libs.plugins.liquibase)
+    // ⚠️移除 Liquibase 插件：该插件从未实际使用，但在升级后引发了依赖冲突⚠️
+    // alias(libs.plugins.liquibase)
 }
 
 hope {

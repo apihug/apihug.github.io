@@ -110,7 +110,8 @@ plugins {
     alias(libs.plugins.spring.boot)
     alias(libs.plugins.spring.dependency)
     alias(libs.plugins.hope)           // ✅ Unified plugin
-    alias(libs.plugins.liquibase)
+    // ⚠️Remove the Liquibase plugin—it was never actively used and now causes dependency conflicts after the upgrade.⚠️
+    // alias(libs.plugins.liquibase)
 }
 
 hope {
