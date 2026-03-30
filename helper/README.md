@@ -12,10 +12,7 @@ It requires **no** existing Gradle project — it works in a brand‑new directo
 1. **Pre‑check:** Java 17+ environment
 2. Resolve the latest version of `com.apihug:it-repl` from Maven Central (or use the version specified by the user)
 3. Download `it-repl.jar` to `<current directory>\.apihug\it-repl.jar`
-4. Execute:
-   ```
-java -jar .apihug\it-repl.jar --task apihug
-   ```
+4. Execute: `java -jar .apihug\it-repl.jar --task apihug`
 
 **Usage:**
 
@@ -45,10 +42,7 @@ It requires **no** existing Gradle project — it works in a brand‑new directo
 1. **Pre‑check:** Java 17+ environment
 2. Resolve the latest version of `com.apihug:it-repl` from Maven Central (or use the version specified by the user)
 3. Download `it-repl.jar` to `<current directory>/.apihug/it-repl.jar`
-4. Execute:
-   ```
-   java -jar .apihug/it-repl.jar --task apihug
-   ```
+4. Execute: `java -jar .apihug/it-repl.jar --task apihug`
 
 **Usage:**
 
