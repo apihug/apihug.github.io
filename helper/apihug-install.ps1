@@ -214,7 +214,7 @@ Write-Host ""
 
 # TODO: replace bare launch with a non-interactive init command once available
 $jvmOpts = @("-Xmx128m", "-Xms64m")
-& $javaExe @jvmOpts -jar $jarPath apihug
+& $javaExe @jvmOpts -jar $jarPath init
 
 $exitCode = $LASTEXITCODE
 if ($exitCode -ne 0) {

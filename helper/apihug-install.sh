@@ -259,7 +259,7 @@ echo "[Step 4] Starting ApiHug REPL..."
 echo ""
 
 # TODO: replace bare launch with a non-interactive init command once available
-"$JAVACMD" -Xmx128m -Xms64m -jar "$JAR_PATH" apihug
+"$JAVACMD" -Xmx128m -Xms64m -jar "$JAR_PATH" init
 
 EXIT_CODE=$?
 if [ $EXIT_CODE -ne 0 ] ; then
