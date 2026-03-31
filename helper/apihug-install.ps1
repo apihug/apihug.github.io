@@ -4,7 +4,8 @@
 #
 #  ApiHug Install Script for Windows (PowerShell)
 #
-#  This script initializes the current directory as an ApiHug project.
+#  This script downloads the ApiHug REPL tool (it-repl.jar) to the current
+#  directory's .apihug\ folder, ready to be launched.
 #  It requires NO existing Gradle project - it works in a brand new directory.
 #
 #  Steps:
@@ -12,7 +13,7 @@
 #    2. Resolve the latest version of com.apihug:it-repl from Maven Central
 #       (or use the version specified by the user)
 #    3. Download it-repl.jar to <current dir>\.apihug\it-repl.jar
-#    4. Execute: java -jar .apihug/it-repl.jar --task apihug
+#    4. Launch: java -jar .apihug\it-repl.jar  (interactive REPL)
 #
 #  Usage:
 #    .\apihug-install.ps1
@@ -23,8 +24,20 @@
 
 param(
     [string]$Version = "",
-    [switch]$Force
+    [switch]$Force,
+    [switch]$Pause
 )
+
+# Keep window open on error when run by double-clicking or without a persistent console
+function Exit-WithPause {
+    param([int]$Code = 1)
+    if ($Pause -or -not $Host.UI.RawUI.KeyAvailable -or $Host.Name -eq 'ConsoleHost') {
+        Write-Host ""
+        Write-Host "Press any key to close this window..."
+        $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
+    }
+    exit $Code
+}
 
 # Fallback version when Maven Central is unreachable
 $FALLBACK_VERSION = "2.5.0-RELEASE"
@@ -54,7 +67,7 @@ if ($env:JAVA_HOME) {
         Write-Host ""
         Write-Host "Please set the JAVA_HOME variable in your environment to match the"
         Write-Host "location of your Java installation."
-        exit 1
+        Exit-WithPause 1
     }
 } else {
     $javaExe = "java"
@@ -63,18 +76,26 @@ if ($env:JAVA_HOME) {
         Write-Host "ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH."
         Write-Host ""
         Write-Host "Please install JDK 17+ and set the JAVA_HOME variable in your environment."
-        exit 1
+        Exit-WithPause 1
     }
 }
 
 # Check Java version >= 17
+# java -version writes to stderr; 2>&1 redirects it as strings in pwsh, but may produce
+# ErrorRecord objects in Windows PowerShell 5.x - convert everything to string explicitly.
 $versionOutput = & $javaExe -version 2>&1
-$versionString = $versionOutput | Where-Object { $_ -match 'version' } | Select-Object -First 1
+$versionString = ($versionOutput | ForEach-Object { "$_" } | Where-Object { $_ -match 'version' } | Select-Object -First 1)
+if ([string]::IsNullOrWhiteSpace($versionString)) {
+    Write-Host ""
+    Write-Host "ERROR: Could not determine Java version. Raw output:"
+    $versionOutput | ForEach-Object { Write-Host "  $_" }
+    Exit-WithPause 1
+}
 $versionMatch  = [regex]::Match($versionString, 'version "(\d+)')
 if (-not $versionMatch.Success) {
     Write-Host ""
-    Write-Host "ERROR: Could not determine Java version from output: $versionString"
-    exit 1
+    Write-Host "ERROR: Could not parse Java version from: $versionString"
+    Exit-WithPause 1
 }
 $majorVersion = [int]$versionMatch.Groups[1].Value
 if ($majorVersion -lt 17) {
@@ -82,7 +103,7 @@ if ($majorVersion -lt 17) {
     Write-Host "ERROR: Java 17+ is required. Current version: $majorVersion"
     Write-Host ""
     Write-Host "Please install JDK 17 or higher."
-    exit 1
+    Exit-WithPause 1
 }
 
 Write-Host "  Java $majorVersion found: $javaExe"
@@ -164,8 +185,8 @@ if ($needDownload) {
     } catch {
         Write-Host ""
         Write-Host "ERROR: Failed to download it-repl.jar from: $jarUrl"
-        Write-Host "       $_"
-        exit 1
+        Write-Host "       $($_.Exception.Message)"
+        Exit-WithPause 1
     }
 
     # Validate download (file must be non-empty)
@@ -173,7 +194,7 @@ if ($needDownload) {
         if (Test-Path $jarPath) { Remove-Item $jarPath }
         Write-Host ""
         Write-Host "ERROR: Downloaded file is empty or missing. Please check your network and try again."
-        exit 1
+        Exit-WithPause 1
     }
 
     # Save version to cache file
@@ -185,24 +206,25 @@ if ($needDownload) {
 Write-Host ""
 
 ##############################################################################
-# Step 4: Execute ApiHug initialization task
+# Step 4: Launch ApiHug interactive REPL
 ##############################################################################
 
-Write-Host "[Step 4] Starting ApiHug initialization..."
+Write-Host "[Step 4] Starting ApiHug REPL..."
 Write-Host ""
 
+# TODO: replace bare launch with a non-interactive init command once available
 $jvmOpts = @("-Xmx128m", "-Xms64m")
-& $javaExe @jvmOpts -jar $jarPath --task apihug
+& $javaExe @jvmOpts -jar $jarPath apihug
 
 $exitCode = $LASTEXITCODE
 if ($exitCode -ne 0) {
     Write-Host ""
-    Write-Host "ERROR: ApiHug initialization failed (exit code: $exitCode)"
-    exit $exitCode
+    Write-Host "ERROR: ApiHug REPL exited with error (exit code: $exitCode)"
+    Exit-WithPause $exitCode
 }
 
 Write-Host ""
 Write-Host "##############################################################################"
-Write-Host "#  ApiHug project initialized successfully!"
+Write-Host "#  Done!"
 Write-Host "##############################################################################"
 Write-Host ""

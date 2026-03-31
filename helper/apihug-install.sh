@@ -4,7 +4,8 @@
 #
 #  ApiHug Install Script for POSIX (Bash)
 #
-#  This script initializes the current directory as an ApiHug project.
+#  This script downloads the ApiHug REPL tool (it-repl.jar) to the current
+#  directory's .apihug/ folder, ready to be launched.
 #  It requires NO existing Gradle project - it works in a brand new directory.
 #
 #  Steps:
@@ -12,7 +13,7 @@
 #    2. Resolve the latest version of com.apihug:it-repl from Maven Central
 #       (or use the version specified by the user)
 #    3. Download it-repl.jar to <current dir>/.apihug/it-repl.jar
-#    4. Execute: java -jar .apihug/it-repl.jar --task apihug
+#    4. Launch: java -jar .apihug/it-repl.jar  (interactive REPL)
 #
 #  Usage:
 #    ./apihug-install.sh
@@ -29,27 +30,16 @@ FALLBACK_VERSION="2.5.0-RELEASE"
 GROUP_ID="com.apihug"
 ARTIFACT_ID="it-repl"
 
-# Parse arguments
+# Parse arguments: support both --version=X and --version X forms
 VERSION=""
 FORCE=0
 
-for arg in "$@"; do
-    case $arg in
-        --version=*)
-            VERSION="${arg#*=}"
-            ;;
-        --version|-v)
-            # handled by next iteration; use shift workaround below
-            ;;
-        --force|-f)
-            FORCE=1
-            ;;
-    esac
-done
-
-# Re-parse to capture --version <value>
 while [ $# -gt 0 ]; do
     case "$1" in
+        --version=*)
+            VERSION="${1#*=}"
+            shift
+            ;;
         --version|-v)
             VERSION="$2"
             shift 2
@@ -124,6 +114,8 @@ echo ""
 
 echo "[Step 2] Resolving ApiHug version..."
 
+DOWNLOAD_CMD=""
+
 if [ -z "$VERSION" ] ; then
     # Determine download tool: prefer curl, fallback to wget
     if command -v curl >/dev/null 2>&1 ; then
@@ -133,7 +125,6 @@ if [ -z "$VERSION" ] ; then
     else
         echo "  WARNING: Neither curl nor wget found. Using fallback version: $FALLBACK_VERSION"
         VERSION="$FALLBACK_VERSION"
-        DOWNLOAD_CMD=""
     fi
 
     if [ -z "$VERSION" ] && [ -n "$DOWNLOAD_CMD" ] ; then
@@ -218,7 +209,7 @@ fi
 
 if [ $NEED_DOWNLOAD -eq 1 ] ; then
     # Ensure download tool is available
-    if [ -z "${DOWNLOAD_CMD:-}" ] ; then
+    if [ -z "$DOWNLOAD_CMD" ] ; then
         if command -v curl >/dev/null 2>&1 ; then
             DOWNLOAD_CMD="curl"
         elif command -v wget >/dev/null 2>&1 ; then
@@ -236,17 +227,20 @@ if [ $NEED_DOWNLOAD -eq 1 ] ; then
     echo "  Downloading: $JAR_URL"
     echo ""
 
+    # Do NOT rely on set -e here - validate explicitly below for a friendly error message
     if [ "$DOWNLOAD_CMD" = "curl" ] ; then
-        curl -fL --connect-timeout 30 --max-time 120 -o "$JAR_PATH" "$JAR_URL"
+        curl -fL --connect-timeout 30 --max-time 120 -o "$JAR_PATH" "$JAR_URL" || true
     else
-        wget -O "$JAR_PATH" --timeout=120 "$JAR_URL"
+        wget -O "$JAR_PATH" --timeout=120 "$JAR_URL" || true
     fi
 
     # Validate download (file must be non-empty)
     if [ ! -f "$JAR_PATH" ] || [ ! -s "$JAR_PATH" ] ; then
         [ -f "$JAR_PATH" ] && rm -f "$JAR_PATH"
         echo ""
-        echo "ERROR: Downloaded file is empty or missing. Please check your network and try again."
+        echo "ERROR: Downloaded file is empty or missing."
+        echo "       URL: $JAR_URL"
+        echo "       Please check your network connection and try again."
         exit 1
     fi
 
@@ -258,23 +252,24 @@ fi
 echo ""
 
 ##############################################################################
-# Step 4: Execute ApiHug initialization task
+# Step 4: Launch ApiHug interactive REPL
 ##############################################################################
 
-echo "[Step 4] Starting ApiHug initialization..."
+echo "[Step 4] Starting ApiHug REPL..."
 echo ""
 
-"$JAVACMD" -Xmx128m -Xms64m -jar "$JAR_PATH" --task apihug
+# TODO: replace bare launch with a non-interactive init command once available
+"$JAVACMD" -Xmx128m -Xms64m -jar "$JAR_PATH" apihug
 
 EXIT_CODE=$?
 if [ $EXIT_CODE -ne 0 ] ; then
     echo ""
-    echo "ERROR: ApiHug initialization failed (exit code: $EXIT_CODE)"
+    echo "ERROR: ApiHug REPL exited with error (exit code: $EXIT_CODE)"
     exit $EXIT_CODE
 fi
 
 echo ""
 echo "##############################################################################"
-echo "#  ApiHug project initialized successfully!"
+echo "#  Done!"
 echo "##############################################################################"
 echo ""
