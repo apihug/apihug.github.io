@@ -40,7 +40,7 @@ function Exit-WithPause {
 }
 
 # Fallback version when Maven Central is unreachable
-$FALLBACK_VERSION = "2.5.0-RELEASE"
+$FALLBACK_VERSION = "2.5.1-RELEASE"
 
 $GROUP_ID    = "com.apihug"
 $ARTIFACT_ID = "it-repl"
@@ -116,29 +116,33 @@ Write-Host ""
 Write-Host "[Step 2] Resolving ApiHug version..."
 
 if (-not $Version) {
-    # Try Maven Central Search API first
-    $searchUrl = "https://search.maven.org/solrsearch/select?q=g:$GROUP_ID+AND+a:$ARTIFACT_ID&rows=1&wt=json"
+    # Primary: query maven-metadata.xml from repo1.maven.org (authoritative, always indexed)
+    # Note: search.maven.org Search API is NOT used because com.apihug artifacts are not indexed there.
+    $metaUrl = "https://repo1.maven.org/maven2/$($GROUP_ID -replace '\.','/')/$ARTIFACT_ID/maven-metadata.xml"
     try {
-        $response = Invoke-RestMethod -Uri $searchUrl -TimeoutSec 15 -ErrorAction Stop
-        $Version  = $response.response.docs[0].latestVersion
-        Write-Host "  Version resolved from Maven Central Search API: $Version"
-    } catch {
-        Write-Host "  Maven Central Search API unavailable, trying maven-metadata.xml..."
-        try {
-            # Fallback: query maven-metadata.xml directly
-            $metaUrl     = "https://repo1.maven.org/maven2/com/apihug/$ARTIFACT_ID/maven-metadata.xml"
-            $metaContent = (Invoke-WebRequest -Uri $metaUrl -TimeoutSec 15 -ErrorAction Stop).Content
-            $metaXml     = [xml]$metaContent
-            $Version     = $metaXml.metadata.versioning.release
-            Write-Host "  Version resolved from maven-metadata.xml: $Version"
-        } catch {
-            # Final fallback: use hardcoded version
-            $Version = $FALLBACK_VERSION
-            Write-Host "  WARNING: Could not reach Maven Central. Using fallback version: $Version"
+        $metaContent = (Invoke-WebRequest -Uri $metaUrl -TimeoutSec 15 -ErrorAction Stop).Content
+        $metaXml     = [xml]$metaContent
+        $resolvedVersion = $metaXml.metadata.versioning.release
+        if ([string]::IsNullOrWhiteSpace($resolvedVersion)) {
+            throw "maven-metadata.xml returned empty release version"
         }
+        $Version = $resolvedVersion
+        Write-Host "  Version resolved from maven-metadata.xml: $Version"
+    } catch {
+        # Fallback: use hardcoded version when network is unavailable
+        $Version = $FALLBACK_VERSION
+        Write-Host "  WARNING: Could not reach Maven Central. Using fallback version: $Version"
     }
 } else {
     Write-Host "  Using user-specified version: $Version"
+}
+
+# Final guard: version must not be empty before proceeding
+if ([string]::IsNullOrWhiteSpace($Version)) {
+    Write-Host ""
+    Write-Host "ERROR: Could not determine ApiHug version. Please specify a version explicitly:"
+    Write-Host "       .\apihug-install.ps1 -Version 2.5.0-RELEASE"
+    Exit-WithPause 1
 }
 
 Write-Host ""

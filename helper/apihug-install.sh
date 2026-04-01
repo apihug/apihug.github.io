@@ -25,7 +25,7 @@
 set -e
 
 # Fallback version when Maven Central is unreachable
-FALLBACK_VERSION="2.5.0-RELEASE"
+FALLBACK_VERSION="2.5.1-RELEASE"
 
 GROUP_ID="com.apihug"
 ARTIFACT_ID="it-repl"
@@ -128,43 +128,24 @@ if [ -z "$VERSION" ] ; then
     fi
 
     if [ -z "$VERSION" ] && [ -n "$DOWNLOAD_CMD" ] ; then
-        # Try Maven Central Search API first
-        SEARCH_URL="https://search.maven.org/solrsearch/select?q=g:${GROUP_ID}+AND+a:${ARTIFACT_ID}&rows=1&wt=json"
+        # Primary: query maven-metadata.xml from repo1.maven.org (authoritative, always indexed)
+        # Note: search.maven.org Search API is NOT used because com.apihug artifacts are not indexed there.
+        GROUP_PATH=$( echo "$GROUP_ID" | tr '.' '/' )
+        META_URL="https://repo1.maven.org/maven2/${GROUP_PATH}/${ARTIFACT_ID}/maven-metadata.xml"
         if [ "$DOWNLOAD_CMD" = "curl" ] ; then
-            SEARCH_RESULT=$( curl -sf --connect-timeout 15 --max-time 15 "$SEARCH_URL" 2>/dev/null || true )
+            META_CONTENT=$( curl -sf --connect-timeout 15 --max-time 15 "$META_URL" 2>/dev/null || true )
         else
-            SEARCH_RESULT=$( wget -qO- --timeout=15 "$SEARCH_URL" 2>/dev/null || true )
+            META_CONTENT=$( wget -qO- --timeout=15 "$META_URL" 2>/dev/null || true )
         fi
 
-        if [ -n "$SEARCH_RESULT" ] ; then
-            VERSION=$( echo "$SEARCH_RESULT" | sed -E 's/.*"latestVersion":"([^"]+)".*/\1/' )
-            # Validate extracted version (should contain a dot)
-            case $VERSION in
-                *.*) echo "  Version resolved from Maven Central Search API: $VERSION" ;;
-                *)   VERSION="" ;;
-            esac
-        fi
-
-        # Fallback: query maven-metadata.xml
-        if [ -z "$VERSION" ] ; then
-            echo "  Maven Central Search API unavailable, trying maven-metadata.xml..."
-            GROUP_PATH=$( echo "$GROUP_ID" | tr '.' '/' )
-            META_URL="https://repo1.maven.org/maven2/${GROUP_PATH}/${ARTIFACT_ID}/maven-metadata.xml"
-            if [ "$DOWNLOAD_CMD" = "curl" ] ; then
-                META_CONTENT=$( curl -sf --connect-timeout 15 --max-time 15 "$META_URL" 2>/dev/null || true )
-            else
-                META_CONTENT=$( wget -qO- --timeout=15 "$META_URL" 2>/dev/null || true )
-            fi
-
-            if [ -n "$META_CONTENT" ] ; then
-                VERSION=$( echo "$META_CONTENT" | sed -n 's|.*<release>\([^<]*\)</release>.*|\1|p' | head -n 1 )
-                if [ -n "$VERSION" ] ; then
-                    echo "  Version resolved from maven-metadata.xml: $VERSION"
-                fi
+        if [ -n "$META_CONTENT" ] ; then
+            VERSION=$( echo "$META_CONTENT" | sed -n 's|.*<release>\([^<]*\)</release>.*|\1|p' | head -n 1 )
+            if [ -n "$VERSION" ] ; then
+                echo "  Version resolved from maven-metadata.xml: $VERSION"
             fi
         fi
 
-        # Final fallback
+        # Fallback: use hardcoded version when network is unavailable
         if [ -z "$VERSION" ] ; then
             VERSION="$FALLBACK_VERSION"
             echo "  WARNING: Could not reach Maven Central. Using fallback version: $VERSION"
