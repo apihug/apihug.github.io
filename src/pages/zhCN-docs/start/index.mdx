@@ -17,6 +17,35 @@ import { SnippetGroup } from '@/components/SnippetGroup'
   
 </TipGood>
 
+## 一键初始化
+
+通过一条命令将空目录转换为 Apihug 工作空间。  
+脚本会自动下载并运行适用于您平台的 Apihug 安装程序。
+
+---
+
+### Windows
+
+**PowerShell**（在 PowerShell 中运行）：
+
+```powershell
+iex (irm 'https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.ps1')
+```
+
+**命令提示符**（在 cmd.exe 中运行）：
+
+```shell
+powershell -c "irm https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.ps1 | iex"
+```
+
+---
+
+### Bash（Linux、Unix、macOS）
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.sh | bash
+```
+
 ## 准备
 
 1. ✅ JDK 17+  [OpenJDK](https://openjdk.org/) or Oracle's

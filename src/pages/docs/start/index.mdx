@@ -16,6 +16,35 @@ This page outlines how you can use ApiHug to create quick demos in **15 minutes*
   
 </TipGood>
 
+## One-Click Initialization
+
+Transform an empty directory into an Apihug workspace with a single command.  
+The script automatically downloads and runs the Apihug installer for your platform.
+
+---
+
+### Windows
+
+**PowerShell** (run in PowerShell):
+
+```powershell
+iex (irm 'https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.ps1')
+```
+
+**Command Prompt** (run in cmd.exe):
+
+```shell
+powershell -c "irm https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.ps1 | iex"
+```
+
+---
+
+### Bash (Linux, Unix, macOS)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.sh | bash
+```
+
 ## Prerequisites
 
 1. ✅ JDK 17+  [OpenJDK](https://openjdk.org/) or Oracle's
