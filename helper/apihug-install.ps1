@@ -218,7 +218,8 @@ Write-Host ""
 
 # TODO: replace bare launch with a non-interactive init command once available
 # Note: --enable-native-access is required for JLine terminal on Java 22+
-$jvmOpts = @("-Xmx128m", "-Xms64m", "--enable-native-access=ALL-UNNAMED")
+# -Dorg.jline.terminal.provider=jni forces JNI provider for better compatibility
+$jvmOpts = @("-Xmx128m", "-Xms64m", "-Dorg.jline.terminal.provider=jni", "--enable-native-access=ALL-UNNAMED")
 & $javaExe @jvmOpts -jar $jarPath init
 
 $exitCode = $LASTEXITCODE

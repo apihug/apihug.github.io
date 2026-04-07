@@ -241,7 +241,8 @@ echo ""
 
 # TODO: replace bare launch with a non-interactive init command once available
 # Note: --enable-native-access is required for JLine terminal on Java 22+
-"$JAVACMD" -Xmx128m -Xms64m --enable-native-access=ALL-UNNAMED -jar "$JAR_PATH" init
+# -Dorg.jline.terminal.provider=jni forces JNI provider for better compatibility
+"$JAVACMD" -Xmx128m -Xms64m -Dorg.jline.terminal.provider=jni --enable-native-access=ALL-UNNAMED -jar "$JAR_PATH" init
 
 EXIT_CODE=$?
 if [ $EXIT_CODE -ne 0 ] ; then
