@@ -240,7 +240,8 @@ echo "[Step 4] Starting ApiHug REPL..."
 echo ""
 
 # TODO: replace bare launch with a non-interactive init command once available
-"$JAVACMD" -Xmx128m -Xms64m -jar "$JAR_PATH" init
+# Note: --enable-native-access is required for JLine terminal on Java 22+
+"$JAVACMD" -Xmx128m -Xms64m --enable-native-access=ALL-UNNAMED -jar "$JAR_PATH" init
 
 EXIT_CODE=$?
 if [ $EXIT_CODE -ne 0 ] ; then

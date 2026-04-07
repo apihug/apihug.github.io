@@ -217,7 +217,8 @@ Write-Host "[Step 4] Starting ApiHug REPL..."
 Write-Host ""
 
 # TODO: replace bare launch with a non-interactive init command once available
-$jvmOpts = @("-Xmx128m", "-Xms64m")
+# Note: --enable-native-access is required for JLine terminal on Java 22+
+$jvmOpts = @("-Xmx128m", "-Xms64m", "--enable-native-access=ALL-UNNAMED")
 & $javaExe @jvmOpts -jar $jarPath init
 
 $exitCode = $LASTEXITCODE
