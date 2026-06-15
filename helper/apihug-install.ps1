@@ -215,12 +215,18 @@ Write-Host ""
 
 Write-Host "[Step 4] Starting ApiHug REPL..."
 Write-Host ""
+Write-Host "  Type 'init' at the apihug> prompt to create a new project."
+Write-Host "  Type 'help' for all commands."
+Write-Host ""
 
-# TODO: replace bare launch with a non-interactive init command once available
-# Note: --enable-native-access is required for JLine terminal on Java 22+
-# -Dorg.jline.terminal.provider=jni forces JNI provider for better compatibility
-$jvmOpts = @("-Xmx128m", "-Xms64m", "-Dorg.jline.terminal.provider=jni", "--enable-native-access=ALL-UNNAMED")
-& $javaExe @jvmOpts -jar $jarPath init
+# --enable-native-access is only needed on Java 22+
+$jvmOpts = @("-Xmx128m", "-Xms64m", "-Dorg.jline.terminal.provider=jni")
+if ($majorVersion -ge 22) {
+    $jvmOpts += "--enable-native-access=ALL-UNNAMED"
+}
+
+# Launch interactive REPL (do NOT pass 'init' — see apihug-install.sh for rationale)
+& $javaExe @jvmOpts -jar $jarPath
 
 $exitCode = $LASTEXITCODE
 if ($exitCode -ne 0) {
@@ -228,9 +234,3 @@ if ($exitCode -ne 0) {
     Write-Host "ERROR: ApiHug REPL exited with error (exit code: $exitCode)"
     Exit-WithPause $exitCode
 }
-
-Write-Host ""
-Write-Host "##############################################################################"
-Write-Host "#  Done!"
-Write-Host "##############################################################################"
-Write-Host ""

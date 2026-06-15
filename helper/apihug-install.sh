@@ -17,15 +17,17 @@
 #
 #  Usage:
 #    ./apihug-install.sh
-#    ./apihug-install.sh --version 2.5.1-RELEASE
+#    ./apihug-install.sh --version 3.1.6-RELEASE
 #    ./apihug-install.sh --force
+#
+#    curl -fsSL .../apihug-install.sh | bash    # supported (stdin reattached to /dev/tty)
 #
 ##############################################################################
 
 set -e
 
 # Fallback version when Maven Central is unreachable
-FALLBACK_VERSION="2.5.1-RELEASE"
+FALLBACK_VERSION="3.1.6-RELEASE"
 
 GROUP_ID="com.apihug"
 ARTIFACT_ID="it-repl"
@@ -107,6 +109,35 @@ fi
 
 echo "  Java $JAVA_MAJOR found: $JAVACMD"
 echo ""
+
+##############################################################################
+# Step 1b: Reattach stdin when invoked via  curl ... | bash
+# Piped installs consume stdin for the script body; JLine needs the real TTY.
+##############################################################################
+
+if [ ! -t 0 ] && [ -r /dev/tty ] ; then
+    echo "  Note: installer was piped (curl | bash); reattaching stdin to /dev/tty"
+    exec </dev/tty
+fi
+
+if [ ! -t 0 ] ; then
+    echo ""
+    echo "ERROR: ApiHug REPL requires an interactive terminal (TTY)."
+    echo ""
+    echo "When using curl, download first then run (recommended):"
+    echo "  curl -fsSL https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.sh -o apihug-install.sh"
+    echo "  bash apihug-install.sh"
+    echo ""
+    echo "Or ensure /dev/tty is available when piping:"
+    echo "  curl -fsSL .../apihug-install.sh | bash"
+    exit 1
+fi
+
+if [ ! -t 1 ] ; then
+    echo ""
+    echo "ERROR: ApiHug REPL requires an interactive terminal (stdout is not a TTY)."
+    exit 1
+fi
 
 ##############################################################################
 # Step 2: Resolve version from Maven Central (or use user-specified version)
@@ -238,21 +269,16 @@ echo ""
 
 echo "[Step 4] Starting ApiHug REPL..."
 echo ""
+echo "  Type 'init' at the apihug> prompt to create a new project."
+echo "  Type 'help' for all commands."
+echo ""
 
-# TODO: replace bare launch with a non-interactive init command once available
-# Note: --enable-native-access is required for JLine terminal on Java 22+
-# -Dorg.jline.terminal.provider=jni forces JNI provider for better compatibility
-"$JAVACMD" -Xmx128m -Xms64m -Dorg.jline.terminal.provider=jni --enable-native-access=ALL-UNNAMED -jar "$JAR_PATH" init
-
-EXIT_CODE=$?
-if [ $EXIT_CODE -ne 0 ] ; then
-    echo ""
-    echo "ERROR: ApiHug REPL exited with error (exit code: $EXIT_CODE)"
-    exit $EXIT_CODE
+# Build JVM opts: --enable-native-access is only needed on Java 22+
+JVM_OPTS="-Xmx128m -Xms64m -Dorg.jline.terminal.provider=jni"
+if [ "$JAVA_MAJOR" -ge 22 ] ; then
+    JVM_OPTS="$JVM_OPTS --enable-native-access=ALL-UNNAMED"
 fi
 
-echo ""
-echo "##############################################################################"
-echo "#  Done!"
-echo "##############################################################################"
-echo ""
+# Launch interactive REPL (do NOT pass 'init' — that runs NonInteractiveShellRunner
+# without a real TTY and breaks JLine input when stdin was piped from curl).
+exec "$JAVACMD" $JVM_OPTS -jar "$JAR_PATH"
