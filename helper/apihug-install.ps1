@@ -13,18 +13,22 @@
 #    2. Resolve the latest version of com.apihug:it-repl from Maven Central
 #       (or use the version specified by the user)
 #    3. Download it-repl.jar to <current dir>\.apihug\it-repl.jar
-#    4. Launch: java -jar .apihug\it-repl.jar  (interactive REPL)
+#    4. Launch: java -jar .apihug\it-repl.jar init  (project wizard, default)
 #
 #  Usage:
 #    .\apihug-install.ps1
-#    .\apihug-install.ps1 -Version 2.5.1-RELEASE
+#    .\apihug-install.ps1 -Version 3.1.6-RELEASE
 #    .\apihug-install.ps1 -Force
+#    .\apihug-install.ps1 -Shell          # open REPL without auto-running init
+#
+#    irm https://.../apihug-install.ps1 | iex
 #
 ##############################################################################
 
 param(
     [string]$Version = "",
     [switch]$Force,
+    [switch]$Shell,
     [switch]$Pause
 )
 
@@ -40,7 +44,7 @@ function Exit-WithPause {
 }
 
 # Fallback version when Maven Central is unreachable
-$FALLBACK_VERSION = "2.5.1-RELEASE"
+$FALLBACK_VERSION = "3.1.6-RELEASE"
 
 $GROUP_ID    = "com.apihug"
 $ARTIFACT_ID = "it-repl"
@@ -141,7 +145,7 @@ if (-not $Version) {
 if ([string]::IsNullOrWhiteSpace($Version)) {
     Write-Host ""
     Write-Host "ERROR: Could not determine ApiHug version. Please specify a version explicitly:"
-    Write-Host "       .\apihug-install.ps1 -Version 2.5.0-RELEASE"
+    Write-Host "       .\apihug-install.ps1 -Version 3.1.6-RELEASE"
     Exit-WithPause 1
 }
 
@@ -210,14 +214,16 @@ if ($needDownload) {
 Write-Host ""
 
 ##############################################################################
-# Step 4: Launch ApiHug interactive REPL
+# Step 4: Launch ApiHug (init wizard by default)
 ##############################################################################
 
-Write-Host "[Step 4] Starting ApiHug REPL..."
-Write-Host ""
-Write-Host "  Type 'init' at the apihug> prompt to create a new project."
-Write-Host "  Type 'help' for all commands."
-Write-Host ""
+if ($Shell) {
+    Write-Host "[Step 4] Starting ApiHug REPL shell..."
+    $launchArgs = @()
+} else {
+    Write-Host "[Step 4] Starting ApiHug project wizard (init)..."
+    $launchArgs = @("init")
+}
 
 # --enable-native-access is only needed on Java 22+
 $jvmOpts = @("-Xmx128m", "-Xms64m", "-Dorg.jline.terminal.provider=jni")
@@ -225,12 +231,36 @@ if ($majorVersion -ge 22) {
     $jvmOpts += "--enable-native-access=ALL-UNNAMED"
 }
 
-# Launch interactive REPL (do NOT pass 'init' — see apihug-install.sh for rationale)
-& $javaExe @jvmOpts -jar $jarPath
+$cmdDisplay = "$javaExe $($jvmOpts -join ' ') -jar `"$jarPath`" $($launchArgs -join ' ')"
+Write-Host ""
+Write-Host "  > $cmdDisplay"
+Write-Host ""
+if (-not $Shell) {
+    Write-Host "  Tip: use -Shell to open the REPL without auto-running init."
+    Write-Host ""
+}
+
+# Piped installs (irm | iex) may not attach a console — java needs an interactive host.
+if ([Console]::IsInputRedirected -or [Console]::IsOutputRedirected) {
+    $manualInit = if ($Shell) { "" } else { " init" }
+    Write-Host ""
+    Write-Host "ERROR: ApiHug requires an interactive console."
+    Write-Host ""
+    Write-Host "Jar downloaded to: $jarPath"
+    Write-Host "Download the script first, then run in PowerShell:"
+    Write-Host "  .\apihug-install.ps1"
+    Write-Host "Or run manually:"
+    Write-Host "  & `"$javaExe`" $($jvmOpts -join ' ') -jar `"$jarPath`"$manualInit"
+    Exit-WithPause 1
+}
+
+& $javaExe @jvmOpts -jar $jarPath @launchArgs
 
 $exitCode = $LASTEXITCODE
 if ($exitCode -ne 0) {
     Write-Host ""
-    Write-Host "ERROR: ApiHug REPL exited with error (exit code: $exitCode)"
+    Write-Host "ERROR: ApiHug exited with error (exit code: $exitCode)"
+    $manualInit = if ($Shell) { "" } else { " init" }
+    Write-Host "Retry manually: & `"$javaExe`" $($jvmOpts -join ' ') -jar `"$jarPath`"$manualInit"
     Exit-WithPause $exitCode
 }

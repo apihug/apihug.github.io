@@ -13,14 +13,15 @@
 #    2. Resolve the latest version of com.apihug:it-repl from Maven Central
 #       (or use the version specified by the user)
 #    3. Download it-repl.jar to <current dir>/.apihug/it-repl.jar
-#    4. Launch: java -jar .apihug/it-repl.jar  (interactive REPL)
+#    4. Launch: java -jar .apihug/it-repl.jar init  (project wizard, default)
 #
 #  Usage:
 #    ./apihug-install.sh
 #    ./apihug-install.sh --version 3.1.6-RELEASE
 #    ./apihug-install.sh --force
+#    ./apihug-install.sh --shell          # open REPL without auto-running init
 #
-#    curl -fsSL .../apihug-install.sh | bash    # supported (stdin reattached to /dev/tty)
+#    curl -fsSL .../apihug-install.sh | bash
 #
 ##############################################################################
 
@@ -35,6 +36,7 @@ ARTIFACT_ID="it-repl"
 # Parse arguments: support both --version=X and --version X forms
 VERSION=""
 FORCE=0
+SHELL_MODE=0
 
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -48,6 +50,10 @@ while [ $# -gt 0 ]; do
             ;;
         --force|-f)
             FORCE=1
+            shift
+            ;;
+        --shell|--repl)
+            SHELL_MODE=1
             shift
             ;;
         *)
@@ -109,35 +115,6 @@ fi
 
 echo "  Java $JAVA_MAJOR found: $JAVACMD"
 echo ""
-
-##############################################################################
-# Step 1b: Reattach stdin when invoked via  curl ... | bash
-# Piped installs consume stdin for the script body; JLine needs the real TTY.
-##############################################################################
-
-if [ ! -t 0 ] && [ -r /dev/tty ] ; then
-    echo "  Note: installer was piped (curl | bash); reattaching stdin to /dev/tty"
-    exec </dev/tty
-fi
-
-if [ ! -t 0 ] ; then
-    echo ""
-    echo "ERROR: ApiHug REPL requires an interactive terminal (TTY)."
-    echo ""
-    echo "When using curl, download first then run (recommended):"
-    echo "  curl -fsSL https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.sh -o apihug-install.sh"
-    echo "  bash apihug-install.sh"
-    echo ""
-    echo "Or ensure /dev/tty is available when piping:"
-    echo "  curl -fsSL .../apihug-install.sh | bash"
-    exit 1
-fi
-
-if [ ! -t 1 ] ; then
-    echo ""
-    echo "ERROR: ApiHug REPL requires an interactive terminal (stdout is not a TTY)."
-    exit 1
-fi
 
 ##############################################################################
 # Step 2: Resolve version from Maven Central (or use user-specified version)
@@ -264,13 +241,16 @@ fi
 echo ""
 
 ##############################################################################
-# Step 4: Launch ApiHug interactive REPL
+# Step 4: Launch ApiHug (init wizard by default)
 ##############################################################################
 
-echo "[Step 4] Starting ApiHug REPL..."
-echo ""
-echo "  Type 'init' at the apihug> prompt to create a new project."
-echo "  Type 'help' for all commands."
+if [ "$SHELL_MODE" -eq 1 ] ; then
+    echo "[Step 4] Starting ApiHug REPL shell..."
+    LAUNCH_ARGS=""
+else
+    echo "[Step 4] Starting ApiHug project wizard (init)..."
+    LAUNCH_ARGS="init"
+fi
 echo ""
 
 # Build JVM opts: --enable-native-access is only needed on Java 22+
@@ -279,6 +259,29 @@ if [ "$JAVA_MAJOR" -ge 22 ] ; then
     JVM_OPTS="$JVM_OPTS --enable-native-access=ALL-UNNAMED"
 fi
 
-# Launch interactive REPL (do NOT pass 'init' — that runs NonInteractiveShellRunner
-# without a real TTY and breaks JLine input when stdin was piped from curl).
-exec "$JAVACMD" $JVM_OPTS -jar "$JAR_PATH"
+# Show the exact command (init visible on the command line)
+echo "  \$ $JAVACMD $JVM_OPTS -jar \"$JAR_PATH\" $LAUNCH_ARGS"
+echo ""
+if [ "$SHELL_MODE" -eq 0 ] ; then
+    echo "  Tip: use --shell to open the REPL without auto-running init."
+    echo ""
+fi
+
+# curl|bash leaves stdin as a pipe — attach java to /dev/tty so init can read input.
+if [ -t 0 ] && [ -t 1 ] ; then
+    # shellcheck disable=SC2086
+    exec "$JAVACMD" $JVM_OPTS -jar "$JAR_PATH" $LAUNCH_ARGS
+fi
+
+if [ -e /dev/tty ] && ( : </dev/tty ) 2>/dev/null ; then
+    # shellcheck disable=SC2086
+    exec "$JAVACMD" $JVM_OPTS -jar "$JAR_PATH" $LAUNCH_ARGS </dev/tty >/dev/tty 2>&1
+fi
+
+echo ""
+echo "ERROR: ApiHug requires an interactive terminal."
+echo ""
+echo "Jar downloaded to: $JAR_PATH"
+echo "Run manually in a terminal:"
+echo "  java $JVM_OPTS -jar $JAR_PATH ${LAUNCH_ARGS:-init}"
+exit 1
