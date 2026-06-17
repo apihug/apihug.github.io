@@ -42,3 +42,5 @@ yarn-error.log*
 *.orig
 classes/
 out/
+temp/
+.worktrees/
