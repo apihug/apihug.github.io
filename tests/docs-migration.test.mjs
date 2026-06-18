@@ -5,7 +5,6 @@ import path from "node:path";
 
 const repoRoot = process.cwd();
 const docsRoot = path.join(repoRoot, "src", "docs");
-const zhDocsRoot = path.join(repoRoot, "src", "zhCN-docs");
 
 function walkMdxFiles(dir) {
   const entries = fs.readdirSync(dir, { withFileTypes: true });
@@ -129,7 +128,7 @@ test("docs nav includes the remaining milestone and changelog detail pages", () 
   }
 });
 
-test("zhCN docs nav includes the legacy-only routes that are missing from the old sidebar file", () => {
+test("zhCN docs nav includes the expected changelog, kola, and milestone routes", () => {
   const zhNavIndex = fs.readFileSync(
     path.join(repoRoot, "src", "app", "(docs)", "zhCN-docs", "index.tsx"),
     "utf8",
