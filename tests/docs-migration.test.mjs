@@ -5,6 +5,7 @@ import path from "node:path";
 
 const repoRoot = process.cwd();
 const docsRoot = path.join(repoRoot, "src", "docs");
+const zhDocsRoot = path.join(repoRoot, "src", "zhCN-docs");
 
 function walkMdxFiles(dir) {
   const entries = fs.readdirSync(dir, { withFileTypes: true });
@@ -128,6 +129,24 @@ test("docs nav includes the remaining milestone and changelog detail pages", () 
   }
 });
 
+test("zhCN docs nav includes the legacy-only routes that are missing from the old sidebar file", () => {
+  const zhNavIndex = fs.readFileSync(
+    path.join(repoRoot, "src", "app", "(docs)", "zhCN-docs", "index.tsx"),
+    "utf8",
+  );
+
+  for (const route of [
+    "/zhCN-docs/changelog/detail/SDK_0.7.8",
+    "/zhCN-docs/changelog/detail/SDK_0.7.8_cn",
+    "/zhCN-docs/changelog/detail/SDK_0.8.6",
+    "/zhCN-docs/changelog/detail/SDK_0.8.6_cn",
+    "/zhCN-docs/kola/006_configurations",
+    "/zhCN-docs/milestone/milestone-1.0.0-RELEASE",
+  ]) {
+    assert.match(zhNavIndex, new RegExp(route.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  }
+});
+
 test("english docs do not link to untranslated changelog detail routes", () => {
   const untranslatedLinks = walkMdxFiles(docsRoot)
     .filter((filePath) => fs.readFileSync(filePath, "utf8").includes("/docs/changelog/detail/SDK_0."))
@@ -195,4 +214,14 @@ test("docs index route redirects to what-is-apihug", () => {
 
   assert.match(docsIndexPage, /permanentRedirect/);
   assert.match(docsIndexPage, /\/docs\/start\/what-is-apihug/);
+});
+
+test("zhCN docs index route redirects to what-is-apihug", () => {
+  const zhDocsIndexPage = fs.readFileSync(
+    path.join(repoRoot, "src", "app", "(docs)", "zhCN-docs", "page.tsx"),
+    "utf8",
+  );
+
+  assert.match(zhDocsIndexPage, /permanentRedirect/);
+  assert.match(zhDocsIndexPage, /\/zhCN-docs\/start\/what-is-apihug/);
 });
