@@ -3,7 +3,7 @@ type NavEntry = readonly [string, string] | readonly [string, string, readonly (
 export default {
   "Getting Started": [
     ["介绍", "/zhCN-docs/start/what-is-apihug"],
-    ["快速开启", "/zhCN-docs/start"],
+    ["快速启动", "/zhCN-docs/start"],
   ] as NavEntry[],
   Editor: [
     ["插件介绍", "/zhCN-docs/idea"],
