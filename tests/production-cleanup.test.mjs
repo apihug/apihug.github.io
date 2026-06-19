@@ -27,6 +27,16 @@ test("pages router leftovers and old bootstrap configs are removed", () => {
   }
 });
 
+test("legacy layout, nav, and hook infrastructure is removed", () => {
+  for (const relPath of [
+    ["src", "layouts"],
+    ["src", "navs"],
+    ["src", "hooks"],
+  ]) {
+    assert.equal(exists(...relPath), false, relPath.join("/"));
+  }
+});
+
 test("app router entrypoints still point at the active runtime", () => {
   const homePage = read("src", "app", "page.tsx");
   const rootLayout = read("src", "app", "layout.tsx");
