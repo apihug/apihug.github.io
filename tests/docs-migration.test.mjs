@@ -263,6 +263,17 @@ test("protobuf extension docs stay aligned with the current it-proto-extend surf
   assert.match(navIndex, /\/docs\/spec\/version/);
 });
 
+test("header exposes english and zhCN docs entry points", () => {
+  const header = fs.readFileSync(path.join(repoRoot, "src", "components", "Header.js"), "utf8");
+
+  assert.match(header, /English Docs/);
+  assert.match(header, /中文文档|涓枃鏂囨。/);
+  assert.match(header, /href="\/zhCN-docs"|href='\/zhCN-docs'|href=\{["']\/zhCN-docs["']\}/);
+  assert.match(header, /href="\/docs"|href='\/docs'|href=\{["']\/docs["']\}/);
+  assert.doesNotMatch(header, /\/zhCN-docs\/start\.html/);
+  assert.doesNotMatch(header, /href="\/zhCN"|href='\/zhCN'|href=\{["']\/zhCN["']\}/);
+});
+
 test("docs index route redirects to what-is-apihug", () => {
   const docsIndexPage = fs.readFileSync(
     path.join(repoRoot, "src", "app", "(docs)", "docs", "page.tsx"),
