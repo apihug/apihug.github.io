@@ -1,0 +1,73 @@
+export const title = "006 Components Design";
+export const description =
+  "how to use component design panel ApiHug Api design Copilot.";
+
+
+Go through the components design and editor part of ApiHug Api design Copilot
+
+1. Component design
+2. Component source code route
+
+<img src={require('@/img/plugin/104_components.gif').default.src} alt="ApiHug Components Manager" width={2334} height={1768} className="rounded-lg" />
+
+## Proto Sample
+
+Please refer: [apihug-full-demo request.proto](https://github.com/apihug/apihug-full-demo/blob/main/demo-user-proto/src/main/proto/com/apihug/demo/user/proto/api/admin/request/request.proto)
+
+```protobuf
+message RegisterRequest {
+  option (hope.swagger.schema) = {
+    json_schema: {
+      description: "Register a user";
+    };
+  };
+
+  string name = 1 [(hope.swagger.field) = {
+    description: "name of the user";
+    example: "My Lord"
+    empty: FALSE;
+    mock: {
+      nature: NAME
+    }
+    max_length: {
+      value: 32
+    }
+  }];
+}
+```
+
+## Java Sample
+
+Please refer [apihug-full-demo RegisterRequest.java](https://github.com/apihug/apihug-full-demo/blob/main/demo-user-proto/src/main/wire/com/apihug/demo/user/wire/api/admin/request/RegisterRequest.java)
+
+```java
+@Generated("H.O.P.E. Infra Team")
+@Schema(
+    description = "Register a user"
+)
+@ProtoFrom(
+    value = "com/apihug/demo/user/proto/api/admin/request/request.proto",
+    entity = "RegisterRequest",
+    kind = Kind.MESSAGE
+)
+public class RegisterRequest {
+    private static final long serialVersionUID = 0L;
+
+    @NotEmpty
+    @Size(
+            max = 32
+    )
+    @Schema(
+            description = "name of the user",
+            maxLength = 32,
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            example = "My Lord"
+    )
+    protected String name;
+}
+```
+
+## Reference
+
+1. [ApiHug101-Bilibili](https://space.bilibili.com/666522636)
+2. [ApiHug101-Youtube](https://youtube.com/@ApiHug?si=C1yw0poHA01zbmyj)

@@ -1,0 +1,77 @@
+export const title = "008 Error Design";
+export const description =
+  "how to use the error design panel of ApiHug Api design Copilot.";
+
+
+Go through the Error design and view of ApiHug Api design Copilot
+
+1. Error design panel
+2. Source code route
+
+<img src={require('@/img/plugin/106_errors.gif').default.src} alt="ApiHug Errors Manager" width={2334} height={1768} className="rounded-lg" />
+
+## Proto Sample
+
+Please refer: [apihug-full-demo error.proto](https://github.com/apihug/apihug-full-demo/blob/main/demo-user-proto/src/main/proto/com/apihug/demo/user/proto/infra/settings/admin/error.proto)
+
+```protobuf
+enum UserErrorsEnum {
+
+  option (hope.swagger.enm) = {
+    description: "User account management errors";
+  };
+
+  USER_EXIST = 0  [
+    (hope.constant.field) = {
+      code: 1001023, message: "customer already exist", message2: "用户存在",
+      error: {
+        tips: "contact your admin",
+        phase: DOMAIN,
+        severity: FATAL,
+      }}];
+}
+```
+
+## Java Sample
+
+Please refer: [apihug-full-demo UserErrorsEnum.java](https://github.com/apihug/apihug-full-demo/blob/main/demo-user-proto/src/main/wire/com/apihug/demo/user/wire/infra/settings/admin/UserErrorsEnum.java)
+
+```java
+@ProtoFrom(
+        value = "com/apihug/demo/user/proto/infra/settings/admin/error.proto",
+        entity = "UserErrorsEnum",
+        kind = Kind.ENUM
+)
+public enum UserErrorsEnum implements Errors {
+    INSTANCE;
+
+    public static final List<Error> ERRORS = new ArrayList();
+
+    public static final Map<String, Error> ERRORS_MAP;
+
+    public static final Error UNDEFINED = Error.unknown().setDomain("user").setTitle("UNDEFINED");
+
+    public static final Error USER_EXIST = new Error();
+
+    public static final Error USER_BLOCKED = new Error();
+
+    static {
+        Map<String, Error> _ERRORS_MAP = new LinkedHashMap<>();
+        USER_EXIST.setDomain("user");
+        USER_EXIST.setCode(1001023);
+        USER_EXIST.setDescription("customer already exist");
+        USER_EXIST.setDescription2("用户存在");
+        USER_EXIST.setTitle("USER_EXIST");
+        USER_EXIST.setTips("contact your admin");
+        USER_EXIST.setPhase(Phase.DOMAIN);
+        USER_EXIST.setSeverity(Severity.FATAL);
+        _ERRORS_MAP.put("USER_EXIST", USER_EXIST);
+        //...
+    }
+}
+```
+
+## Reference
+
+1. [ApiHug101-Bilibili](https://space.bilibili.com/666522636)
+2. [ApiHug101-Youtube](https://youtube.com/@ApiHug?si=C1yw0poHA01zbmyj)

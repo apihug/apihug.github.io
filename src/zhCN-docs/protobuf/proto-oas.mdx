@@ -1,0 +1,80 @@
+export const title = "Protocol Buffers AS OAS DSL";
+export const description =
+  "Use Protocol Buffers as DSL to define OAS(Open API Specification";
+
+
+## Basic
+
+[The OpenAPI Specification](https://github.com/OAI/OpenAPI-Specification) target for:
+
+> The OpenAPI Specification (OAS) defines a standard, programming language-agnostic interface description for HTTP APIs. This allows both humans and computers to discover and understand the capabilities of a service without requiring access to source code, additional documentation, or inspection of network traffic.
+
+Similar to what interface descriptions have done for **lower-level programming**, the OpenAPI Specification removes guesswork in calling a service.
+
+When it comes to interface descriptions for lower-level programming, we use a concept called **IDL** (Interface Definition Language). For example, Protocol Buffers and Apache Thrift fall into the category of IDL.
+
+To establish a common language for OpenAPI definition, we can combine DSL and IDL, enabling concise syntax and language-agnostic interfaces for interoperability across programming languages and frameworks. This fosters collaboration and seamless API design and consumption.
+
+## ApiHug
+
+ApiHug has made further advancements in integration and innovation, making the entire process more robust and easily adaptable for engineering purposes. It offers a comprehensive DSL design specifically catering to OpenAPI, a complete toolchain, and seamless integration with modern enterprise development, resulting in efficient and streamlined API development.
+
+[ApiHug Proto for OAS](https://github.com/apihug/apihug-proto/) define extension to support OAS standard.
+
+Example [API Definition](https://github.com/apihug/apihug-full-demo/blob/main/demo-user-proto/src/main/proto/com/apihug/demo/user/proto/api/admin/api.proto):
+
+```protobuf
+service UserAdminService {
+  option (hope.swagger.svc) = {
+    path: "/user/admin";
+    description: "User admin server";
+  };
+
+  rpc SayHello (google.protobuf.Empty) returns (google.protobuf.Empty) {
+    option (hope.swagger.operation) = {
+      get: "/say-hello";
+      description: "Hello from the user admin server";
+      tags: "project";
+      priority: MIDDLE;
+      authorization:{
+        low_limit_risky_mode: ANONYMOUS
+      }
+    };
+  };
+
+
+  rpc RegisterCustomer (com.apihug.demo.user.proto.api.admin.request.RegisterRequest) returns (com.apihug.demo.user.proto.api.admin.response.CustomerRegisteredResponse) {
+    option (hope.swagger.operation) = {
+      post: "/register";
+      description: "admin try to register a new customer";
+      priority: CRITICAL;
+      authorization:{
+        rbac:{
+          authorities: ["USER_ADD"];
+        }
+      }
+    };
+  }
+  
+  rpc ChangePassword (com.apihug.demo.user.proto.api.admin.request.ChangePasswordRequest) returns (com.apihug.demo.user.proto.api.admin.response.CustomerPasswordUpdatedResponse) {
+    option (hope.swagger.operation) = {
+      post: "/change-password";
+      description: "use to reset the password after password forgot";
+      priority: HIGH;
+      authorization:{
+        rbac:{
+          authorities: ["USER_ADD", "USER_DELETE"];
+        }
+      }
+    };
+  }
+}
+```
+
+
+## Refer
+
+1. [gRPC-Gateway](https://github.com/grpc-ecosystem/grpc-gateway) is a plugin of protoc. It reads a gRPC service definition and generates a reverse-proxy server which translates a RESTful JSON API into gRPC.
+2. [Google Open API Protos](https://github.com/googleapis/googleapis/tree/master/google/api)  public Google APIs that support both REST and gRPC protocols.
+3. [The OpenAPI Specification](https://github.com/OAI/OpenAPI-Specification)
+4. [Apihug full demo](https://github.com/apihug/apihug-full-demo)

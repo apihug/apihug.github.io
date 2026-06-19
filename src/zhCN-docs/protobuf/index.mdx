@@ -1,0 +1,104 @@
+export const title = "ApiHug DSL & Protocol Buffers";
+export const description =
+  "ApiHug Leverage the Protocol Buffers to design the DSL";
+
+
+ApiHug leverages the Protocol Buffers to design its Domain Specific Language (DSL). By utilizing the mature and concise syntax of Protocol Buffers, ApiHug is exceptionally well-suited for implementing the Open API Specification (OAS). 
+
+The industry has already established a solid foundation for designing API protocols using Protobuf, such as Google Open API Protos. ApiHug builds upon this foundation, refining and simplifying it to create a brand-new, more concise, and user-friendly API DSL.
+
+
+## Protocol Buffers
+
+[Protocol Buffers](https://protobuf.dev/) are language-neutral, platform-neutral extensible mechanisms for serializing structured data.
+
+> Protocol buffers are Google’s language-neutral, platform-neutral, extensible mechanism for serializing structured data – think XML, but smaller, faster, and simpler. You define how you want your data to be structured once, then you can use special generated source code to easily write and read your structured data to and from a variety of data streams and using a variety of languages.
+
+
+### Proto definition and modulation
+
+```protobuf
+message Person {
+  optional string name = 1;
+  optional int32 id = 2;
+  optional string email = 3;
+}
+```
+
+The modularity in Protocol Buffers is achieved through the use of the `'import'` statement, which is widely adopted and highly mature in popular programming languages like Python and Java. 
+
+This approach allows for seamless integration and code reuse, making it a preferred choice for developers in these languages.
+
+To import another `.proto`’s definitions, you add an import statement to the top of your file:
+
+```protobuf
+import "myproject/other_protos.proto";
+```
+
+## gRPC
+
+[gRPC](https://grpc.io/) A high performance, open source universal RPC framework.
+
+> gRPC is a modern open source high performance Remote Procedure Call (RPC) framework that can run in any environment. It can efficiently connect services in and across data centers with pluggable support for load balancing, tracing, health checking and authentication. It is also applicable in last mile of distributed computing to connect devices, mobile applications and browsers to backend services.
+
+### gRPC Service definition
+
+gRPC can use protocol buffers as both its Interface Definition Language (IDL) and as its underlying message interchange format:
+
+```protobuf
+// The greeter service definition.
+service Greeter {
+  // Sends a greeting
+  rpc SayHello (HelloRequest) returns (HelloReply) {}
+}
+
+// The request message containing the user's name.
+message HelloRequest {
+  string name = 1;
+}
+
+// The response message containing the greetings
+message HelloReply {
+  string message = 1;
+}
+```
+
+## DSL
+
+> The critical complexity of most software projects is in understanding the domain itself.
+> By Eric Evans in Domain-Driven Design
+
+Being easy to understand should be the gold standard of good and maintainable software.
+
+> A domain-specific language (DSL) is a computer language specialized to a particular application domain.
+
+Domain Specific Language(Common Language) closes the gap between:
+
+- Domain Experts
+- Technical Experts
+- Working Software & Tests
+
+ApiHug aims to bridge the gap between various stakeholders involved in API development, including Business Analysts, Project Managers, Architects, UI designers, and Testers. 
+It achieves this by providing a common language for defining APIs that transcends specific formats like Swagger's JSON/YAML or programming languages like Java and Python. 
+
+ApiHug's goal is to facilitate effective communication and collaboration among diverse team members, ensuring a shared understanding and streamlined development process.
+
+We ultimately selected Protocol Buffers as the baseline for our DSL due to several reasons:
+
+- It enjoys widespread popularity, making it easily accessible and adoptable.
+- The mature community support surrounding Protocol Buffers reduces the associated risks.
+- The existence of a well-practiced toolchain ensures a cost-effective development process.
+
+
+## Refer
+
+1. [Protocol Buffers](https://protobuf.dev/)
+2. [gRPC](https://grpc.io/)
+3. [Domain-specific language-wikipedia](https://en.wikipedia.org/wiki/Domain-specific_language)
+4. [Domain-Specific Languages Guide -  Martin Fowler](https://martinfowler.com/dsl.html)
+5. [Domain-Specific Languages - Jetbrains](https://www.jetbrains.com/mps/concepts/domain-specific-languages/)
+6. [gRPC-Gateway](https://github.com/grpc-ecosystem/grpc-gateway) is a plugin of protoc. It reads a gRPC service definition and generates a reverse-proxy server which translates a RESTful JSON API into gRPC.
+7. [Google Open API Protos](https://github.com/googleapis/googleapis/tree/master/google/api)  public Google APIs that support both REST and gRPC protocols.
+8. [The OpenAPI Specification](https://github.com/OAI/OpenAPI-Specification)
+9. [ApiHug101-Bilibili](https://space.bilibili.com/666522636)
+10. [ApiHug101-Youtube](https://youtube.com/@ApiHug?si=C1yw0poHA01zbmyj)

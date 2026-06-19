@@ -1,0 +1,187 @@
+export const title = "011 Api Test";
+export const description =
+  "how to test api in ApiHug Api design Copilot.";
+
+
+1. ApiHug Tool Window
+2. Switch to `Test` tab
+3. Find Api
+4. Save Test
+5. Switch to wider test editor panel
+6. Test script
+
+<img src={require('@/img/plugin/109_test_01.gif').default.src} alt="ApiHug Test Manager" width={2334} height={1768} className="rounded-lg" />
+
+## Test Script
+
+1. Script tab
+2. Generate the code template
+3. Open Edit Panel(or inline edit)
+4. `Prior` change request or `Post` change response
+
+<img src={require('@/img/plugin/109_test_02_script.gif').default.src} alt="ApiHug Test Script Manager" width={2334} height={1768} className="rounded-lg" />
+
+## Test Environment
+
+1. Choice Environment
+2. Select Server
+3. Select Environment
+
+<img src={require('@/img/plugin/109_test_03_env.gif').default.src} alt="ApiHug Test Environment Manager" width={2334} height={1768} className="rounded-lg" />
+
+## API Script Management
+
+1. `groovy` Syntax
+2. Editor autocomplete
+3. `Prior` request manipulate before send, `Post` response manipulae
+
+## Embedded Context
+
+**Common** Part:
+
+| Method                                | Description         | Comment               |
+|---------------------------------------|---------------------|-----------------------|
+| `String getHeader(String key)`        | get header          | both request/response |
+| `List<String> getHeaders(String key)` | get header as list  | both request/response |
+| `List<String> getHeaderKeys()`        | get header key list | both request/response |
+
+### Request
+
+| Method                                               | Description            | Comment                   |
+|------------------------------------------------------|------------------------|---------------------------|
+| `String getUrl()`                                    | Get URL                | -                         |
+| `void setUrl(String url)`                            | Overwrite URL          | -                         |
+| `String getParameter(String name)`                   | Get Parameter          | If list only first return |
+| `void setParameter(String name, String value)`       | Set Parameter          | Overwrite exist           |
+| `void setParameters(Map<String, String> parameters)` | Set Parameter Map      | -                         |
+| `void addParameter(String name, String value)`       | Add Parameter          | -                         |
+| `void removeParameter(String name)`                  | Delete Parameter       | -                         |
+| `void setFormData(String name, String value)`        | Set Form Data          | -                         |
+| `void setHeader(String name, String value)`          | Set header             | -                         |
+| `void addHeader(String name, String value)`          | Add header             | -                         |
+| `void removeHeader(String name)`                     | Remove header          | -                         |
+| `byte[] getRequestBody()`                            | Get request body       | -                         |
+| `void setRequestBody(String payload)`                | Set request body       | String                    |
+| `void setRequestBody(byte[] payload)`                | Set request body       | byte                      |
+| `void setRequestBody(InputStream input)`             | Set request body       | Stream                    |
+| `Map<String, List<String>> getParameterMap()`        | Get all parameter      | -                         |
+| `List<String> getParameterValues(String name)`       | Get all parameter name | -                         |
+| `void setCookie(String cookie)`                      | Set cookie             | -                         |
+
+### Response
+
+| Method                          | Description        | Comment                 |
+|---------------------------------|--------------------|-------------------------|
+| `String getResponseBody()`      | Get response body  | String                  |
+| `int getCode()`                 | Get http code      | -                       |
+| `String getCookie(String name)` | Get cookie by name | -                       |
+| `String getCookie()`            | Get cookie         | Entire cookie as String |
+
+### Logger
+
+Debug log to IDEA console:
+
+| Method                             | Description | Comment |
+|------------------------------------|-------------|---------|
+| `void clear()`                     | clear       | -       |
+| `void warn(final String message)`  | warn        | -       |
+| `void info(final String message)`  | info        | -       |
+| `void debug(final String message)` | debug       | -       |
+| `void error(final String message)` | error       | -       |
+
+### Runtime context
+
+It can be used to update the current runtime environment parameters or variables based on the returned information.
+
+| Method                                                  | Description                     | Comment |
+|---------------------------------------------------------|---------------------------------|---------|
+| `void updateGlobalVariable(String name, Object value)`  | Overwrite global variable       | -       |
+| `void updateGlobalParameter(String name, Object value)` | Overwrite global parameter      | -       |
+| `void updateEnvVariable(String name, Object value)`     | Overwrite current env variable  | -       |
+| `void updateEnvParameter(String name, Object value)`    | Overwrite current env parameter | -       |
+
+## Sample Template
+
+<TipCompat>
+  Pay attention for those tips:
+</TipCompat>
+
+1. The `dummy` object is meant to assist you during the design phase. It will be automatically adjusted at runtime, so please do not touch it.
+2. `// Place your logic here` indicates the starting point for your code.
+3. It is necessary to perform a complete `gradle build` for the project. Otherwise, the context may not be accessible, and code suggestions may not work properly. This is a one-time task.
+4. Groovy syntax is similar to Java and generally interchangeable. It is also more concise, and there is no need to use semicolons(`;`) at the end.
+5. Use the context's `logger` to output information instead of using `System.out`.
+
+
+### Prior Script
+
+Context included:
+
+1. `request`, original request
+2. `logger`, logger to track the output
+
+```groovy
+
+import hope.common.script.HTTPRequest
+import hope.common.script.LoggerAdapter
+
+/************************************************************************
+ * 1. Do not touch code below, it will be injected at runtime
+ * 2. Fellow the groovy syntax, Java syntax almost can work
+ ************************************************************************/
+
+HTTPRequest request = HTTPRequest.DUMMY
+LoggerAdapter logger = LoggerAdapter.DUMMY
+
+/*************************************************************************/
+
+// Place your logic here
+
+headerKey = request.getHeader("key");
+
+if (headerKey != null) {
+    logger.warn("we has header value $headerKey")
+} else {
+    logger.warn("we has no header value set")
+}
+
+//request.setHeader("key","value");
+
+
+```
+
+### Post Script
+
+Context included:
+
+1. `response`, response object
+2. `logger`, logger to track output
+3. `runtime`, interface to update runtime environment
+
+```groovy
+
+import hope.common.script.HTTPResponse
+import hope.common.script.LoggerAdapter
+import hope.common.script.RuntimeContext
+
+/************************************************************************
+ * 1. Do not touch code below, it will be injected at runtime
+ * 2. Fellow the groovy syntax, Java syntax almost can work
+ ************************************************************************/
+
+HTTPResponse response = HTTPResponse.DUMMY
+LoggerAdapter logger = LoggerAdapter.DUMMY
+RuntimeContext runtime = RuntimeContext.DUMMY
+
+/*************************************************************************/
+
+// Place your logic here
+
+response.getHeader("key");
+
+```
+
+## Reference
+
+1. [ApiHug101-Bilibili](https://space.bilibili.com/666522636)
+2. [ApiHug101-Youtube](https://youtube.com/@ApiHug?si=C1yw0poHA01zbmyj)

@@ -1,0 +1,140 @@
+export const title = "ApiHug Testing Framework Kola";
+export const description =
+  "Kola make your test life happier and colourful";
+
+
+## Latest
+
+⚠️请及时更新 SDK + IDEA插件保持先进⚠️
+
+**SDK Version**
+
+[Maven Central](https://search.maven.org/artifact/com.apihug/it-bom)
+
+**Plugin Version**
+
+[JetBrains Marketplace](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
+
+## Timeline
+
+Sine **ApiHug [1.0.0-RELEASE] -  2024-08-02** [关于Kola](/zhCN-docs/kola/001_what_is_kola)
+
+### Features
+
+- 全面支持DSL,类BDD, Contract 定义测试
+- 引入 wire 端 `kolaTest` 测试任务
+- 无缝集成所有现存测试解决方案(junit5 assertJ etc)
+
+### 升级步骤
+
+参考 [apihug-demo/libs.versions.toml](https://github.com/apihug/apihug-demo/blob/main/gradle/libs.versions.toml)
+
+1. 升级版本： `{your_project}/gradle/libs.versions.toml` 修改： `apihug = "xxx"`  到 `1.0.0-RELEASE`+ 版本
+2. 添加 lib:  `springBootDependencies = { group = "org.springframework.boot", name = "spring-boot-dependencies", version.ref = "springBoot" }`
+
+⚠️ `springBootDependencies` **必须**配置，否则 wire 编译会报错:
+
+```shell
+Could not get unknown property 'springBootDependencies' for extension 'libs' of type org.gradle.accessors.dm.LibrariesForLibs.
+```
+
+⚠️ 由于尚在测验版本， 默认 Kola 没有打开，你得修改 proto 模块的 build,  参考 [build.gradle](https://github.com/apihug/apihug-demo/blob/main/apihug-demo-proto/build.gradle):
+
+```groovy
+hopeWire {
+    // others...
+    kola = true
+}
+```
+
+## Quick Starter
+
+升级完SDK + Plugin 后(可能需要重启IDEA), Kola 是基于协议层的测试，所以和 proto 模块在一起；
+
+### 目录
+
+文件模块 `{your_project}/{proto_module}` 目录 `src/test/resourcs`:
+
+```shell
+
+├────────
+│  junit-platform.properties ①
+│
+├─config
+│      kola.groovy ②
+│
+└─kola
+    └─com
+        └─apihug
+            └─sample
+                    test.groovy ③
+
+```
+
+1. `junit-platform.properties`  junit 配置文件 ①
+2. `kola.groovy`  环境配置文件 ②
+3. `test.groovy` 测试用例文件 ③
+
+完整 **例子**:
+
+```groovy
+package contracts
+
+import hope.kola.contract.Feature
+
+Feature.make {
+    priority 100
+    name("Customer login place order and check balance logic")
+    description("""Never judge the boss, as you may the real fool""")
+    Scenario "001 Try login ", {
+        Given {
+            api("UserService", "Login")
+        }
+        When {
+            json("""
+                    
+            """)
+            body {
+                set('name', "same")
+                set('student.name', "blue")
+                set('student.age', 22)
+                set('student.weight', 123.3d)
+                set('student.soreList', 12, 123, 45, Mocker.numberBetween(12, 34))
+                set('json', Mocker.chineseName().name(), Mocker.cat().name(), Mocker.ip4(), regular("[a-z]"))
+            }
+        }
+        And {
+            stringAssert("$.user.address.zipCode", {
+                isEqualTo("jake")
+                isBase64()
+                isAlphabetic()
+                startsWithIgnoringCase("json")
+            })
+            bigDecimalAssert("$.user.salary", {
+                isCloseTo(ofBigDecimal("1112.22"), offset(12))
+                isGreaterThanOrEqualTo(ofBigDecimal("231312"))
+            })
+            booleanAssert("$.user.live", {
+                isTrue()
+            })
+
+        }
+
+    }
+    Scenario "002 Place a order", {}
+    Scenario "003 Check balance", {}
+}
+```
+
+### Task
+
+Kick `kolaTest` task, 测试：
+
+```shell
+
+./gradlwe.bat {proto_module}:kolaTest --stacktrace
+
+```
+
+1. `groovy` feature 编译成测试用例
+2. 运行测试用例， 输出测试报告

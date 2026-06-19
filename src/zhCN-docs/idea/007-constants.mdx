@@ -1,0 +1,51 @@
+export const title = "007 Constants Design";
+export const description =
+  "how to use the Constants design and view panel of ApiHug Api design Copilot.";
+
+
+Go through the constants design panel of ApiHug Api design Copilot
+
+1. Constant(Enum) design panel
+2. Source code route
+
+<img src={require('@/img/plugin/105_constants.gif').default.src} alt="ApiHug Constant Manager" width={2334} height={1768} className="rounded-lg" />
+
+## Proto Sample
+
+Please refer: [apihug-full-demo admin/constant.proto](https://github.com/apihug/apihug-full-demo/blob/main/demo-user-proto/src/main/proto/com/apihug/demo/user/proto/infra/settings/admin/constant.proto)
+
+```protobuf
+enum  UserStatusEnum {
+
+  option (hope.swagger.enm) = {
+    description: "User management status"
+  };
+
+  NORMAL = 0 [(hope.constant.field) = {code: 1,message: "normal", message2: "user normal status"}];
+  BLOCKED = 1 [(hope.constant.field) = {code: 2,message: "blocked", message2: "user blocked"}];
+
+}
+```
+
+## Java Sample
+
+Please refer: [apihug-full-demo UserStatusEnum.java](https://github.com/apihug/apihug-full-demo/blob/main/demo-user-proto/src/main/wire/com/apihug/demo/user/wire/infra/settings/admin/UserStatusEnum.java)
+
+```java
+@Generated("H.O.P.E. Infra Team")
+@ProtoFrom(
+        value = "com/apihug/demo/user/proto/infra/settings/admin/constant.proto",
+        entity = "UserStatusEnum",
+        kind = Kind.ENUM
+)
+public enum UserStatusEnum implements Enumeration<UserStatusEnum> {
+    NA(-1, "Default Placeholder Should NEVER be used", "默认占位枚举请勿使用"),
+    NORMAL(1, "normal", "user normal status"),
+    BLOCKED(2, "blocked", "user blocked");
+}
+```
+
+## Reference
+
+1. [ApiHug101-Bilibili](https://space.bilibili.com/666522636)
+2. [ApiHug101-Youtube](https://youtube.com/@ApiHug?si=C1yw0poHA01zbmyj)

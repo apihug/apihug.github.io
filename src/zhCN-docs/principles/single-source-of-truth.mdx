@@ -1,0 +1,91 @@
+export const title = "Why SSOT is important";
+export const description =
+  "Single source of truth, more efficient communication and collaboration";
+
+
+<TipInfo>To be done 🏗️</TipInfo>
+
+> Single source of truth (SSOT) is used to describe the unique data that everyone in an organization relies on for reference.
+
+
+## Concept
+
+`SSOT`: Single Source Of Truth, as the name suggests.
+
+Once upon a time, the computer world was controlled by something called a Mainframe, where code and programs were centralized. However, with the proliferation of various solutions and the distribution and decentralization of computer resources, the environment and architecture have become microservices, which brings benefits as well as challenges.
+The fragmentation of management and collaboration, while providing a high degree of autonomy to different working groups and different roles within the same group, also brings inevitable conflicts in change management. This is not out of malice but due to architectural design flaws that cannot adapt to the change management required in modern distributed systems.
+Fortunately, there is a set of methods, single source of truth (SSOT) + GitOps principles, that can effectively manage the changes in your organizational assets.
+
+> Single source of truth (SSOT) is a concept used to ensure that everyone in an organization bases business decisions on the same data.
+
+## Why
+
+Change management, the pursuit of **fast, accurate** delivery to all places, **fast**: all processes are as automated as possible; **accurate**: the need to exclude human intervention, formatted expression: **code**.
+Everything is code (Code), which is both the code in the sense of human-computer interaction and the principle (Law). Code and Law are two closely related concepts, such as the Pirate Code that everyone must follow in the "Pirates of the Caribbean."
+
+<img src={require('@/img/principles/pirates-code.webp').default.src} alt="Pirates" width={3508} height={2480} className="rounded-lg" />
+
+Applications (Application), networking (Networking), computing resources (Computing resources), storage (Storage), everything can be codified.
+Unified under code (Code) is easy to handle, which is equivalent to normalizing everything, and the rules of code time are unified.
+Code has its own verification rules: static or dynamic, and code has its own organization, storage, and distribution methods: Repository & Artificat; Nexus Repository in the Java world, npm in the JavaScript world.
+
+> Git repository is the sole source of truth
+
+Based on the Git construction process, it has evolved into GitOps.
+Most modern Git repository platforms have already integrated CI/CD interactions into their list of essential functions.
+
+<img src={require('@/img/principles/git-op1.webp').default.src} alt="Git Ops" width={1080} height={758} className="rounded-lg" />
+
+
+When all resources are codified, GitOps controls storage, versioning, synchronization, etc.
+
+<img src={require('@/img/principles/git-op2.webp').default.src} alt="Pirates" width={1080} height={702} className="rounded-lg" />
+
+
+Under this principle, architects need to ensure that all artifacts (such as jar packages) have detailed descriptions, displays, and controls of the underlying environmental architecture; deployment scripts need: CI/CD process control; virtual environment configuration files; they should be as detailed and rigorous as the database's ERD, architectural UML, etc.
+
+So, what does this have to do with the entire API lifecycle management? Here's an example:
+
+## An Example
+
+API implementation + API documentation is as follows. Of course, the API documentation here is independently written, and now it can be generated from the code in reverse. However, most are still disconnected. If you are directly using some API design tools, such as ApiFox, Postman, Stoplight, etc., the two parallel worlds still exist!
+
+<img src={require('@/img/principles/api-syn-1.webp').default.src} alt="Pirates" width={1080} height={527} className="rounded-lg" />
+
+The next day, a new interface '/elephants' was added to the requirements, and something bad happened, the API documentation was not synchronized! Now, after reverse generation of the document, it feeds back to the API sharing platform, whether manually or semi-automatically, but this is not a perfect solution. The defect is that although the source code plays the role of SSOT, it does not take full responsibility; the SSOT role needs:
+
+1. A way for all parties to access
+2. To notify interested parties when the truth changes
+
+Obviously, the source code does not have the above capabilities! So, what should be used as the only trusted source SSOT?
+At this time, an independent Specification is needed, and this Specification is preferred:
+> All work emanates from an ever-evolving but controlled specification. This includes coding, documenting, and enhancing software
+
+**Specification First** is a software development method whose core concept is that all work originates from a continuously evolving but controlled specification. This includes aspects such as coding, document writing, and software enhancement. This is the code, it's the law!
+
+"Specification First" has many in the API world: OpenAPI, gRPC, AsyncAPI, or GraphQL, etc.
+
+Specification serves as a neutral SSOT to control the generation of documentation and code. Different roles in software development use the API Specification as a collaborative medium, as follows:
+
+<img src={require('@/img/principles/api-syn-2.webp').default.src} alt="Pirates" width={1080} height={390} className="rounded-lg" />
+
+
+There is also a defect: How to prevent API developers from entering the source code and changing the API without the knowledge of the documentation personnel, causing the content to become out of sync again? This is where automation comes into play. As shown in the figure below, the `OnSpecChange` event displayed at the bottom indicates that when the API specification is changed, it will trigger an `OnSpecChange` event in some way, and interested parties can respond accordingly.
+
+Current Git repositories generally provide a Web Hook mechanism to obtain the relevant triggers for the next action.
+
+<img src={require('@/img/principles/api-syn-3.webp').default.src} alt="Pirates" width={1080} height={557} className="rounded-lg" />
+
+
+This scheme still has significant limitations. Triggering the next action, automatically updating the code and documentation, especially the code update, still cannot be smoothly achieved under the limitations of language and architecture, and the risk is relatively high.
+
+SSOT is easy to choose, but the path to synchronization is still long. How to truly eliminate the differences in understanding of changes among different roles and links, and maintain strong consistency, is a topic that is always worth exploring.
+
+[Apihug](https://www.apihug.com) not only uses `git` as the first management tool for the single source of truth of the `API` protocol standard, relying on major git service providers (Github, GitLab, Gitee, etc.) to unify the management of `API` protocols and version iterations; at the same time, in the distribution and sharing of `API` protocols, it uses existing distribution tools; modularization, reuse of `API` components, to avoid repetitive work, significantly improving development efficiency.
+
+## Refer
+
+- [Implementing single source of truth in an enterprise architecture](https://www.redhat.com/architect/single-source-truth-architecture)
+- [Single Source of Truth](https://www.talend.com/resources/single-source-truth/)
+- [swaggerhub -The Single Source of Truth for API Development](https://swagger.io/tools/swaggerhub/)
+- [Metadata-as-Code SSOT](https://hackolade.com/metadata-as-code.html)

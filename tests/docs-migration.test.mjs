@@ -5,6 +5,7 @@ import path from "node:path";
 
 const repoRoot = process.cwd();
 const docsRoot = path.join(repoRoot, "src", "docs");
+const zhDocsRoot = path.join(repoRoot, "src", "zhCN-docs");
 
 function walkMdxFiles(dir) {
   const entries = fs.readdirSync(dir, { withFileTypes: true });
@@ -50,19 +51,19 @@ test("docs MDX pipeline supports GFM tables and constrained code blocks", () => 
   assert.match(snippetGroup, /CodeCopyButton/);
   assert.match(snippetGroup, /tabs\[selectedIndex\]\?\.props\.code/);
   assert.match(snippetGroup, /\{child\.props\.children\}/);
-  assert.match(snippetGroup, /flex h-10 flex-auto items-center justify-end[\s\S]*px-2/);
+  assert.match(snippetGroup, /flex items-center justify-between border-b[\s\S]*px-2 py-2/);
   assert.doesNotMatch(snippetGroup, /dangerouslySetInnerHTML/);
   assert.match(docsCodeBlock, /CodeCopyButton/);
-  assert.match(docsCodeBlock, /flex h-10 items-center justify-end border-b/);
+  assert.match(docsCodeBlock, /flex items-center justify-between border-b[\s\S]*px-4 py-2/);
   assert.match(copyButton, /navigator\.clipboard\.writeText/);
   assert.doesNotMatch(copyButton, /\bborder\b/);
   assert.doesNotMatch(startDoc, /\{\{\s*filename\s*:/);
   assert.match(startDoc, /<div[\s\S]*filename="libs\.versions\.toml"[\s\S]*code=\{/);
   assert.match(startDoc, /DocsMavenCentralBadge/);
   assert.match(startDoc, /DocsJetBrainsMarketplaceCard/);
-  assert.match(docsStartResources, /href="https:\/\/search\.maven\.org\/artifact\/com\.apihug\/it-bom"/);
+  assert.match(docsStartResources, /DEFAULT_MAVEN_CENTRAL_HREF = "https:\/\/search\.maven\.org\/artifact\/com\.apihug\/it-bom"/);
   assert.match(docsStartResources, /target="_blank"/);
-  assert.match(docsStartResources, /img\.shields\.io\/maven-central\/v\/com\.apihug\/it-bom\.svg\?label=Maven%20Central/);
+  assert.match(docsStartResources, /img\.shields\.io\/maven-central\/v\/com\.apihug\/\$\{artifactId\}\.svg\?label=Maven%20Central/);
   assert.match(docsStartResources, /plugins\.jetbrains\.com\/embeddable\/card\/23534/);
   assert.match(docsStartResources, /frameBorder="0"|style=\{\{\s*border:\s*0\s*\}\}/);
   assert.match(docsStartResources, /height="319px"/);
@@ -76,18 +77,52 @@ test("docs code blocks expose Tailwind-style chrome", () => {
   const docsCodeBlock = fs.readFileSync(path.join(repoRoot, "src", "components", "DocsCodeBlock.tsx"), "utf8");
   const copyButton = fs.readFileSync(path.join(repoRoot, "src", "components", "CodeCopyButton.tsx"), "utf8");
 
-  assert.match(docsCodeBlock, /const LANGUAGE_LABELS =/);
-  assert.match(docsCodeBlock, /getCodeBlockLabel\(className\)/);
+  assert.match(docsCodeBlock, /CodeCopyButton value=\{code\}/);
   assert.match(docsCodeBlock, /items-center justify-between/);
-  assert.match(docsCodeBlock, /<span[^>]*>\{label\}<\/span>/);
+  assert.match(docsCodeBlock, /Terminal/);
+  assert.match(docsCodeBlock, /PowerShell/);
+  assert.match(docsCodeBlock, /Code/);
 
   assert.match(copyButton, /aria-label=\{copied \? "Copied code" : "Copy code"\}/);
   assert.match(copyButton, /title=\{copied \? "Copied" : "Copy"\}/);
   assert.doesNotMatch(copyButton, /<span>\{copied \? "Copied" : "Copy"\}<\/span>/);
 
-  assert.match(snippetGroup, /const activeLabel = tabs\[selectedIndex\]\?\.props\.filename \|\| 'Code'/);
+  assert.match(snippetGroup, /props\.filename[\s\S]*['"]Code['"]/);
   assert.match(snippetGroup, /items-center justify-between/);
   assert.match(snippetGroup, /CodeCopyButton value=\{activeCode\}/);
+});
+
+test("docs copy button shows checked feedback immediately after click", () => {
+  const copyButton = fs.readFileSync(path.join(repoRoot, "src", "components", "CodeCopyButton.tsx"), "utf8");
+
+  assert.match(copyButton, /setCopyState\(\(\{ tick \}\) => \(\{ copied: true, tick: tick \+ 1 \}\)\)/);
+  assert.match(copyButton, /navigator\.clipboard\.writeText\(value\)\.catch\(\(\) => \{\}\)/);
+  assert.match(copyButton, /text-emerald-400/);
+});
+
+test("docs resource links render through shared components", () => {
+  const mdxComponents = fs.readFileSync(path.join(repoRoot, "mdx-components.tsx"), "utf8");
+  const docsStartResources = fs.readFileSync(
+    path.join(repoRoot, "src", "components", "DocsStartResources.tsx"),
+    "utf8",
+  );
+
+  assert.match(mdxComponents, /DocsJetBrainsMarketplaceCard/);
+  assert.match(mdxComponents, /DocsMavenCentralBadge/);
+  assert.match(mdxComponents, /plugins\.jetbrains\.com\/plugin\/23534-apihug--api-design-copilot/);
+  assert.match(mdxComponents, /search\.maven\.org\/artifact\/com\.apihug\//);
+  assert.match(mdxComponents, /p\(props\)/);
+  assert.match(mdxComponents, /a\(props\)/);
+  assert.match(docsStartResources, /artifactId/);
+  assert.match(docsStartResources, /search\.maven\.org\/artifact\/com\.apihug\//);
+  assert.match(docsStartResources, /img\.shields\.io\/maven-central\/v\/com\.apihug\/\$\{artifactId\}\.svg/);
+});
+
+test("tip components avoid nested paragraph markup", () => {
+  const tipComponent = fs.readFileSync(path.join(repoRoot, "src", "components", "Tip.js"), "utf8");
+
+  assert.doesNotMatch(tipComponent, /<p className="m-0 flex-1/);
+  assert.match(tipComponent, /<div className="m-0 flex-1/);
 });
 
 test("migrated docs no longer contain YAML frontmatter blocks", () => {
@@ -100,6 +135,29 @@ test("migrated docs no longer contain YAML frontmatter blocks", () => {
 
 test("migrated docs no longer contain legacy badge and iframe embeds", () => {
   const legacyHtmlFiles = walkMdxFiles(docsRoot)
+    .filter((filePath) => {
+      const source = fs.readFileSync(filePath, "utf8");
+      return (
+        source.includes("<iframe") ||
+        source.includes("img.shields.io") ||
+        source.includes("plugins.jetbrains.com/embeddable")
+      );
+    })
+    .map((filePath) => path.relative(repoRoot, filePath));
+
+  assert.deepEqual(legacyHtmlFiles, []);
+});
+
+test("migrated zhCN docs no longer contain YAML frontmatter blocks", () => {
+  const frontmatterFiles = walkMdxFiles(zhDocsRoot)
+    .filter((filePath) => fs.readFileSync(filePath, "utf8").startsWith("---"))
+    .map((filePath) => path.relative(repoRoot, filePath));
+
+  assert.deepEqual(frontmatterFiles, []);
+});
+
+test("migrated zhCN docs no longer contain legacy badge and iframe embeds", () => {
+  const legacyHtmlFiles = walkMdxFiles(zhDocsRoot)
     .filter((filePath) => {
       const source = fs.readFileSync(filePath, "utf8");
       return (

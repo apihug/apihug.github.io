@@ -1,0 +1,156 @@
+export const title = "ApiHug API 设计助手 FAQ";
+export const description =
+  "ApiHug API 设计助手的常见问题";
+
+
+## Proto 模块编译问题
+
+### IDEA plugin
+
+[Plugin Release](https://github.com/apihug/apihug-ide-plugin/releases)
+
+JVM 版本兼容性对 Proto 模块的顺利编译至关重要。
+
+涉及两个 JVM 版本:
+
+1. 项目中 **gradle/java.gradle** 文件定义的工具链版本。
+2. 构建环境的 JVM 版本（即 Gradle 运行时所使用的版本）。
+
+这两个版本不一致时，可能导致 Protobuf Wire 编译器静默失败。
+
+为避免问题，请遵循以下原则:
+
+**确保** Proto 模块的目标编译版本 `<=` 构建环境的 JVM 版本。
+
+Java 版本对应关系:
+
+| 项目工具链版本 | 编译环境(Gradle) | Proto 模块版本要求 |
+|---------|--------------|--------------|
+| 21      | 21           | 默认或 `<=21`   |
+| 21      | 17           | 必须设置为 `<=17` |
+| 17      | 21           | 默认或 `<=21`   |
+
+项目工具链java 版本`{project-root}/gradle/java.gradle`:
+
+```groovy
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+```
+
+Gradle JVM 版本, 在启动编译时会输出:
+
+```
+Java version: 19.0.1
+Gradle version: 8.14.3
+Current dir: /user/home/project/myproject
+Spring Boot version: 3.5.5
+Spring Dependency version: 1.1.7
+Spring Ai version: 1.0.0
+Spring Cloud version: 2024.0.1
+ApiHug version: 1.4.3-M8
+All Modules: [project ':sample-proto',':sample-app']
+```
+
+当面每个模块都可以在自己的 `build.gradle` 覆盖新的 java 版本。
+
+
+## ProtoBuf
+
+### Proto 文件无法识别
+
+目前 IDE 支持的 `Proto buffer` 插件主要有两种：
+
+1. IDE 自带的，供应商为 `JetBrains s.r.o.` ✅✅✅
+2. 第三方 `HIGAN` 插件 ❌❌❌
+
+这两个插件存在冲突，只能启用其中一个。⚠️
+
+ApiHug Plugin 依赖于 IDE 自带的 **Proto Editor** 插件进行 AST 语法树解析，因此必须启用 `JetBrains s.r.o.` ✅ Proto 插件：
+
+<img src={require('@/img/plugin/protobuf_plugin.png').default.src} alt="ApiHug plugin" width={986} height={712} className="rounded-lg" />
+
+### Proto 文件无法导入，无法识别 proto import
+
+ApiHug SDK proto 导入 `import "swagger/annotations.proto";` 时报错：
+
+ApiHug SDK proto import `import "swagger/annotations.proto";` 失败：
+
+<img src={require('@/img/plugin/import_error.png').default.src} alt="ApiHug plugin SDK import error" width={880} height={361} className="rounded-lg" />
+
+**01: 编译项目, compile the project** (通过 markdown 或 gradle 任务)
+
+<img src={require('@/img/plugin/2ways_build.png').default.src} alt="ApiHug 2 ways build project" width={1113} height={568} className="rounded-lg" />
+
+**02: 编译完成后，查看 proto 项目的 build 缓存**，after compile success, check the project proto build cache:
+
+`{PROJECT}/{PROTO-MODULE}/build/extracted-include-protos`:
+
+<img src={require('@/img/plugin/2ways_build_success.png').default.src} alt="ApiHug success build" width={1202} height={535} className="rounded-lg" />
+
+**03：如果仍未成功导入**，手动配置 proto import；if still not import then please add path manually：
+
+1. 打开 `Settings` 面板
+2. 找到 `Protocol Buffers`
+3. 取消勾选 `Configure Automatically`
+4. 将 `{PROJECT}/{PROTO-MODULE}/build/extracted-include-protos` 添加到 `Import Paths` 中：
+
+从 [Plugin](/zhCN-docs/changelog/plugin) 0.7.6 版本起，插件已内置这些预定义的 proto 文件。
+
+<img src={require('@/img/plugin/2ways_finally.png').default.src} alt="ApiHug import finally" width={1928} height={1041} className="rounded-lg" />
+
+最终所有 `import` 语句都应变为绿色，Eventually all the `import` should turn green!
+
+⚠️ 有时官方的 proto editor 可能会崩溃，请留意崩溃提示！
+
+若即使重启 IDEA 问题依旧存在，请向我们报告：[report issue](https://github.com/apihug/apihug-ide-plugin/issues/new/choose)
+
+## Gradle
+
+### 无法识别 Gradle 项目
+
+IDE 应弹出 **Load Gradle Project** 提示，若通知被关闭，请打开 **Notification** 面板手动触发。
+
+IDE should pop up a notification: **Load Gradle Project**，if notification pop up was forbidden, then please open the **Notification** panel to load it manually!
+
+<img src={require('@/img/plugin/gradle_loader.png').default.src} alt="ApiHug Load gradle project" width={740} height={428} className="rounded-lg" />
+
+### Gradle 编译失败
+
+1. [report issue](https://github.com/apihug/apihug-ide-plugin/issues/new/choose)
+2. [Homepage](https://github.com/apihug/apihug.com) 查找二维码加入我们的交流群。
+
+## API 设计树未显示/未刷新
+
+1. 刷新树
+2. 重建树（耗时操作），重新编译后再刷新
+
+<img src={require('@/img/plugin/api-tree-rebuild.png').default.src} alt="ApiHug Rebuild" width={678} height={518} className="rounded-lg" />
+
+若错误仍然存在，则 [report issue](https://github.com/apihug/apihug-ide-plugin/issues/new/choose)！
+
+## 检查版本
+
+检查已安装的 ApiHug IDE 插件版本：
+
+顶部菜单：`ApiHug` -> `About`：
+
+<img src={require('@/img/plugin/version_checker.png').default.src} alt="ApiHug version check" width={1248} height={545} className="rounded-lg" />
+
+## Plugin 0.2+ 问题
+
+[Milestone 20240222](/zhCN-docs/milestone/milestone-20240222) 特别是 Spring Boot 升级！
+
+## 最新版本
+
+[Maven Central](https://search.maven.org/artifact/com.apihug/it-bom)
+
+
+[JetBrains Marketplace](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
+
+## 参考资料
+
+1. [ApiHug101-Bilibili](https://space.bilibili.com/666522636)
+2. [ApiHug101-Youtube](https://youtube.com/@ApiHug?si=C1yw0poHA01zbmyj)
