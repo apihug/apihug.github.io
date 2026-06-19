@@ -242,7 +242,7 @@ test("docs sidebar switches to zhCN nav for zhCN routes", () => {
   assert.match(docsSidebar, /import zhIndex from "..\/app\/\(docs\)\/zhCN-docs\/index"/);
   assert.match(docsSidebar, /pathname\.startsWith\("\/zhCN-docs"\)/);
   assert.match(docsSidebar, /let navIndex = pathname\.startsWith\("\/zhCN-docs"\) \? zhIndex : index/);
-});test("zhCN docs index route redirects to what-is-apihug", () => {
+});`r`n`r`ntest("zhCN docs index route redirects to what-is-apihug", () => {
   const zhDocsIndexPage = fs.readFileSync(
     path.join(repoRoot, "src", "app", "(docs)", "zhCN-docs", "page.tsx"),
     "utf8",
