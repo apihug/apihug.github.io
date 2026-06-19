@@ -274,6 +274,20 @@ test("header exposes english and zhCN docs entry points", () => {
   assert.doesNotMatch(header, /href="\/zhCN"|href='\/zhCN'|href=\{["']\/zhCN["']\}/);
 });
 
+test("header docs locale panel uses disclosure accessibility and stable open-close handling", () => {
+  const header = fs.readFileSync(path.join(repoRoot, "src", "components", "Header.js"), "utf8");
+
+  assert.doesNotMatch(header, /aria-haspopup="menu"|aria-haspopup='menu'/);
+  assert.match(header, /aria-controls="docs-menu"|aria-controls='docs-menu'|aria-controls=\{['"]docs-menu['"]\}/);
+  assert.match(header, /id="docs-menu"|id='docs-menu'/);
+  assert.match(header, /onClick=\{\(\) => setIsOpen\(true\)\}/);
+  assert.match(header, /onFocus=\{\(\) => setIsOpen\(true\)\}/);
+  assert.match(header, /onBlur=\{\(event\) => \{/);
+  assert.match(header, /!event\.currentTarget\.contains\(event\.relatedTarget\)/);
+  assert.match(header, /onKeyDown=\{\(event\) => \{/);
+  assert.match(header, /event\.key === 'Escape'|event\.key === "Escape"/);
+});
+
 test("docs index route redirects to what-is-apihug", () => {
   const docsIndexPage = fs.readFileSync(
     path.join(repoRoot, "src", "app", "(docs)", "docs", "page.tsx"),

@@ -4,7 +4,7 @@ import { SearchButton } from '@/components/Search'
 import Router from 'next/router'
 import { Logo } from '@/components/Logo'
 import { Dialog, DialogPanel } from '@headlessui/react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import clsx from 'clsx'
 import { ThemeSelect, ThemeToggle } from './ThemeToggle'
 
@@ -82,19 +82,33 @@ function Featured() {
 
 function DocsMenu() {
   let [isOpen, setIsOpen] = useState(false)
+  let triggerRef = useRef(null)
 
   return (
     <li
       className="relative"
       onMouseEnter={() => setIsOpen(true)}
       onMouseLeave={() => setIsOpen(false)}
+      onFocus={() => setIsOpen(true)}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) {
+          setIsOpen(false)
+        }
+      }}
+      onKeyDown={(event) => {
+        if (event.key === 'Escape') {
+          setIsOpen(false)
+          triggerRef.current?.focus()
+        }
+      }}
     >
       <button
+        ref={triggerRef}
         type="button"
         className="inline-flex items-center gap-1 hover:text-sky-500 dark:hover:text-sky-400"
         aria-expanded={isOpen}
-        aria-haspopup="menu"
-        onClick={() => setIsOpen((open) => !open)}
+        aria-controls="docs-menu"
+        onClick={() => setIsOpen(true)}
       >
         Docs
         <svg
@@ -114,7 +128,10 @@ function DocsMenu() {
         </svg>
       </button>
       {isOpen && (
-        <div className="absolute left-0 top-full mt-3 w-44 rounded-xl border border-slate-200 bg-white p-2 shadow-lg dark:border-slate-700 dark:bg-slate-800">
+        <div
+          id="docs-menu"
+          className="absolute left-0 top-full mt-3 w-44 rounded-xl border border-slate-200 bg-white p-2 shadow-lg dark:border-slate-700 dark:bg-slate-800"
+        >
           <div className="flex flex-col text-sm font-semibold text-slate-700 dark:text-slate-200">
             <Link href="/docs" className="rounded-lg px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-700">
               English Docs
