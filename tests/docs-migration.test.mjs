@@ -217,12 +217,32 @@ test("docs index route redirects to what-is-apihug", () => {
 
 test("pagination supports both english and zhCN docs trees", () => {
   const pagination = fs.readFileSync(path.join(repoRoot, "src", "components", "pagination.tsx"), "utf8");
+  const englishDocPage = fs.readFileSync(
+    path.join(repoRoot, "src", "app", "(docs)", "docs", "[...slug]", "page.tsx"),
+    "utf8",
+  );
+  const zhDocPage = fs.readFileSync(
+    path.join(repoRoot, "src", "app", "(docs)", "zhCN-docs", "[...slug]", "page.tsx"),
+    "utf8",
+  );
 
   assert.doesNotMatch(pagination, /import index from "..\/app\/\(docs\)\/docs\/index"/);
   assert.match(pagination, /currentPath/);
   assert.match(pagination, /navIndex/);
+  assert.match(englishDocPage, /<Pagination currentPath=\{\/docs\/\$\{slugStr\}\} navIndex=\{index\} \/>/);
+  assert.match(zhDocPage, /<Pagination currentPath=\{\/zhCN-docs\/\$\{slugStr\}\} navIndex=\{zhIndex\} \/>/);
 });
-test("zhCN docs index route redirects to what-is-apihug", () => {
+
+test("docs sidebar switches to zhCN nav for zhCN routes", () => {
+  const docsSidebar = fs.readFileSync(path.join(repoRoot, "src", "components", "docs-sidebar.tsx"), "utf8");
+
+  assert.match(docsSidebar, /^"use client";/m);
+  assert.match(docsSidebar, /usePathname/);
+  assert.match(docsSidebar, /import index from "..\/app\/\(docs\)\/docs\/index"/);
+  assert.match(docsSidebar, /import zhIndex from "..\/app\/\(docs\)\/zhCN-docs\/index"/);
+  assert.match(docsSidebar, /pathname\.startsWith\("\/zhCN-docs"\)/);
+  assert.match(docsSidebar, /let navIndex = pathname\.startsWith\("\/zhCN-docs"\) \? zhIndex : index/);
+});test("zhCN docs index route redirects to what-is-apihug", () => {
   const zhDocsIndexPage = fs.readFileSync(
     path.join(repoRoot, "src", "app", "(docs)", "zhCN-docs", "page.tsx"),
     "utf8",
