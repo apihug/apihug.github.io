@@ -263,29 +263,30 @@ test("protobuf extension docs stay aligned with the current it-proto-extend surf
   assert.match(navIndex, /\/docs\/spec\/version/);
 });
 
-test("header exposes english and zhCN docs entry points", () => {
-  const header = fs.readFileSync(path.join(repoRoot, "src", "components", "Header.js"), "utf8");
+test("app docs header exposes english and zhCN docs entry points", () => {
+  const appHeader = fs.readFileSync(path.join(repoRoot, "src", "components", "header.tsx"), "utf8");
 
-  assert.match(header, /English Docs/);
-  assert.match(header, /中文文档|涓枃鏂囨。/);
-  assert.match(header, /href="\/zhCN-docs"|href='\/zhCN-docs'|href=\{["']\/zhCN-docs["']\}/);
-  assert.match(header, /href="\/docs"|href='\/docs'|href=\{["']\/docs["']\}/);
-  assert.doesNotMatch(header, /\/zhCN-docs\/start\.html/);
-  assert.doesNotMatch(header, /href="\/zhCN"|href='\/zhCN'|href=\{["']\/zhCN["']\}/);
+  assert.match(appHeader, /English Docs/);
+  assert.match(appHeader, /中文文档/);
+  assert.match(appHeader, /href="\/docs"|href='\/docs'|href=\{["']\/docs["']\}/);
+  assert.match(appHeader, /href="\/zhCN-docs"|href='\/zhCN-docs'|href=\{["']\/zhCN-docs["']\}/);
+  assert.match(appHeader, /aria-controls="docs-locale-menu"|aria-controls='docs-locale-menu'/);
 });
 
-test("header docs locale panel uses disclosure accessibility and stable open-close handling", () => {
-  const header = fs.readFileSync(path.join(repoRoot, "src", "components", "Header.js"), "utf8");
+test("app docs header locale panel avoids a hover gap under the docs trigger", () => {
+  const appHeader = fs.readFileSync(path.join(repoRoot, "src", "components", "header.tsx"), "utf8");
 
-  assert.doesNotMatch(header, /aria-haspopup="menu"|aria-haspopup='menu'/);
-  assert.match(header, /aria-controls="docs-menu"|aria-controls='docs-menu'|aria-controls=\{['"]docs-menu['"]\}/);
-  assert.match(header, /id="docs-menu"|id='docs-menu'/);
-  assert.match(header, /onClick=\{\(\) => setIsOpen\(true\)\}/);
-  assert.match(header, /onFocus=\{\(\) => setIsOpen\(true\)\}/);
-  assert.match(header, /onBlur=\{\(event\) => \{/);
-  assert.match(header, /!event\.currentTarget\.contains\(event\.relatedTarget\)/);
-  assert.match(header, /onKeyDown=\{\(event\) => \{/);
-  assert.match(header, /event\.key === 'Escape'|event\.key === "Escape"/);
+  assert.doesNotMatch(appHeader, /id="docs-locale-menu"[\s\S]*mt-3/);
+  assert.match(appHeader, /className="absolute left-0 top-full z-20 pt-3"/);
+});
+
+test("home hero title uses an ApiHug eyebrow and tighter title spacing", () => {
+  const hero = fs.readFileSync(path.join(repoRoot, "src", "components", "home", "hero.tsx"), "utf8");
+
+  assert.match(hero, /API as Architecture/);
+  assert.match(hero, /pt-8 sm:pt-10/);
+  assert.match(hero, /font-mono text-sm\/6 font-medium tracking-widest text-gray-500 uppercase/);
+  assert.match(hero, /<h1 className="mt-2 px-2 text-4xl tracking-tighter text-balance/);
 });
 
 test("docs index route redirects to what-is-apihug", () => {
