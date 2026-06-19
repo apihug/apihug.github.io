@@ -11,7 +11,7 @@ import { ThemeSelect, ThemeToggle } from './ThemeToggle'
 function Featured2() {
   return (
     <a
-      href="/zhCN-docs/start.html"
+      href="/zhCN-docs"
       className="ml-3 text-xs leading-5 font-medium text-sky-600 dark:text-sky-400 bg-sky-400/10 rounded-full py-1 px-3 hidden xl:flex items-center hover:bg-sky-400/20"
     >
       <strong className="font-semibold">中文</strong>
@@ -43,7 +43,6 @@ function Featured2() {
     </a>
   )
 }
-
 
 function Featured() {
   return (
@@ -78,6 +77,55 @@ function Featured() {
         />
       </svg>
     </a>
+  )
+}
+
+function DocsMenu() {
+  let [isOpen, setIsOpen] = useState(false)
+
+  return (
+    <li
+      className="relative"
+      onMouseEnter={() => setIsOpen(true)}
+      onMouseLeave={() => setIsOpen(false)}
+    >
+      <button
+        type="button"
+        className="inline-flex items-center gap-1 hover:text-sky-500 dark:hover:text-sky-400"
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
+        onClick={() => setIsOpen((open) => !open)}
+      >
+        Docs
+        <svg
+          width="8"
+          height="6"
+          aria-hidden="true"
+          className={clsx('transition-transform', isOpen && 'rotate-180')}
+        >
+          <path
+            d="M1 1l3 3 3-3"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </button>
+      {isOpen && (
+        <div className="absolute left-0 top-full mt-3 w-44 rounded-xl border border-slate-200 bg-white p-2 shadow-lg dark:border-slate-700 dark:bg-slate-800">
+          <div className="flex flex-col text-sm font-semibold text-slate-700 dark:text-slate-200">
+            <Link href="/docs" className="rounded-lg px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-700">
+              English Docs
+            </Link>
+            <Link href="/zhCN-docs" className="rounded-lg px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-700">
+              中文文档
+            </Link>
+          </div>
+        </div>
+      )}
+    </li>
   )
 }
 
@@ -133,7 +181,7 @@ export function NavPopover({ display = 'md:hidden', className, ...props }) {
             </svg>
           </button>
           <ul className="space-y-6">
-            <NavItems />
+            <NavItems mobile />
             <li>
               <a
                 href="https://github.com/apihug"
@@ -152,19 +200,25 @@ export function NavPopover({ display = 'md:hidden', className, ...props }) {
   )
 }
 
-export function NavItems() {
+export function NavItems({ mobile = false }) {
   return (
     <>
-      <li>
-        <Link href="/zhCN" className="hover:text-sky-500 dark:hover:text-sky-400" title={'中文主页'}>
-          中文
-        </Link>
-      </li>
-      <li>
-        <Link href="/docs/start" className="hover:text-sky-500 dark:hover:text-sky-400">
-          Docs
-        </Link>
-      </li>
+      {mobile ? (
+        <>
+          <li>
+            <Link href="/docs" className="hover:text-sky-500 dark:hover:text-sky-400">
+              English Docs
+            </Link>
+          </li>
+          <li>
+            <Link href="/zhCN-docs" className="hover:text-sky-500 dark:hover:text-sky-400" title="中文文档">
+              中文文档
+            </Link>
+          </li>
+        </>
+      ) : (
+        <DocsMenu />
+      )}
       <li>
         <Link href="/docs/idea" className="hover:text-sky-500 dark:hover:text-sky-400" title={'IDEA Plugin'}>
           Editor
