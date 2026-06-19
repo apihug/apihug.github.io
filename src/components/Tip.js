@@ -14,9 +14,9 @@ export function TipGood({ children }) {
         </svg>
         <div className="absolute top-full mt-1 left-[0.46875rem] w-px h-[1.375rem] bg-cyan-500/30 rounded-full dark:bg-sky-400/30" />
       </div>
-      <p className="m-0 flex-1 text-base font-semibold text-slate-900 dark:text-slate-200">
+      <div className="m-0 flex-1 text-base font-semibold text-slate-900 dark:text-slate-200">
         {children}
-      </p>
+      </div>
     </div>
   )
 }
@@ -37,9 +37,9 @@ export function TipBad({ children }) {
         </svg>
         <div className="absolute top-full mt-1 left-[0.46875rem] w-px h-[1.375rem] bg-rose-200 rounded-full dark:bg-red-200/25" />
       </div>
-      <p className="m-0 flex-1 text-base font-semibold text-slate-900 dark:text-slate-200">
+      <div className="m-0 flex-1 text-base font-semibold text-slate-900 dark:text-slate-200">
         {children}
-      </p>
+      </div>
     </div>
   )
 }
@@ -55,7 +55,7 @@ export function TipCompat({ children }) {
             d="M6.998 2a1 1 0 00-.707 1.707l.707.707v3.758a1 1 0 01-.293.707l-4 4C.815 14.769 2.154 18 4.826 18H15.17c2.672 0 4.01-3.231 2.12-5.121l-4-4a1 1 0 01-.292-.707V4.414l.707-.707A1 1 0 0012.998 2h-6zm2 6.172V4h2v4.172a3 3 0 00.879 2.12l1.027 1.028a4 4 0 00-2.171.102l-.47.156a4 4 0 01-2.53 0l-.563-.187a1.992 1.992 0 00-.114-.035l1.063-1.063a3 3 0 00.879-2.121z"
           />
         </svg>
-        <p className="flex-1">{children}</p>
+        <div className="flex-1">{children}</div>
       </div>
     </div>
   )
@@ -77,7 +77,7 @@ export function TipInfo({ children }) {
         />
       </svg>
 
-      <p className="m-0 text-slate-700 text-sm font-medium dark:text-slate-200">{children}</p>
+      <div className="m-0 text-slate-700 text-sm font-medium dark:text-slate-200">{children}</div>
     </div>
   )
 }
