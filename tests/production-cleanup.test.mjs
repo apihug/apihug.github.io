@@ -44,3 +44,10 @@ test("app router entrypoints still point at the active runtime", () => {
   assert.match(docsLayout, /@\/components\/mobile-docs-nav/);
   assert.match(docsLayout, /@\/components\/docs-sidebar/);
 });
+
+test("tooling no longer carries pages-legacy default paths", () => {
+  const convertMdxScript = read("scripts", "convert-mdx.mjs");
+
+  assert.doesNotMatch(convertMdxScript, /src\/pages-legacy/);
+  assert.match(convertMdxScript, /Usage: node scripts\/convert-mdx\.mjs <source-root> \[target-root\]/);
+});

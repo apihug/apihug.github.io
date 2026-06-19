@@ -1,8 +1,15 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const sourceRoot = process.argv[2] ?? "src/pages-legacy/docs";
+const usage = "Usage: node scripts/convert-mdx.mjs <source-root> [target-root]";
+const sourceRoot = process.argv[2];
 const targetRoot = process.argv[3] ?? "src/docs";
+
+if (!sourceRoot) {
+  console.error(usage);
+  process.exit(1);
+}
+
 const resolvedSourceRoot = path.resolve(sourceRoot);
 const resolvedTargetRoot = path.resolve(targetRoot);
 const pluginMarketplaceHref =

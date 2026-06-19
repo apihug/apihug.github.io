@@ -270,6 +270,8 @@ test("app docs header exposes english and zhCN docs entry points", () => {
   assert.match(appHeader, /中文文档/);
   assert.match(appHeader, /href="\/docs"|href='\/docs'|href=\{["']\/docs["']\}/);
   assert.match(appHeader, /href="\/zhCN-docs"|href='\/zhCN-docs'|href=\{["']\/zhCN-docs["']\}/);
+  assert.doesNotMatch(appHeader, /\/zhCN-docs\/start\.html/);
+  assert.doesNotMatch(appHeader, /href="\/zhCN"|href='\/zhCN'|href=\{["']\/zhCN["']\}/);
   assert.match(appHeader, /aria-controls="docs-locale-menu"|aria-controls='docs-locale-menu'/);
 });
 
