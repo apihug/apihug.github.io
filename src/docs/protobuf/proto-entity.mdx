@@ -1,0 +1,94 @@
+export const title = "Protocol Buffers Entity Definition";
+export const description =
+  "Current ApiHug entity and column syntax for protobuf-based database modeling.";
+
+[Maven Central](https://search.maven.org/artifact/com.apihug/it-bom)
+
+[Install the IntelliJ plugin](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
+
+ApiHug maps domain messages to database structures through `hope.persistence.table` and `hope.persistence.column`.
+
+## Import and Extension Points
+
+```proto
+import "apihug/protobuf/domain/annotations.proto";
+```
+
+That import registers:
+
+- `(hope.persistence.table)` on `google.protobuf.MessageOptions`
+- `(hope.persistence.column)` on `google.protobuf.FieldOptions`
+
+## Current Syntax
+
+Use scalar booleans and scalar numeric fields. Do **not** use nested wrapper objects for properties like `length`, `precision`, or `scale`.
+
+```proto
+message Account {
+  option (hope.persistence.table) = {
+    name: "ACCOUNT";
+    description: "Account table";
+    wires: [IDENTIFIABLE, AUDITABLE];
+  };
+
+  string user_name = 1 [(hope.persistence.column) = {
+    name: "MY_USER_NAME";
+    description: "Name of the account";
+    nullable: false;
+    updatable: false;
+    length: 32;
+    type: VARCHAR;
+  }];
+}
+```
+
+## Runtime Configuration
+
+Project module `{module}-proto` can still tune persistence defaults in `src/resources/hope-wire.json`:
+
+```json
+{
+  "persistence": {
+    "identifyType": "LONG",
+    "tenantType": "LONG",
+    "format": "CAMEL",
+    "upper": "UPPER"
+  }
+}
+```
+
+### Naming Strategy
+
+- `format: "DEFAULT"` keeps the framework default naming convention
+- `format: "CAMEL"` keeps camelCase field naming
+- `format: "SNAKE"` forces snake_case field naming
+- `upper: "DEFAULT"` keeps the framework default case transformation
+- `upper: "UPPER"` converts generated column names to uppercase
+- `upper: "LOWER"` converts generated column names to lowercase
+- `upper: "CAPITALIZE"` converts generated column names to capitalized form
+
+If the proto explicitly sets `name`, that manual column name still wins.
+
+## What Lives in the Table Definition
+
+`Table` from `persistence.proto` covers:
+
+- table `name`, `catalog`, `schema`, `description`
+- `unique_constraints`
+- `indexes`
+- `views`
+- `wires`
+- `liquibase`
+
+`Column` covers:
+
+- `nullable`, `unique`, `insertable`, `updatable`, `searchable`, `sortable`
+- `length`, `precision`, `scale`
+- `type`, `enum_type`
+- `id`, `generated_value`
+- `transient`, `default_value`, `column_definition`, `table`
+
+## See Also
+
+1. [Database Directive Specification](/docs/spec/domain)
+2. [ApiHug Spring Data Extension](/docs/framework/spring-data)

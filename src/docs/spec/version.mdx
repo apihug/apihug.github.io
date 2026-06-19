@@ -1,0 +1,99 @@
+export const title = "Version Change Specification";
+export const description =
+  "Legacy version annotations from version.proto, kept for compatibility audits and older projects.";
+
+`apihug/protobuf/extend/version.proto` still exists in the current source, but the file is marked **deprecated**. New projects should prefer milestone and changelog documentation for human release notes, but older proto contracts may still carry these annotations.
+
+- **Extension Package**: `apihug/protobuf/extend/version.proto`
+- **Scope**: File / Service / Method / Message / Enum / Field
+- **Status**: Deprecated compatibility layer
+
+---
+
+## 1. Import and Registration
+
+```proto
+import "apihug/protobuf/extend/version.proto";
+```
+
+Registered extension points:
+
+| Descriptor | Extension point | Field number | Value type |
+|---|---|---:|---|
+| `FileOptions` | `(hope.version.file)` | 31142 | `repeated Version` |
+| `MethodOptions` | `(hope.version.method)` | 31142 | `repeated Version` |
+| `MessageOptions` | `(hope.version.msg)` | 31143 | `repeated Version` |
+| `ServiceOptions` | `(hope.version.svc)` | 31143 | `repeated Version` |
+| `EnumOptions` | `(hope.version.enm)` | 31143 | `repeated Version` |
+| `FieldOptions` | `(hope.version.field)` | 31143 | `repeated Version` |
+
+`31142` is reused for file and method descriptors, and `31143` is reused for message, service, enum, and field descriptors. That is valid because each registration targets a different protobuf descriptor type.
+
+---
+
+## 2. VersionTypeEnum
+
+```proto
+enum VersionTypeEnum {
+  NA = 0;
+  ADD = 1;
+  MODIFY = 2;
+  REMOVE = 3;
+}
+```
+
+| Enum Value | Meaning |
+|---|---|
+| `NA` | No explicit change type |
+| `ADD` | Added in this version |
+| `MODIFY` | Changed in this version |
+| `REMOVE` | Removed in this version |
+
+---
+
+## 3. Version Message
+
+```proto
+message Version {
+  string version = 1;
+  string timestamp = 2;
+  VersionTypeEnum type = 10;
+  string message = 11;
+  string track = 12;
+  string updated_by = 20;
+}
+```
+
+| Field | Type | Description |
+|---|---|---|
+| `version` | string | Version identifier such as `2.0.0-RELEASE` |
+| `timestamp` | string | Change timestamp |
+| `type` | `VersionTypeEnum` | Add / modify / remove marker |
+| `message` | string | Human-readable change note |
+| `track` | string | External ticket or issue id |
+| `updated_by` | string | Maintainer name |
+
+---
+
+## 4. Example
+
+```proto
+import "apihug/protobuf/extend/version.proto";
+
+service UserApi {
+  option (hope.version.svc) = [{
+    version: "2.0.0-RELEASE";
+    timestamp: "2025-05-15";
+    type: MODIFY;
+    message: "Merged legacy proto/app split into unified app module";
+    track: "MILESTONE-2.0.0";
+    updated_by: "Aaron";
+  }];
+}
+```
+
+## 5. Practical Guidance
+
+- Keep reading these annotations when auditing old proto files.
+- Do not introduce new `hope.version.*` usage unless you are maintaining backward compatibility with an existing contract.
+- Prefer [Milestone](/docs/milestone) and [Changelog](/docs/changelog) pages for current release history.

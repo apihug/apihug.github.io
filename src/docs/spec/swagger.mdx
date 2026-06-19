@@ -1,0 +1,947 @@
+export const title = "API Directive Specification";
+export const description =
+  "API Interface Extension User Manual — map protobuf service rpc to HTTP RESTful API and generate OpenAPI/Swagger documentation.";
+
+Map protobuf service rpc to HTTP RESTful API and generate OpenAPI/Swagger documentation.
+
+- **Extension Package**: `apihug/protobuf/swagger/swagger.proto`
+- **Scope**: Service/Method(rpc)/Message/Field
+- **Scenarios**: HTTP API, OpenAPI documentation, frontend-backend coordination
+
+---
+
+## Forbidden Rules
+
+### 1. Forbid file-level option
+
+**NEVER** add any file-level option declarations in proto files:
+
+```proto
+// Forbidden to use the following options (rely on default code generation configuration)
+option java_package = "...";
+option java_multiple_files = true;
+option go_package = "...";
+```
+
+All code generation configurations are automatically managed by the build system.
+
+### 2. Forbid cross-layer reference
+
+**API layer (api/) must not reference Domain entities**:
+
+```proto
+// Forbidden to reference domain layer entities
+import "com/example/domain/entities/user.proto";  // Wrong!
+
+message CreateUserRequest {
+  UserEntity user = 1;  // Wrong!
+}
+```
+
+**Correct approach**:
+```proto
+// Allow referencing constant layer (infra/)
+import "com/example/infra/settings/user_constant.proto";
+// Allow referencing other API messages
+import "com/example/api/common/response.proto";
+
+message CreateUserRequest {
+  string user_name = 1;  // Use basic types
+  UserStatusEnum status = 2;  // Enums can be shared
+  CommonResponse response = 3;  // API internal reference
+}
+```
+
+---
+
+## 1. Import and Syntax
+
+### 1.1 Import
+
+```proto
+import "apihug/protobuf/swagger/annotations.proto";
+```
+
+**Optional import** (only when Mock data is needed):
+```proto
+import "apihug/protobuf/mock/mock.proto";
+```
+
+### 1.2 Four-layer Extension Points
+
+From `apihug/protobuf/swagger/annotations.proto`:
+
+| Level   | proto Element | Extension Point            | Extension # | Function |
+|---------|---------------|----------------------------|-------------|----------|
+| Service | `service`     | `(hope.swagger.svc)`       | 1044 | Define service base path, description |
+| Method  | `rpc`         | `(hope.swagger.operation)` | 1042 | Define HTTP method, path, permissions |
+| Message | `message`     | `(hope.swagger.schema)`    | 1042 | Define request/response description |
+| Field   | `field`       | `(hope.swagger.field)`     | 1042 | Define field constraints, examples |
+| Enum    | `enum`        | `(hope.swagger.enm)`       | 1042 | Enum title and description |
+
+---
+
+## 2. Service-level Extension
+
+### 2.1 ServiceSchema Syntax
+
+```proto
+service ServiceName {
+  option (hope.swagger.svc) = {
+    path: "/base_path";
+    description: "Service description";
+  };
+}
+```
+
+### 2.2 Real Case
+
+```proto
+syntax = "proto3";
+package com.example.pet.service;
+
+import "apihug/protobuf/swagger/annotations.proto";
+
+service PetService {
+  option (hope.swagger.svc) = {
+    path: "/pet";
+    description: "Pet Manager service";
+  };
+
+  rpc GetPet (...) returns (...) {
+    // Method definition...
+  }
+}
+```
+
+### 2.3 Field Description
+
+#### `path` (string)
+Base path prefix for the service. Use resource names (`/user`, `/order`, `/pet`).
+
+#### `description` (string)
+Business description of the service.
+
+---
+
+## 3. Operation-level Extension (Core)
+
+### 3.1 HTTP Methods and Paths
+
+```proto
+rpc MethodName (RequestType) returns (ResponseType) {
+  option (hope.swagger.operation) = {
+    post: "/path";  // or get/put/patch/delete
+    description: "Method description";
+  };
+}
+```
+
+| Method   | Use Case                          | Example Path            |
+|----------|-----------------------------------|-------------------------|
+| `get`    | Query resources                   | `get: "/users"`         |
+| `post`   | Create resources, complex queries | `post: "/users"`        |
+| `put`    | Full update resources             | `put: "/users/{id}"`    |
+| `patch`  | Partial update resources          | `patch: "/users/{id}"`  |
+| `delete` | Delete resources                  | `delete: "/users/{id}"` |
+
+#### Path Variables
+
+```proto
+option (hope.swagger.operation) = {
+  get: "/pet/{id}";
+};
+```
+
+### 3.2 Real Case Collection
+
+#### Case 1: File Upload (multipart/form-data)
+
+```proto
+rpc UploadMeta (OpenApiMetaUploadRequest) returns (google.protobuf.Empty) {
+  option (hope.swagger.operation) = {
+    post: "/upload-meta";
+    description: "Open platform upload API metadata";
+    tags: "open";
+    group: TENANT;
+    authorization: {
+      low_limit_risky_mode: ANONYMOUS
+    };
+    priority: HIGH;
+    consumes: "multipart/form-data";
+  };
+}
+```
+
+#### Case 2: Paginated Query
+
+```proto
+rpc ReturnPageable (Customer) returns (Pet) {
+  option (hope.swagger.operation) = {
+    post: "/batch-user-pet";
+    pageable: true;
+    description: "Return pageable data based on request";
+    tags: "user";
+    tags: "pet";
+    request_name: "pet";
+  };
+}
+```
+
+#### Case 3: Path Parameters + Query Parameters
+
+```proto
+rpc UpdateByPath (google.protobuf.Empty) returns (google.protobuf.Empty) {
+  option (hope.swagger.operation) = {
+    post: "/update-by-path/{user-id}/try-more/{user-name}";
+    description: "Test two path parameters";
+    tags: "other";
+    parameters: {
+      parameter: {
+        name: "user-id";
+        in: PATH;
+        schema: {
+          format: INTEGER;
+          maximum: 12345
+        };
+      };
+      parameter: {
+        name: "user-name";
+        in: PATH;
+        schema: {
+          format: STRING;
+          empty: false;
+          pattern: "^[A-Za-z0-9+_.-]+@(.+)$";
+          max_length: 64
+        };
+      }
+    }
+  };
+}
+```
+
+#### Case 4: With Permission Validation
+
+```proto
+rpc PlaceOrder (google.protobuf.Empty) returns (PlaceOrderRequest) {
+  option (hope.swagger.operation) = {
+    post: "/place-order";
+    description: "Place order operation";
+    summary: "Place order detailed operation";
+    tags: "user";
+    tags: "pet";
+    security: {
+      security_requirement: {
+        key: "jwt";
+        value: {
+          scope: "pet:read";
+          scope: "pet:write";
+        };
+      }
+    }
+  };
+}
+```
+
+---
+
+## 4. Operation Field Details
+
+### 4.1 Basic Description
+
+| Field | Type | Description |
+|---|---|---|
+| `description` | string | Interface functionality description |
+| `summary` | string | Brief summary (under 120 chars) |
+| `tags` | repeated string | Interface grouping tags |
+| `operation_id` | string | Unique identifier for code generation |
+
+### 4.2 Request and Response Configuration
+
+#### `request_name` (string)
+Request body parameter name.
+
+#### `pageable` (optional bool)
+Enable paginated query. Request auto-adds `page`, `size`, `sort`; response wrapped as `Page<T>`.
+
+#### `input_repeated` / `output_repeated` (optional bool)
+Mark request/response as list.
+
+**Deprecated**: Use `input_repeated` instead of `input_plural`; use `output_repeated` instead of `out_plural`.
+
+#### `raw` (optional bool)
+Do not wrap response (return raw type directly).
+
+#### `body_empty` (bool)
+Allow response body to be empty.
+
+### 4.3 Media Types
+
+#### `consumes` / `produces` (repeated string)
+Content-Type accepted/returned by the interface.
+
+#### `response_media_type` (MediaType enum)
+
+**Selected common values** (from `Operation.MediaType` in `swagger.proto`):
+
+| Enum Value | MIME Type | Use Case |
+|---|---|---|
+| `APPLICATION_JSON` | application/json | JSON response (default) |
+| `TEXT_PLAIN` | text/plain | Plain text |
+| `TEXT_HTML` | text/html | HTML page |
+| `APPLICATION_PDF` | application/pdf | PDF file |
+| `APPLICATION_ZIP` | application/zip | Zip archive |
+| `APPLICATION_XLSX` | application/vnd.openxmlformats-officedocument.spreadsheetml.sheet | Excel |
+| `IMAGE_PNG` | image/png | PNG image |
+| `MULTIPART_FORM_DATA` | multipart/form-data | File upload |
+| `APPLICATION_OCTET_STREAM` | application/octet-stream | Binary download |
+| `TEXT_CSV` | text/csv | CSV data |
+| `APPLICATION_XML` | application/xml | XML data |
+
+```proto
+response_media_type: APPLICATION_PDF;
+```
+
+The source enum is broader than this quick table and also includes office formats, YAML, audio, video, and additional multipart variants.
+
+### 4.4 Parameter Definition
+
+#### `parameters` (Parameters message)
+
+**Mandatory rules**: All path/query/header/cookie/session parameters must be declared.
+
+| Field | Type | Description |
+|---|---|---|
+| `name` | string | Parameter name |
+| `in` | IN enum | Location |
+| `schema` | JSONSchema | Parameter constraints |
+| `is_repeated` | bool | Mark the parameter as an array/list |
+
+`plural` still exists in source as a deprecated compatibility field. Prefer `is_repeated`.
+
+**IN Enum Values**:
+
+| Enum Value | Meaning |
+|---|---|
+| `QUERY` | Query parameter (`?key=value`) |
+| `PATH` | Path parameter (`/{id}`) |
+| `HEADER` | HTTP header |
+| `COOKIE` | Cookie |
+| `SESSION` | Session |
+
+```proto
+parameters: {
+  parameter: {
+    name: "user-id";
+    in: QUERY;
+    is_repeated: true;
+    schema: {
+      format: INTEGER;
+      description: "user id";
+    }
+  };
+}
+```
+
+### 4.5 Permission Control
+
+#### `authorization` (Authorization message)
+
+**Method 1: Low-level risk mode**
+
+```proto
+authorization: {
+  low_limit_risky_mode: ANONYMOUS  // or LOGIN / ACTIVE
+}
+```
+
+| Enum Value  | Meaning                              |
+|-------------|--------------------------------------|
+| `ANONYMOUS` | No login required                    |
+| `LOGIN`     | Login required                       |
+| `ACTIVE`    | Login required and account activated |
+
+**Method 2: RBAC**
+
+```proto
+authorization: {
+  rbac: {
+    roles: {
+      roles: ["ROLE_ADMIN", "ROLE_USER"]
+    };
+    authorities: ["USER_CREATE", "USER_DELETE"];
+    combinator: AND;  // or OR
+  }
+}
+```
+
+**Method 3: SpEL Expression**
+
+```proto
+authorization: {
+  expression: "hasRole('ADMIN') and #userId == authentication.principal.id"
+}
+```
+
+#### `group` (Group enum)
+
+| Enum Value | Meaning |
+|---|---|
+| `CUSTOMER` | User-side (C-side) |
+| `TENANT` | Tenant management side (B-side) |
+| `PLATFORM` | Platform operation side |
+
+### 4.6 Priority and Visibility
+
+#### `priority` (Priority enum, from source)
+
+| Enum Value | Value | Meaning |
+|---|---|---|
+| `NA` | 0 | Not set |
+| `LOW` | 1 | Low priority |
+| `MIDDLE` | 4 | Medium (team lead approval) |
+| `HIGH` | 8 | High (project manager approval) |
+| `CRITICAL` | 16 | Critical (VP approval) |
+| `FATAL` | 32 | May affect business (CTO approval) |
+
+#### `internal` / `hide` / `deprecated` (bool)
+Mark as internal, hidden from docs, or deprecated.
+
+### 4.7 AI-friendly Fields
+
+#### `questions` (repeated string)
+
+Natural language questions for LLM understanding:
+```proto
+questions: [
+  "How to get user order list?",
+  "Query the most recent page of order data"
+];
+```
+
+---
+
+## 5. Message-level Extension
+
+### 5.1 Schema Syntax
+
+```proto
+message MessageName {
+  option (hope.swagger.schema) = {
+    json_schema: {
+      title: "Object title";
+      description: "Object description";
+    };
+  };
+}
+```
+
+### 5.2 Real Case
+
+```proto
+message PlaceOrderRequest {
+  option (hope.swagger.schema) = {
+    json_schema: {
+      title: "PlaceOrder";
+      description: "Place order request";
+    };
+    external_docs: {
+      url: "https://example.com/order-design";
+      description: "Order design detailed information"
+    }
+  };
+
+  uint64 id = 1 [(hope.swagger.field) = {
+    description: "Request ID";
+    empty: false;
+    maximum: 12345;
+    example: "1111";
+  }];
+}
+```
+
+---
+
+## 6. Field-level Extension (JSONSchema)
+
+### 6.1 Basic Fields
+
+| Field | Type | Description |
+|---|---|---|
+| `description` | string | Field description |
+| `example` | string | Example value |
+| `title` | string | Field title |
+| `default` | string | Default value |
+
+### 6.2 Empty Value Control (choose one — `oneof EmptyConstraint`)
+
+| Field | Applicable | Function |
+|---|---|---|
+| `empty` (bool) | All types | Not null/empty string/collection size > 0 |
+| `blank` (bool) | String only | Cannot be blank (no spaces) |
+| `nullable` (bool) | Non-string | Cannot be null |
+
+**Selection**:
+```
+String → empty: false
+String (no spaces) → blank: false
+Number/Date → nullable: false
+Collection → empty: false
+```
+
+### 6.3 Length Constraints
+
+```proto
+max_length: 100;    // uint64
+min_length: 1;
+max_items: 50;      // collection element count
+min_items: 1;
+max_properties: 20; // object property count
+min_properties: 1;
+```
+
+### 6.4 Numeric Constraints
+
+```proto
+maximum: 12345;     // double
+minimum: 1;
+exclusive_maximum: true;  // open interval
+exclusive_minimum: true;
+multiple_of: 10;          // must be multiple
+```
+
+### 6.5 Pattern and Enum
+
+```proto
+pattern: "^[A-Za-z0-9+_.-]+@(.+)$";  // regex
+enum: ["PENDING", "APPROVED", "REJECTED"];
+```
+
+### 6.6 Format Specification (`format` — JSONSchemaFormat enum)
+
+| Enum Value  | Type | Use Case |
+|---|---|---|
+| `STRING`    | string | String |
+| `INTEGER`   | int32 | Integer |
+| `LONG`      | int64 | Long integer |
+| `DOUBLE`    | double | Float |
+| `BOOLEAN`   | bool | Boolean |
+| `DATE`      | LocalDate | Date |
+| `DATE_TIME` | LocalDateTime | DateTime |
+| `TIME`      | LocalTime | Time |
+| `UUID`      | UUID | UUID string |
+| `EMAIL`     | string | Email |
+| `PASSWORD`  | string | Password |
+| `BINARY`    | bytes | Binary data |
+
+### 6.7 Date and Time Constraints
+
+#### `time_constraint_type` (TimeConstraintType enum)
+
+| Enum Value | Meaning | Jakarta Annotation |
+|---|---|---|
+| `NA` | No restriction | - |
+| `FUTURE` | Must be future | `@Future` |
+| `FUTURE_OR_PRESENT` | Future or present | `@FutureOrPresent` |
+| `PAST` | Must be past | `@Past` |
+| `PAST_OR_PRESENT` | Past or present | `@PastOrPresent` |
+
+#### `date_format` (DateFormat enum)
+
+| Enum Value | Format | Example |
+|---|---|---|
+| `BASIC_ISO_DATE` | yyyyMMdd | 20231225 |
+| `ISO_LOCAL_DATE` | yyyy-MM-dd | 2023-12-25 |
+| `ISO_TIME` | HH:mm:ss.SSSSSSS | 10:15:30.123 |
+| `ISO_LOCAL_TIME` | HH:mm:ss | 10:15:30 |
+| `YYYY_MM_DD_HH_MM_SS` | yyyy-MM-dd HH:mm:ss | 2023-12-25 10:15:30 |
+| `YYYY_MM_DD_HH_MM_SS_SSS` | yyyy-MM-dd HH:mm:ss:SSS | 2023-12-25 10:15:30:123 |
+
+Custom format: `customized_date_format: "yyyy/MM/dd";`
+
+### 6.8 Advanced Validation
+
+```proto
+email: true;                // email validation
+assert: true;               // must be true/false
+digits_integer: 3;          // integer part digits
+digits_fraction: 2;         // decimal part digits
+decimal_max: "999.99";      // string form
+decimal_min: "0.01";
+```
+
+---
+
+## 7. Mock Data Configuration
+
+Mock data is configured via the `mock` field inside `hope.swagger.field`. See the [Mock Data Specification](/docs/spec/mock) for full details.
+
+### 7.1 Field-level Mock
+
+```proto
+string phone = 1 [(hope.swagger.field) = {
+  description: "Phone number";
+  mock: {
+    nature: CN_PHONE
+  };
+}];
+```
+
+### 7.2 Operation-level Mock
+
+```proto
+option (hope.swagger.operation) = {
+  post: "/ping";
+  mock: {
+    nature: GUID
+  };
+};
+```
+
+### 7.3 Quick Mock Reference
+
+| Use Case | Mock Config |
+|---|---|
+| Email | `mock: { nature: EMAIL }` |
+| Phone | `mock: { nature: CN_PHONE }` |
+| UUID | `mock: { nature: GUID }` |
+| Name | `mock: { nature: NAME }` |
+| Enum values | `mock: { string_rule: { candidates: ["A", "B"] } }` |
+| Price | `mock: { number_rule: { min: 1; max: 9999; max_fraction: 2 } }` |
+
+---
+
+## 8. Key Type Identification
+
+### 8.1 bool vs string
+
+**Wrong**:
+```proto
+empty: "false"  // String, wrong!
+nullable: "true"
+is_repeated: "false"
+```
+
+**Correct**:
+```proto
+empty: false  // bool type
+nullable: true
+is_repeated: false
+```
+
+### 8.2 uint32/uint64/int64/double vs wrapper types
+
+**Wrong** (old syntax):
+```proto
+length: {value: 32}  // Old syntax!
+max_length: {value: 100}
+maximum: {value: 12345}
+```
+
+**Correct**:
+```proto
+length: 32  // uint32
+max_length: 100  // uint64
+maximum: 12345  // double
+```
+
+### 8.3 optional bool vs bool
+
+`optional bool` for three-state boolean (not set/true/false):
+
+```proto
+optional bool pageable = 51;
+optional bool raw = 52;
+```
+
+- `bool`: Default false (two-state)
+- `optional bool`: Can be not set (three-state)
+
+---
+
+## 9. Complete Examples
+
+### 9.1 Complete Service Example
+
+```proto
+syntax = "proto3";
+package com.example.pet.service;
+
+import "com/example/pet/bean/request.proto";
+import "swagger/annotations.proto";
+import "google/protobuf/empty.proto";
+
+service PetService {
+  option (hope.swagger.svc) = {
+    path: "/pet";
+    description: "Pet management service";
+  };
+
+  rpc UploadFile (UploadRequest) returns (google.protobuf.Empty) {
+    option (hope.swagger.operation) = {
+      post: "/upload";
+      description: "Upload pet photo";
+      tags: "pet";
+      consumes: "multipart/form-data";
+      multipart: true;
+      authorization: {
+        low_limit_risky_mode: LOGIN
+      };
+    };
+  };
+
+  rpc ListPets (PetQueryRequest) returns (Pet) {
+    option (hope.swagger.operation) = {
+      post: "/list";
+      description: "Paginated query pet list";
+      tags: "pet";
+      pageable: true;
+      authorization: {
+        rbac: {
+          authorities: ["PET_VIEW"];
+        }
+      };
+    };
+  };
+
+  rpc GetPetById (google.protobuf.Empty) returns (Pet) {
+    option (hope.swagger.operation) = {
+      get: "/pets/{id}";
+      description: "Get pet details by ID";
+      tags: "pet";
+      parameters: {
+        parameter: {
+          name: "id";
+          in: PATH;
+          schema: {
+            format: LONG;
+            minimum: 1;
+          };
+        }
+      };
+      authorization: {
+        low_limit_risky_mode: ANONYMOUS
+      };
+    };
+  };
+
+  rpc DeletePet (google.protobuf.Empty) returns (google.protobuf.Empty) {
+    option (hope.swagger.operation) = {
+      delete: "/pets/{id}";
+      description: "Delete pet";
+      tags: "pet";
+      priority: HIGH;
+      parameters: {
+        parameter: {
+          name: "id";
+          in: PATH;
+          schema: {
+            format: LONG;
+          };
+        }
+      };
+      authorization: {
+        rbac: {
+          roles: {roles: ["ROLE_ADMIN"]};
+          authorities: ["PET_DELETE"];
+          combinator: AND;
+        }
+      };
+    };
+  };
+}
+```
+
+### 9.2 Complete Message Example
+
+```proto
+syntax = "proto3";
+package com.example.pet.bean;
+
+import "swagger/annotations.proto";
+import "com/example/pet/enumeration/constants.proto";
+
+message PlaceOrderRequest {
+  option (hope.swagger.schema) = {
+    json_schema: {
+      title: "PlaceOrderRequest";
+      description: "Place order request object";
+    };
+  };
+
+  uint64 id = 1 [(hope.swagger.field) = {
+    description: "Request ID";
+    empty: false;
+    maximum: 12345;
+    example: "1111";
+  }];
+
+  uint64 pet_id = 2 [(hope.swagger.field) = {
+    description: "Pet ID";
+    empty: false;
+    minimum: 1;
+    maximum: 999999;
+    example: "1985";
+  }];
+
+  uint32 quantity = 3 [(hope.swagger.field) = {
+    description: "Purchase quantity";
+    empty: false;
+    minimum: 1;
+    maximum: 100;
+    example: "5";
+  }];
+
+  com.example.pet.enumeration.OrderStatus order_status = 4 [(hope.swagger.field) = {
+    description: "Order status";
+  }];
+
+  string ship_date = 5 [(hope.swagger.field) = {
+    description: "Shipping date";
+    example: "2023-12-25";
+    date_format: ISO_LOCAL_DATE;
+    time_constraint_type: FUTURE;
+    empty: false;
+  }];
+
+  bool complete = 6 [(hope.swagger.field) = {
+    description: "Is completed";
+    example: "false";
+  }];
+
+  string phone = 7 [(hope.swagger.field) = {
+    description: "Contact phone";
+    example: "13800138000";
+    pattern: "^1[3-9]\\d{9}$";
+    mock: {nature: CN_PHONE};
+  }];
+
+  string email = 8 [(hope.swagger.field) = {
+    description: "Contact email";
+    email: true;
+    empty: false;
+    mock: {nature: EMAIL};
+  }];
+
+  string remark = 9 [(hope.swagger.field) = {
+    description: "Remark";
+    max_length: 500;
+    mock: {
+      chinese_rule: {
+        type: SENTENCE;
+        max: 50;
+      }
+    };
+  }];
+}
+```
+
+---
+
+## 10. Common Errors
+
+### 10.1 Type Confusion
+
+**Wrong**:
+```proto
+empty: "false"  // String
+max_length: {value: 100}  // Old syntax
+pageable: "false"  // String
+```
+
+**Correct**:
+```proto
+empty: false  // bool type
+max_length: 100  // uint64 type
+pageable: true  // optional bool
+```
+
+### 10.2 oneof Conflict
+
+**Wrong**: `empty: false; blank: false;` (both set!)
+**Correct**: Set only one: `empty: false;`
+
+### 10.3 Deprecated Fields
+
+**Wrong**: `input_plural: true;` / `out_plural: true;`
+**Correct**: `input_repeated: true;` / `output_repeated: true;`
+
+---
+
+## 11. Best Practices
+
+### 11.1 HTTP Method Selection
+
+```
+Query single resource -> GET /resources/{id}
+Query list -> GET /resources or POST /resources/search
+Create resource -> POST /resources
+Full update -> PUT /resources/{id}
+Partial update -> PATCH /resources/{id}
+Delete resource -> DELETE /resources/{id}
+```
+
+### 11.2 Path Design
+
+```
+Resource collection -> /pets
+Specific resource -> /pets/{id}
+Sub-resource -> /pets/{id}/photos
+Action -> /pets/{id}/activate
+Complex query -> POST /pets/search
+```
+
+### 11.3 Permission Design
+
+```
+Public interface -> low_limit_risky_mode: ANONYMOUS
+Login required -> low_limit_risky_mode: LOGIN
+Role required -> rbac.roles
+Permission required -> rbac.authorities
+Complex rules -> rbac.combinator: AND
+```
+
+---
+
+## 12. Quick Reference
+
+### Service Template
+
+```proto
+service ServiceName {
+  option (hope.swagger.svc) = {
+    path: "/path";
+    description: "Description";
+  };
+
+  rpc MethodName (...) returns (...) {
+    option (hope.swagger.operation) = {
+      post: "/path";
+      description: "Description";
+    };
+  }
+}
+```
+
+### Operation Template
+
+```proto
+option (hope.swagger.operation) = {
+  post: "/path";
+  description: "Description";
+  tags: "tag";
+  authorization: {
+    low_limit_risky_mode: LOGIN
+  };
+};
+```
+
+### Field Template
+
+```proto
+string field_name = sequence [(hope.swagger.field) = {
+  description: "Description";
+  example: "Example";
+  empty: false;
+}];
+```

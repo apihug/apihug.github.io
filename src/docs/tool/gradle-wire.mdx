@@ -1,0 +1,117 @@
+export const title = "ApiHug Gradle Wire Command";
+export const description =
+  "How ApiHug Wire gradle task work";
+
+<TipInfo>May be a bit out of date ⚠️⚠️⚠️</TipInfo>
+
+`Wire` specific for the proto kind module, it used to compile the proto definition to neutral result.
+
+## Setup
+
+Please refer to: [apihug-full-demo demo-user-proto](https://github.com/apihug/apihug-full-demo/tree/main/demo-user-proto) gradle [build.gradle](https://github.com/apihug/apihug-full-demo/blob/main/demo-user-proto/build.gradle):
+
+```groovy
+plugins {
+    id "java-library"
+    alias(libs.plugins.hopeWire)
+}
+
+hopeWire {
+    keepProto = false
+    verbose = false
+}
+```
+
+Meta information  [hope-wire.json](https://github.com/apihug/apihug-full-demo/blob/main/demo-user-proto/src/main/resources/hope-wire.json):
+
+```json
+{
+  "packageName": "com.apihug.demo.user",
+  "name": "demo-user-proto",
+  "application": "demo-user",
+  "domain": "user",
+  "persistence" : {
+    "identifyType" : "LONG",
+    "tenantType" : "LONG"
+  },
+  "authority" : {
+    "enumClass" : "com.apihug.demo.user.proto.infra.settings.UserAuthorityEnum",
+    "codePrefix" : 10240000
+  },
+  "createdAt": "2024-02-29",
+  "createdBy" : "dell",
+  "api": {
+    "openapi" : "3.0.1",
+    "info" : {
+      "contact" : {
+        "name" : "developer@apihug.com",
+        "url" : "https://github.com/apihug/",
+        "email" : "developer@apihug.com"
+      }
+    },
+    "externalDocs" : {
+      "description" : "Hope is the best thing",
+      "url" : "https://github.com/apihug/"
+    },
+    "tags" : [ {
+      "name" : "sample",
+      "description" : "Sample Tag"
+    }]
+  }
+}
+```
+
+## Configuration
+
+Gradle `hopeWire` Configuration details:
+
+| Argument                        | Description                                  | Type      | Default | Comment                                                                                                                                                                                 |
+|---------------------------------|----------------------------------------------|-----------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| disable                         | Plugin debugging                             | `boolean` | `false` | After dependency injection is complete, do not add additional tasks, for debugging and testing purposes                                                                                 |
+| smock                           | Plugin debugging                             | `boolean` | `false` | After the above step is complete + Task injection is finished, do not execute the final generation action, for debugging and testing purposes                                           |
+| debug                           | Plugin debugging                             | `boolean` | `false` | After the above steps are complete + the first stage of the generation action is prepared, do not finally trigger the action, for debugging and testing purposes                        |
+| restrict                        | Implicit conversion for non-extensible types | `boolean` | `false` | Whether `google.protobuf.Timestamp` is supported for default conversion to local time                                                                                                   |
+| verbose                         | Enable execution process log                 | `boolean` | `false` | Enable full log for debugging when there are issues                                                                                                                                     |
+| generatedVersion                | Include generated plugin version             | `boolean` | `false` | Whether to include the plugin version in the `@Generated` annotation of the generated code                                                                                              |
+| generatedTime                   | Include generation timestamp                 | `boolean` | `false` | Whether to include the generation timestamp in the `@Generated` annotation of the generated code                                                                                        |
+| pluginMainVersion               | Plugin auxiliary version                     | `String`  |         | The version dependency of the wire plugin at runtime, do not set unless necessary. The Apihug overall package is released with BOM, and this version should not be manually set         |
+| pluginMainClass                 | Plugin auxiliary entry Main                  | `String`  |         | Do not set unless the plugin is extended                                                                                                                                                |
+| local                           | Local plugin                                 | `boolean` | `false` | Set if you are extending the plugin yourself, otherwise do not set                                                                                                                      |
+| protocVersion                   | Protoc version                               | `String`  |         | Supplied by Wire at the time of release, can be defined by oneself (may lead to incompatibility risks)                                                                                  |
+| grpcVersion                     | GRPC version                                 | `String`  |         | Supplied by Wire at the time of release, can be defined by oneself (may lead to incompatibility risks)                                                                                  |
+| keepProto                       | Include original compiled proto files        | `boolean` | `false` | Whether to carry the results of protoc compilation when the wire project is released, it should be limited to the POJO layer unless there is a deep logical dependency between projects |
+| wireProtoBufGradlePluginVersion | Protobuf plugin version                      | `String`  |         | Not enabled                                                                                                                                                                             |
+| validationVersion               | Validation version                           | `String`  |         | Not enabled                                                                                                                                                                             |
+| swaggerVersion                  | Swagger version                              | `String`  |         | Not enabled                                                                                                                                                                             |
+
+Meta configuration `resources\hope-wire.json`:
+
+| Name                     | Description                       | Type     | (Default) | Remarks                                                                                                                                                |
+|--------------------------|-----------------------------------|----------|-----------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
+| packageName              | Package Name                      | `String` | Required  | Project package name, must conform to Java package naming conventions, cannot contain reserved keywords: `wire`, `stub`                                |
+| name                     | Project Name                      | `String` | Required  | Project identifier, must conform to artifact ID, lowercase, Chinese characters, example with a proto suffix: user-info-proto                           |
+| application              | Application Project               | `String` | Required  | The name of the project that matches the proto, usually the `name` without the `proto` suffix, example: user-info                                      |
+| module                   | Module Name                       | `String` | Required  | Used for service locator at runtime to locate, if not set, `name` is used instead, the combination of domain+module must be unique at runtime          |
+| domain                   | Domain Name                       | `String` | Required  | The domain it belongs to                                                                                                                               |
+| description              | Description                       | `String` | Optional  | Description                                                                                                                                            |
+| persistence.identifyType | Database, Account Type            | `String` | Optional  | Data design, enabled when there is an account ID identifier, STRING\|INTEGER\|LONG                                                                     |
+| persistence.tenantType   | Database, Tenant Type             | `String` | Optional  | Data design, enabled when there is a multi-tenant identifier, STRING\|INTEGER\|LONG                                                                    |
+| authority.enumClass      | Authority, Permission Type Enum   | `String` | Optional  | Authority design, permission enumeration class, must be defined in the proto, checked at compile time                                                  |
+| authority.codePrefix     | Authority, Permission Code Prefix | `Long`   | Optional  | Authority design, for multi-module setups, permission code segment to avoid overlap, example: 100000 for `user` permission range, 100001 for the first |
+
+## Run
+
+Every Auto generated project include a detail `README` example: [README](https://github.com/apihug/apihug-full-demo/blob/main/README.md), include detail instruction how to use it.
+
+### Build All
+
+```shell
+sh gradlew clean build -x test -x wireTest -x stubTest
+```
+
+### Build Individual Module
+
+```shell
+sh gradlew {YOUR_MODULE}:clean wire build -x test -x wireTest
+```
+

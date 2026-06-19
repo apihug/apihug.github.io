@@ -1,0 +1,171 @@
+export const title = "Milestone 2.0.0-RELEASE";
+export const description =
+  "SDK [2.0.0-RELEASE]";
+
+<TipGood>
+  `2.0.0-RELEASE` marks a pivotal milestone for ApiHug, introducing **breaking changes** designed to establish a next-generation, **Large Language Model (LLM)-friendly** API specification and tooling ecosystem.
+</TipGood>
+
+[Maven Central](https://search.maven.org/artifact/com.apihug/it-bom)
+
+[JetBrains Marketplace](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
+
+## SDK [2.0.0-RELEASE] – December 10, 2025
+
+- Migrated JavaPoet from Square to the Palantir fork  
+- Replaced Google’s Protobuf parser with Square’s Wire engine  
+- Initial support for Protobuf Schema Catalog
+
+## Plugin [1.0.0] – December 10, 2025
+
+- Upgraded to SDK `2.0.0-RELEASE`  
+- Removed legacy Protocol Buffer plugin dependencies  
+- Adopted a lightweight, pure Wire-driven Protobuf compiler  
+- Removed AI-related components to focus on core functionality  
+- Cached metadata in human-readable text format to improve LLM compatibility  
+- Various bug fixes
+
+⚠️⚠️⚠️ **Do NOT upgrade to Spring Boot 4.0 or later (as of December 2025)** — the current SDK is **not yet compatible** with the **breaking changes** introduced in Spring Boot 4.0. ⚠️⚠️⚠️
+
+Forcing an upgrade may result in obscure build or runtime errors that severely impact development velocity.
+
+For details on Spring Boot 4.0 breaking changes, refer to the official migration guide:  
+[Spring Boot 4.0 Migration Guide](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.0-Migration-Guide)
+
+## Key New Features
+
+1. **Polymorphism Support**: Implemented via Protocol Buffers’ `oneof` syntax.  
+2. **Streamlined OpenAPI Output**: Uses OAS `allOf` to flatten and simplify response wrappers.  
+3. **Ultra-Fast Lightweight Compiler**: Dramatically improves generation and iteration speed.  
+4. **Rich Metadata Export**: Enables advanced toolchain integration.  
+5. **LLM-Ready Specification Format**: Lays the foundation for future Specification-Driven Development (work in progress).
+
+## Upgrade Instructions
+
+Refer to: [apihug-demo/libs.versions.toml](https://github.com/apihug/apihug-demo/blob/main/gradle/libs.versions.toml)
+
+1. **Upgrade ApiHug SDK**: In `{PROJECT_ROOT}/gradle/libs.versions.toml`, update `apihug = "1.0.0-RELEASE"` to `2.0.0-RELEASE` or higher.  
+2. **Upgrade IntelliJ IDEA Plugin** to version `1.0.0+`:  
+   [ApiHug – API Design Copilot](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)  
+3. **Ensure Spring Boot version < 4.0** — we recommend the `3.8.x` series due to breaking changes in Spring Boot 4.0.  
+4. **Update build commands**: The lightweight compiler now runs automatically before builds; explicit `wire` or `stub` commands are no longer needed.  
+5. **Project structure has changed as follows**:
+
+## Project Structure
+
+### Generated vs. Handwritten Directories
+
+- **Generated directories (`src/generated`)** are **read-only** and managed entirely by ApiHug tooling.  
+  - Do **not** manually edit files in these directories—changes will be overwritten.  
+  - To customize output, modify source `.proto` contracts or generator configuration instead.  
+- **Handwritten directories** (`java`, `proto`, etc.) contain developer-authored code and schemas.  
+  - Business logic belongs in `src/main/java`.  
+  - Protocol Buffer definitions (`.proto` files) belong in `src/main/proto`.
+
+### Production Source Layout
+
+```
+{module}/
+├── src/main/
+│   ├── proto/                         → Handwritten .proto definitions
+│   │   └── {package_name}/
+│   │       ├── api/                   → API contracts
+│   │       ├── domain/                → Domain entities
+│   │       └── infra/                 → Infrastructure (enums, errors)
+│   ├── java/                          → Handwritten business logic
+│   ├── trait/                         → Repository extensions
+│   └── resources/
+│       └── hope-wire.json             → Module configuration
+├── src/generated/main/                → Generated code (read-only)
+│   ├── api/                           → API interfaces
+│   ├── domain/                        → Domain models
+│   ├── wire/                          → DTOs
+│   ├── mcp/                           → Microservice contracts
+│   └── cloud/                         → Cloud adapters
+├── src/test/
+│   ├── java/                          → Unit/integration tests
+│   └── trait/                         → Test extensions
+└── src/generated/test/                → Generated test code (read-only)
+├── api/                           → Contract-based API tests
+└── ...
+```
+
+**Gradle conventions**:
+- Subdirectories under `src/generated/main` are added to `sourceSets.main.java.srcDirs` and compiled as part of the main Java sources.
+- `src/main/proto` is registered as a resource directory (`sourceSets.main.resources.srcDir`) so `.proto` files are available at build time.
+
+### Kola Contract Test Directory (`src/test-kola`)
+
+Kola enables contract-based end-to-end testing via a dedicated source set and task:
+
+```
+src/
+  main/
+    java/          // Production Java source code
+    resources/     // Production resources
+  test/
+    java/          // Standard unit and integration tests (e.g., JUnit)
+    resources/     // Test resources for standard tests
+  test-kola/
+    java/          // Auto-generated Java test classes (compiled and executed)
+    groovy/        // Groovy DSL scripts (treated as resources; not compiled)
+    resources/     // Additional test assets (contracts, sample data, configurations, etc.)
+```
+
+Gradle defines a `testKola` source set:
+- `src/test-kola/java`: Contains generated test classes.
+- `src/test-kola/groovy` and `src/test-kola/resources`: Registered as resource directories.
+- Groovy DSL files are **not compiled**—they’re consumed by generators or test runners at build time.
+- The `testKola` classpath includes outputs from both `main` and `test`, enabling reuse of utilities and base classes.
+
+A dedicated `testKola` Gradle task runs only Kola-generated tests (via JUnit Platform). The default `test` task also uses JUnit Platform for consistency.
+
+### Best Practices
+
+- **Never edit files in `src/generated`**—update source contracts and regenerate instead.  
+- Keep **business logic in `src/main/java`** and **tests in `src/test/java`** for clarity.  
+- Place **Protobuf contracts in `src/main/proto`** and **Kola DSL scripts in `src/test-kola/groovy`** to avoid mixing concerns.  
+- Use `./gradlew test` for standard tests and `./gradlew testKola` for contract validation—this enables layered execution and easier debugging.
+
+---
+
+## Stub Module
+
+As of SDK `2.1.4-RELEASE`, the `stub` module has been merged into the main module. There is **no longer a separate `stub` module or command**.
+
+## Protobuf Path Changes
+
+```protobuf
+// Old paths
+import "extend/version.proto";
+import "swagger/annotations.proto";
+import "extend/domain.proto";
+
+// New paths
+import "apihug/protobuf/extend/version.proto";
+import "apihug/protobuf/swagger/annotations.proto";
+import "apihug/protobuf/extend/domain.proto";
+```
+
+### Syntax Enhancements
+
+1. Polymorphism via `oneof` (mapped to OpenAPI `allOf`)
+2. Stream definitions (semantically equivalent to gRPC streams; server-side support pending)
+3. Upload/download endpoint definitions (server-side support pending)
+4. Improved single-response type definitions (for non-reference types)
+5. Support for complex type definitions
+6. Schema definition capabilities
+7. API visibility markers: `internal`, `external`, `hide`
+
+## Gradle Configuration
+
+1. `wire` projects support the `protoImport` syntax for including third-party Protobuf dependencies.
+2. Projects previously using `stub` should now use `wireImport` to declare Wire module dependencies.  
+⚠️ Using `implementation` instead of `wireImport` will **not** cause a build error but will result in **empty stub generation**.
+
+## References
+
+😆 Quick Start Guides:
+
+1. [ApiHug101 – Bilibili](https://space.bilibili.com/666522636)
+2. [ApiHug101 – YouTube](https://youtube.com/@ApiHug?si=C1yw0poHA01zbmyj)

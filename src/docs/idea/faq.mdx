@@ -1,0 +1,154 @@
+export const title = "ApiHug API Design Copilot FAQ";
+export const description =
+  "Frequently asked questions about the ApiHug API Design Copilot";
+
+## Trivial 
+
+### IDEA plugin
+
+[Plugin Release](https://github.com/apihug/apihug-ide-plugin/releases)
+
+### Proto module compile issue
+
+JVM version compatibility is critical for successful proto module compilation.
+
+Two JVM versions are involved:
+
+1. The toolchain version defined in the project's **gradle/java.gradle** file.
+2. The JVM version of the build environment (used by Gradle at runtime).
+
+A version mismatch between these can cause the protobuf wire compiler to fail silently.
+
+To prevent issues:
+- Ensure the proto module's target compilation version is `<=` build environment JVM version.
+
+Java version:
+
+| Project | Compile(gradle) | Proto Module      |
+|---------|-----------------|-------------------|
+| 21      | 21              | Default or `<=21` |
+| 21      | 17              | `<=17`            |
+| 17      | 21              | Default or `<=21` |
+
+Project toolchain Java version `{project-root}/gradle/java.gradle`:
+
+```groovy
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+```
+
+Gradle JVM version, which will be printed when starting compilation:
+
+```
+Java version: 19.0.1
+Gradle version: 8.14.3
+Current dir: /user/home/project/myproject
+Spring Boot version: 3.5.5
+Spring Dependency version: 1.1.7
+Spring Ai version: 1.0.0
+Spring Cloud version: 2024.0.1
+ApiHug version: 1.4.3-M8
+All Modules: [project ':sample-proto',':sample-app']
+```
+
+Each module can override the Java version in its own `build.gradle`.
+
+## ProtoBuf
+
+### Proto file cannot be recognized
+
+Currently, there are two popular `Proto buffer` plugins supported by IDEs:
+
+1. Built-in IDE plugin, provided by `JetBrains s.r.o.` ✅✅✅
+2. Third-party `HIGAN` plugin ❌❌❌
+
+These two plugins conflict with each other and only one can be enabled at a time. ⚠️
+
+The ApiHug Plugin relies on the IDE's built-in **Proto Editor** plugin for AST parsing, so the `JetBrains s.r.o.` ✅ Proto plugin must be enabled:
+
+<img src={require('@/img/plugin/protobuf_plugin.png').default.src} alt="ApiHug plugin" width={986} height={712} className="rounded-lg" />
+
+### Proto file import fails, cannot recognize the proto import
+
+ApiHug SDK proto import `import "swagger/annotations.proto";` fails with an error:
+
+ApiHug SDK proto import `import "swagger/annotations.proto";` fails:
+
+<img src={require('@/img/plugin/import_error.png').default.src} alt="ApiHug plugin SDK import error" width={880} height={361} className="rounded-lg" />
+
+**01: Compile the project** (via markdown or gradle task)
+
+<img src={require('@/img/plugin/2ways_build.png').default.src} alt="ApiHug 2 ways build project" width={1113} height={568} className="rounded-lg" />
+
+**02: After successful compilation, check the build cache of the proto project**:
+
+`{PROJECT}/{PROTO-MODULE}/build/extracted-include-protos`:
+
+<img src={require('@/img/plugin/2ways_build_success.png').default.src} alt="ApiHug success build" width={1202} height={535} className="rounded-lg" />
+
+**03: If the import still fails**, manually configure the proto import path; if imports are still not recognized, please add the path manually:
+
+1. Open the `Settings` panel
+2. Locate `Protocol Buffers`
+3. Un-check `Configure Automatically`
+4. Add `{PROJECT}/{PROTO-MODULE}/build/extracted-include-protos` to the `Import Paths`:
+
+Since [Plugin](/docs/changelog/plugin) version 0.7.6, these predefined protos are included by the plugin.
+
+<img src={require('@/img/plugin/2ways_finally.png').default.src} alt="ApiHug import finally" width={1928} height={1041} className="rounded-lg" />
+
+Eventually, all `import` statements should turn green!
+
+⚠️ Occasionally, the official proto editor may crash; please pay attention to any crash notifications.
+
+If the issue persists even after restarting IDEA, please report it to us: [report issue](https://github.com/apihug/apihug-ide-plugin/issues/new/choose)
+
+## Gradle
+
+### Cannot recognize as Gradle project
+
+The IDE should display a **Load Gradle Project** notification. If notifications are disabled, open the **Notification** panel to trigger it manually.
+
+IDE should pop up a notification: **Load Gradle Project**; if the notification was disabled, please open the **Notification** panel to load it manually!
+
+<img src={require('@/img/plugin/gradle_loader.png').default.src} alt="ApiHug Load gradle project" width={740} height={428} className="rounded-lg" />
+
+### Gradle compile failure
+
+1. [report issue](https://github.com/apihug/apihug-ide-plugin/issues/new/choose)
+2. Visit the [Homepage](https://github.com/apihug/apihug.com) to find the QR code and join our chat group.
+
+## API Design tree not present/refresh
+
+1. Refresh the tree
+2. Rebuild the tree (heavy operation): recompile and then refresh
+
+<img src={require('@/img/plugin/api-tree-rebuild.png').default.src} alt="ApiHug Rebuild" width={678} height={518} className="rounded-lg" />
+
+If the error persists, please [report issue](https://github.com/apihug/apihug-ide-plugin/issues/new/choose)!
+
+## Check version
+
+Check the installed version of the ApiHug IDE plugin:
+
+Top Menu: `ApiHug` -> `About`:
+
+<img src={require('@/img/plugin/version_checker.png').default.src} alt="ApiHug version check" width={1248} height={545} className="rounded-lg" />
+
+## Plugin 0.2+ issue
+
+[Milestone 20240222](/docs/milestone/milestone-20240222) — Includes Spring Boot upgrade!
+
+## Latest
+
+[Maven Central](https://search.maven.org/artifact/com.apihug/it-bom)
+
+[JetBrains Marketplace](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
+
+## Reference
+
+1. [ApiHug101-Bilibili](https://space.bilibili.com/666522636)
+2. [ApiHug101-Youtube](https://youtube.com/@ApiHug?si=C1yw0poHA01zbmyj)

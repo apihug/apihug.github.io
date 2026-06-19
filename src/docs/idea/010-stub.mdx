@@ -1,0 +1,57 @@
+export const title = "010 Stub";
+export const description =
+  "how the stub panel work of ApiHug Api design Copilot.";
+
+How to use the stub panel of ApiHug Api design Copilot
+
+1. ApiHug Tool Window
+2. Switch to `Assemble` tab
+3. Click module open design panel
+4. Configuration `hope-stub.json`
+
+<img src={require('@/img/plugin/108_stub.gif').default.src} alt="ApiHug Stub Manager" width={2334} height={1768} className="rounded-lg" />
+
+## Configuration Sample
+
+Please refer: [apihug-full-demo hope-stub.json](https://github.com/apihug/apihug-full-demo/blob/main/demo-external/src/main/resources/hope-stub.json)
+
+```json
+{
+  "packageName": "com.apihug.demo.external",
+  "name": "demo-external",
+  "domain": "external",
+  "proto": {
+    "artifact": {
+      "groupId": "com.apihug",
+      "artifactId": "demo-external-proto",
+      "version": "0.1.1-SNAPSHOT"
+    },
+    "module": "demo-external-proto",
+    "domain": "external",
+    "applied": true
+  },
+  "dependencies": [
+    {
+      "artifact": {
+        "groupId": "com.apihug",
+        "artifactId": "demo-order-proto",
+        "version": "0.1.2-RELEASE"
+      },
+      "module": "demo-order-proto",
+      "domain": "order",
+      "applied": true,
+      "serviceIncludeOperations": {
+        "com.apihug.demo.order.wire.api.admin.OrderAdminService": [
+          "/order/admin/hello-world",
+          "/order/admin/add-order"
+        ]
+      }
+    }
+  ]
+}
+```
+
+## Reference
+
+1. [ApiHug101-Bilibili](https://space.bilibili.com/666522636)
+2. [ApiHug101-Youtube](https://youtube.com/@ApiHug?si=C1yw0poHA01zbmyj)

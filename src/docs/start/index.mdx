@@ -1,0 +1,447 @@
+export const title = "Quick start";
+export const description =
+  "This page outlines how you can start using ApiHug to start a new API develop in 15 minutes.";
+
+import { DocsCodeBlock } from '@/components/DocsCodeBlock'
+import { DocsJetBrainsMarketplaceCard, DocsMavenCentralBadge } from '@/components/DocsStartResources'
+import { SnippetGroup } from '@/components/SnippetGroup'
+
+This page outlines how you can use ApiHug to create quick demos in **15 minutes**.
+
+<TipGood>
+  Since 3.0.0+ Version, only support spring boot 4.0+
+</TipGood>
+
+## One-Click Initialization
+
+Transform an empty directory into an Apihug workspace with a single command.  
+The script automatically downloads and runs the Apihug installer for your platform.
+
+### Windows
+
+**PowerShell** (run in PowerShell):
+
+```powershell
+iex (irm 'https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.ps1')
+```
+
+**Command Prompt** (run in cmd.exe):
+
+```shell
+powershell -c "irm https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.ps1 | iex"
+```
+
+### Bash (Linux, Unix, macOS)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.sh | bash
+```
+
+### Spring 4.0 Migration
+
+**SDK 3.0** is still undergoing rapid upgrades and constant updates, with many compatibility issues yet to be discovered. How to upgrade Spring to 4.0. Note [Spring Boot 4.0 Migration Guide](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.0-Migration-Guide)
+
+## Prerequisites
+
+1. ✅ JDK 17+  [OpenJDK](https://openjdk.org/) or Oracle's
+2. ✅ [Gradle](https://gradle.org/install/) 8+
+3. ✅ [IDEA](https://www.jetbrains.com/idea/)  2022+ (Optional)
+4. ✅ [ApiHug - API design Copilot](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
+5. ✅ [Spring Initializr](https://start.spring.io/) - Accessible or Local Deployment Alternatives
+
+<DocsMavenCentralBadge />
+
+### IDEA plugin
+
+[Plugin Release](https://github.com/apihug/apihug-ide-plugin/releases)
+
+<DocsJetBrainsMarketplaceCard />
+
+⚠️ The IDEA plugin will no longer be upgraded frequently in the future, IDEA support is no longer the main direction, you can use Apihug REPL for most things!
+
+### Plugin Install
+
+1. File
+2. Settings
+3. Plugin
+4. Search `ApiHug`
+5. Install & Restart
+
+<img src={require('@/img/editor/001_install_plugin.gif').default.src} alt="Install ApiHug Plugin" width={2316} height={1768} className="rounded-lg" />
+
+## Project Wizard
+
+[ApiHug - API design Copilot](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)  provides a highly friendly and intuitive project template to kickstart your API development. It guides you through step-by-step creation of API projects that adhere to best practices.
+
+### 01-Start ApiHug Project
+
+1. File
+2. New -> Project
+3. ApiHug
+
+<img src={require('@/img/editor/002_start_project.gif').default.src} alt="Start project from ApiHug Plugin" width={2316} height={1768} className="rounded-lg" />
+
+### 02-Project Settings
+
+1. Project settings
+2. package
+3. name
+4. description
+5. SDK Settings
+6. version
+7. DB Vendor
+8. Cache
+9. Port
+
+<img src={require('@/img/editor/003_project_settings.gif').default.src} alt="ApiHug Project Settings" width={2316} height={1768} className="rounded-lg" />
+
+<TipGood>
+
+  Better keep the default settings at first time!
+
+</TipGood>
+
+```
+├─order <1>
+    │  
+    ├─order-app <2>
+    │  
+    └─order-app-proto<3>
+```
+
+This is a common structure of a project;
+
+1. `<1>` name of this project
+2. `<2>` application module: Implementation & Service
+3. `<3>` protocol module: API Definition, suffix application name with `-proto` 
+
+### 03-Spring Settings
+
+This is a standard [Start Spring](https://start.spring.io/) configuration:
+
+1. Select Type
+2. Choice the components for example `Spring Web`
+
+<img src={require('@/img/editor/004_spring_settings.gif').default.src} alt="ApiHug Project Spring Settings" width={2316} height={1768} className="rounded-lg" />
+
+Eventually click **Create -> Open Project** to open the project:
+
+### 04-Start Project
+
+<TipGood>The SDK version may update while our project goes on;please check:</TipGood>
+
+<DocsMavenCentralBadge />
+
+For an exist project, then you can upgrade them manually:
+
+1. YOUR_PROJECT > gradle > **libs.versions.toml**
+2. `apihug = "0.9.2-RELEASE"` update to latest version
+
+Follow the IDEA's instruction:
+
+1. load this project as `Gradle`, if not please manually reload(check Notification)
+2. two modules `demo-app-proto` & `demo-app` should be recognized
+
+<img src={require('@/img/editor/005_load_project.gif').default.src} alt="ApiHug Load Project" width={2316} height={1768} className="rounded-lg" />
+
+The simplest project layout will be like ([simplest-demo](https://github.com/apihug/simplest-demo)):
+
+```shell
++---gradle
+|   |   libs.versions.toml  (1)
++---demo-app  (2)
+|   |   build.gradle
+|   \---src
+|       \---main
+|           +---java
+|           |   \---com
+|           |       \---apihug
+|           |           \---demo
+|           |               |   DemoAppApplication.java
+|           |               +---domain
+|           |               \---service
+|           \---resources
+|               |   hope-stub.json  (3)
+|
++---demo-app-proto (4)
+|   |   build.gradle
+|   \---src
+|       \---main
+|           +---proto
+|           |   \---com
+|           |       \---apihug
+|           |           \---demo
+|           |               \---proto
+|           |                   +---api
+|           |                   \---infra
+|           \---resources
+|                   hope-wire.json (5)
+````
+
+| File                         | Comment                          |
+|------------------------------|----------------------------------|
+| **(1)** `libs.versions.toml` | Version toml configuration       |
+| **(2)** `demo-app`           | Application module               |
+| **(3)** `hope-stub.json`     | Application module configuration |
+| **(4)** `demo-app-proto`     | Protocol module                  |
+| **(5)** `hope-wire.json`     | Protocol module configuration    |
+
+<SnippetGroup>
+
+<div
+  filename="libs.versions.toml"
+  code={`# libraries
+apihug = "0.9.9-RELEASE"
+# plugins
+springBoot = "3.2.5"
+springDependency = "1.1.4"
+
+#Apihug Common
+apihugBom = { group = "com.apihug", name = "it-bom", version.ref = "apihug" }
+
+#Spring plugin
+springBoot = { id = "org.springframework.boot", version.ref = "springBoot" }
+springDependency = { id = "io.spring.dependency-management", version.ref = "springDependency" }`}
+>
+  <DocsCodeBlock
+    compact
+    className="language-toml"
+    code={`# libraries
+apihug = "0.9.9-RELEASE"
+# plugins
+springBoot = "3.2.5"
+springDependency = "1.1.4"
+
+#Apihug Common
+apihugBom = { group = "com.apihug", name = "it-bom", version.ref = "apihug" }
+
+#Spring plugin
+springBoot = { id = "org.springframework.boot", version.ref = "springBoot" }
+springDependency = { id = "io.spring.dependency-management", version.ref = "springDependency" }`}
+  />
+</div>
+
+<div
+  filename="demo-app"
+  code={`plugins {
+  id "java"
+  alias(libs.plugins.springBoot)
+  alias(libs.plugins.springDependency)
+  alias(libs.plugins.hopeStub)
+  alias(libs.plugins.liquibase)
+}
+
+hopeStub {
+  debug = false
+}
+
+dependencies {
+  //Hope START
+  implementation project(':demo-app-proto')
+  implementation 'org.springframework.boot:spring-boot-starter-web'
+}`}
+>
+  <DocsCodeBlock
+    compact
+    className="language-gradle"
+    code={`plugins {
+  id "java"
+  alias(libs.plugins.springBoot)
+  alias(libs.plugins.springDependency)
+  alias(libs.plugins.hopeStub)
+  alias(libs.plugins.liquibase)
+}
+
+hopeStub {
+  debug = false
+}
+
+dependencies {
+  //Hope START
+  implementation project(':demo-app-proto')
+  implementation 'org.springframework.boot:spring-boot-starter-web'
+}`}
+  />
+</div>
+
+<div
+  filename="hope-stub.json"
+  code={`{
+  "packageName": "com.apihug.demo",
+  "name": "demo-app",
+  "domain": "demo",
+  "proto": {
+    "artifact": {
+      "groupId": "com.apihug",
+      "artifactId": "demo-app-proto",
+      "version": "0.1.1-SNAPSHOT"
+    },
+    "module": "demo-app-proto",
+    "domain": "demo",
+    "applied": true
+  },
+  "dependencies": []
+}`}
+>
+  <DocsCodeBlock
+    compact
+    className="language-json"
+    code={`{
+  "packageName": "com.apihug.demo",
+  "name": "demo-app",
+  "domain": "demo",
+  "proto": {
+    "artifact": {
+      "groupId": "com.apihug",
+      "artifactId": "demo-app-proto",
+      "version": "0.1.1-SNAPSHOT"
+    },
+    "module": "demo-app-proto",
+    "domain": "demo",
+    "applied": true
+  },
+  "dependencies": []
+}`}
+  />
+</div>
+
+<div
+  filename="demo-app-proto"
+  code={`plugins {
+  id "java-library"
+  alias(libs.plugins.hopeWire)
+}
+
+hopeWire {
+  keepProto = false
+  verbose = false
+}`}
+>
+  <DocsCodeBlock
+    compact
+    className="language-gradle"
+    code={`plugins {
+  id "java-library"
+  alias(libs.plugins.hopeWire)
+}
+
+hopeWire {
+  keepProto = false
+  verbose = false
+}`}
+  />
+</div>
+
+<div
+  filename="hope-wire.json"
+  code={`{
+  "packageName": "com.apihug.demo",
+  "name": "demo-app-proto",
+  "application": "demo-app",
+  "domain": "demo",
+  "persistence": {
+    "identifyType": "LONG",
+    "tenantType": "LONG"
+  },
+  "authority": {
+    "enumClass": "com.apihug.demo.proto.infra.settings.DemoAuthorityEnum",
+    "codePrefix": 10240000
+  },
+  "createdAt": "2024-05-19",
+  "createdBy": "admin"
+}`}
+>
+  <DocsCodeBlock
+    compact
+    className="language-json"
+    code={`{
+  "packageName": "com.apihug.demo",
+  "name": "demo-app-proto",
+  "application": "demo-app",
+  "domain": "demo",
+  "persistence": {
+    "identifyType": "LONG",
+    "tenantType": "LONG"
+  },
+  "authority": {
+    "enumClass": "com.apihug.demo.proto.infra.settings.DemoAuthorityEnum",
+    "codePrefix": 10240000
+  },
+  "createdAt": "2024-05-19",
+  "createdBy": "admin"
+}`}
+  />
+</div>
+
+</SnippetGroup>
+
+#### 04.1-Wire
+
+**Wire** task of the proto module response for verify and compile the protocol buffers files.
+
+1. Open `README.md` > `0. Build All`;
+2. find the command, parse to the `Terminal`, Example: `gradlew clean build -x test -x wireTest -x stubTest`;
+3. press `Enter` to execute;
+4. Check the `demo-app-proto` path `main > wire` for updates;
+
+<img src={require('@/img/editor/006_wire.gif').default.src} alt="ApiHug Wire Project" width={2316} height={1768} className="rounded-lg" />
+
+#### 04.2-Stub
+
+**Stub** task of the application module response for generate the stub code from the protocol definition.
+
+1. Open `README.md` > `2. Build Stub (Individual)`;
+2. find the command, parse to the `Terminal`, Example: `gradlew.bat demo-app:clean stub build -x test -x stubTest`;
+3. press `Enter` to execute;
+4. Check the `demo-app` path `main > stub` for updates;
+
+<img src={require('@/img/editor/007_stub.gif').default.src} alt="ApiHug Stub Project" width={2316} height={1768} className="rounded-lg" />
+
+#### 04.3-Boot
+
+1. Open `README.md` > `3. Run Application`;
+2. find the command, parse to the `Terminal`,  Example: `gradlew demo-app:bootRun`;
+3. press `Enter` to execute;
+4. Check the log print of `demo-app`;
+
+<img src={require('@/img/editor/008_boot.gif').default.src} alt="ApiHug Spting Boot" width={2316} height={1768} className="rounded-lg" />
+
+```shell
+----------------------------------------------------------
+
+Application 'demo-app' is running! Access URLs:
+
+Local                             http://localhost:18089/
+External                          http://192.168.0.115:18089/
+OAS                               http://192.168.0.115:18089/v3/api-docs
+Actuator                          http://192.168.0.115:18089/management
+Api-Errors                        http://192.168.0.115:18089/hope/meta/errors
+Api-Dictionaries                  http://192.168.0.115:18089/hope/meta/dictionaries
+Api-Authorities                   http://192.168.0.115:18089/hope/meta/authorities
+Profile(s)                        dev
+```
+
+#### 04.4-Check OAS
+
+1. copy the url(`/v3/api-docs`) from the console;
+2. parse them in the Chrome to view;
+
+<img src={require('@/img/editor/009_OAS.gif').default.src} alt="ApiHug API Information" width={2316} height={1768} className="rounded-lg" />
+
+## ApiHug Tool Window
+
+**ApiHug Tool Window** should dock on the right side of the IDE, if not you can also bring it up from the top menu bar: `ApiHug > ApiHug Designer`:
+
+<img src={require('@/img/editor/010_toolwindow.gif').default.src} alt="ApiHug Tool Window" width={2316} height={1768} className="rounded-lg" />
+
+Congratulations! You have successfully finished a perfect API development joinery!
+
+## Summary
+
+During the last 15-minute demo, we went through the typical steps involved in API design and development. These steps often include various trivial tasks that distract us from focusing on the core business logic design. However, with ApiHug, you can leave behind all the tedious and troublesome steps.
+
+ApiHug automates these tasks and generates high-quality designs with a user-friendly and easily understandable structure and code details. In the upcoming lessons, we will delve deeper into exploring the capabilities of ApiHug.
+
+In fact, the techniques used by ApiHug are not entirely new inventions. Platforms like [Jhipster](https://www.jhipster.tech/), [Spring Starter](https://start.spring.io/), Grails, and Ruby on Rails have paved the way for similar approaches.
+
+ApiHug builds upon the best practices and lessons learned from these predecessors, making them more practical and straightforward for everyday use. We acknowledge and appreciate the contributions of these platforms in shaping the foundation of ApiHug.

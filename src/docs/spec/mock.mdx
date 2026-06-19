@@ -1,0 +1,519 @@
+export const title = "Mock Data Specification";
+export const description =
+  "Mock data generation extension user manual — automatically generate realistic test data from protobuf field definitions.";
+
+Generate realistic mock data directly from protobuf field annotations for testing and prototyping.
+
+- **Extension Package**: `apihug/protobuf/mock/mock.proto`
+- **Scope**: Field-level and Operation-level
+- **Scenarios**: API testing, frontend development, demo environments
+
+---
+
+## 1. Overview
+
+The ApiHug mock system is inspired by [Mock.js](http://mockjs.com/) and [Java Faker](https://github.com/DiUS/java-faker/). It provides a rich set of semantic data generators (Nature types), string/number/date rules, and locale-specific generators for Chinese text, names, and addresses.
+
+### 1.1 Where Mock is Used
+
+**Field-level Mock** (via `hope.swagger.field`):
+
+```proto
+string phone = 1 [(hope.swagger.field) = {
+  description: "Phone number";
+  mock: {
+    nature: CN_PHONE
+  };
+}];
+```
+
+**Operation-level Mock** (simple response types only):
+
+```proto
+option (hope.swagger.operation) = {
+  post: "/ping";
+  mock: {
+    nature: GUID
+  };
+};
+```
+
+### 1.2 Mock Message Structure
+
+The top-level `Mock` message uses `oneof rule` to select exactly one mock strategy:
+
+```proto
+message Mock {
+  oneof rule {
+    Nature nature = 1;
+    StringRule string_rule = 3;
+    BoolRule bool_rule = 4;
+    DateRule date_rule = 5;
+    ImageRule image_rule = 6;
+    ColorRule color_rule = 7;
+    ChineseRule chinese_rule = 8;
+    ChineseNameRule chinese_name_rule = 9;
+    ChinaAddressRule china_address_rule = 10;
+    NumberRule number_rule = 11;
+    MapRule map_rule = 112;
+  }
+  uint32 max = 200;  // shortcut: array max items
+  uint32 min = 201;  // shortcut: array min items
+}
+```
+
+---
+
+## 2. Nature (Semantic Category)
+
+The `Nature` enum provides instant, semantic mock data with zero configuration:
+
+### 2.1 General Data
+
+| Enum Value | Generated Content | Example |
+|---|---|---|
+| `ANIMAL` | Animal name | Cat, Dog, Eagle |
+| `AVATAR` | Avatar URL | https://i.pravatar.cc/... |
+| `BEER` | Beer brand | Heineken, Guinness |
+| `BOOK` | Book name | The Great Gatsby |
+| `BUSINESS` | Business kind | Consulting, Retail |
+| `CAT` | Cat breed | Persian, Siamese |
+| `COLOR` | Color name | Red, Blue, Green |
+| `COUNTRY` | Country name | China, Japan |
+| `CURRENCY` | Currency name | US Dollar, Euro |
+| `DOG` | Dog breed | Labrador, Poodle |
+| `FOOD` | Food name | Pizza, Sushi |
+| `FUNNY_NAME` | Humorous name | Mike Litoris |
+| `GENDER` | Gender (English) | Male / Female |
+| `HOBBIT` | Hobby | Fishing, Reading |
+| `JOB` | Job title | Software Engineer |
+| `MEDICAL` | Medical term | Hypertension |
+| `MUSIC` | Music genre/name | Jazz, Rock |
+| `NAME` | Name (English) | John Doe |
+| `NATION` | Nation name | American, Chinese |
+| `PROGRAMMING_LANGUAGE` | Language name | Java, Python |
+| `STOCK` | Stock name | Apple, Tesla |
+| `TEAM` | Team name | Lakers, Warriors |
+| `WEATHER` | Weather description | Cloudy, Sunny |
+| `SPACE` | Space term | Mars, Nebula |
+| `DISEASE` | Disease name | Headache, Flu |
+
+### 2.2 Digital & Contact
+
+| Enum Value | Generated Content | Example |
+|---|---|---|
+| `EMAIL` | Email address | user@example.com |
+| `IP4` | IPv4 address | 192.168.1.1 |
+| `IP6` | IPv6 address | 2001:0db8:85a3:... |
+| `URL` | HTTP URL | https://example.com |
+| `GUID` | UUID | 550e8400-e29b-... |
+| `PHONE` | International phone | +1-555-1234 |
+
+### 2.3 China-specific
+
+| Enum Value | Generated Content | Example |
+|---|---|---|
+| `CN_GENDER` | Chinese gender | 男 / 女 |
+| `CN_ADDRESS` | Chinese address | 上海 静安 |
+| `CN_PHONE` | Chinese mobile | 13800138000 |
+| `CN_UNIVERSITY` | Chinese university | 清华大学 |
+| `CID` | Chinese ID number | 310101199001011234 |
+| `MEDICINE` | Medicine name | 阿莫西林 |
+| `HOSPITAL` | Hospital name | 协和医院 |
+
+### 2.4 Other
+
+| Enum Value | Generated Content | Example |
+|---|---|---|
+| `UNIVERSITY` | University name | MIT, Stanford |
+| `ID` | ID number | Generic ID |
+| `DATE_AND_TIME` | Date/time string | 2024-01-15 10:30:00 |
+
+### 2.5 Usage Example
+
+```proto
+string email = 1 [(hope.swagger.field) = {
+  mock: { nature: EMAIL }
+}];
+
+string avatar = 2 [(hope.swagger.field) = {
+  mock: { nature: AVATAR }
+}];
+
+string phone = 3 [(hope.swagger.field) = {
+  mock: { nature: CN_PHONE }
+}];
+
+string uuid = 4 [(hope.swagger.field) = {
+  mock: { nature: GUID }
+}];
+```
+
+---
+
+## 3. StringRule (String Generation)
+
+Control string length, character pool, and candidate values.
+
+### 3.1 Fields
+
+| Field | Type | Description |
+|---|---|---|
+| `length` | uint32 | Exact string length |
+| `min` | uint32 | Minimum length |
+| `max` | uint32 | Maximum length |
+| `pool` | Pool enum | Character pool type |
+| `customized_pool` | string | Custom character set |
+| `candidates` | repeated string | Pick from fixed list |
+
+### 3.2 Pool Enum
+
+| Enum Value | Description |
+|---|---|
+| `ORIGINAL` | Keep original format, no transform |
+| `LOWER` | All lowercase |
+| `UPPER` | All uppercase |
+| `NUMBER` | Digits only (0-9) |
+| `SYMBOL` | Symbols only |
+| `CAPITALIZE` | First letter uppercase |
+
+### 3.3 Examples
+
+**Random lowercase string (3-20 chars)**:
+```proto
+mock: {
+  string_rule: {
+    min: 3;
+    max: 20;
+    pool: LOWER;
+  }
+}
+```
+
+**Fixed candidate values**:
+```proto
+mock: {
+  string_rule: {
+    candidates: ["PENDING", "APPROVED", "REJECTED"]
+  }
+}
+```
+
+**Exact length with custom pool**:
+```proto
+mock: {
+  string_rule: {
+    length: 8;
+    customized_pool: "ABCDEF0123456789";
+  }
+}
+```
+
+---
+
+## 4. NumberRule (Numeric Generation)
+
+Control integer and decimal ranges.
+
+### 4.1 Fields
+
+| Field | Type | Description |
+|---|---|---|
+| `min` | int64 | Integer part minimum |
+| `max` | int64 | Integer part maximum |
+| `min_integer` | uint32 | Minimum integer digits |
+| `max_integer` | uint32 | Maximum integer digits |
+| `min_fraction` | uint32 | Minimum decimal places |
+| `max_fraction` | uint32 | Maximum decimal places |
+
+### 4.2 Example
+
+```proto
+mock: {
+  number_rule: {
+    min: 1;
+    max: 100000;
+    min_fraction: 0;
+    max_fraction: 2;  // 0-2 decimal places
+  }
+}
+```
+
+---
+
+## 5. BoolRule (Boolean Generation)
+
+### 5.1 Fields
+
+| Field | Type | Description |
+|---|---|---|
+| `min` | uint32 | Minimum (for array context) |
+| `max` | uint32 | Maximum (for array context) |
+| `current` | bool | Starting value |
+
+---
+
+## 6. DateRule (Date/Time Generation)
+
+### 6.1 Birthday Mode
+
+Generate realistic birthday dates:
+
+```proto
+mock: {
+  date_rule: {
+    birth_day: {
+      min_age: 18;
+      max_age: 60;
+    }
+  }
+}
+```
+
+### 6.2 Relative Time Mode
+
+Generate dates relative to "now":
+
+```proto
+mock: {
+  date_rule: {
+    time_gap: 30;
+    time_unit: DAYS;
+    dir: PAST;
+  }
+}
+```
+
+### 6.3 TimeUnit Enum
+
+| Enum Value | Description |
+|---|---|
+| `NANOSECONDS` | Nanoseconds |
+| `MICROSECONDS` | Microseconds |
+| `MILLISECONDS` | Milliseconds |
+| `SECONDS` | Seconds |
+| `MINUTES` | Minutes |
+| `HOURS` | Hours |
+| `DAYS` | Days |
+
+### 6.4 Dir Enum
+
+| Enum Value | Description |
+|---|---|
+| `PAST` | Date in the past |
+| `FUTURE` | Date in the future |
+
+---
+
+## 7. ImageRule (Placeholder Images)
+
+### 7.1 Fields
+
+| Field | Type | Description |
+|---|---|---|
+| `width` | uint32 | Image width (px) |
+| `height` | uint32 | Image height (px) |
+| `background_hex_color` | string | Background color |
+| `text` | string | Text overlay |
+
+### 7.2 Example
+
+```proto
+mock: {
+  image_rule: {
+    width: 200;
+    height: 200;
+    background_hex_color: "#4A90D9";
+    text: "Avatar";
+  }
+}
+```
+
+---
+
+## 8. ColorRule (Color Values)
+
+### 8.1 Type Enum
+
+| Enum Value | Format | Example |
+|---|---|---|
+| `HEX` | #FFF or #FFFFFF | #4A90D9 |
+| `RGB` | rgb(r,g,b) | rgb(121, 210, 242) |
+| `RGBA` | rgba(r,g,b,a) | rgba(121, 242, 167, 0.50) |
+| `HSL` | hsl(h,s,l) | hsl(228, 82, 71) |
+| `NAME` | Color name | red, blue, yellow |
+
+### 8.2 Example
+
+```proto
+mock: {
+  color_rule: {
+    type: HEX;
+  }
+}
+```
+
+---
+
+## 9. ChineseRule (Chinese Text)
+
+Generate Chinese paragraphs, sentences, words, or titles.
+
+### 9.1 Type Enum
+
+| Enum Value | Description |
+|---|---|
+| `PARAGRAPH` | Long paragraph |
+| `SENTENCE` | Medium sentence |
+| `WORD` | Single word |
+| `TITLE` | News-style title |
+
+### 9.2 Fields
+
+| Field | Type | Description |
+|---|---|---|
+| `type` | Type enum | Text type |
+| `length` | uint32 | Exact length |
+| `min` | uint32 | Minimum length |
+| `max` | uint32 | Maximum length |
+| `pool` | string | Character pool |
+
+### 9.3 Example
+
+```proto
+mock: {
+  chinese_rule: {
+    type: TITLE;
+    min: 5;
+    max: 20;
+  }
+}
+```
+
+---
+
+## 10. ChineseNameRule (Chinese Names)
+
+### 10.1 Type Enum
+
+| Enum Value | Description |
+|---|---|
+| `FIRST` | Given name (名) |
+| `LAST` | Surname (姓) |
+| `NAME` | Full name |
+
+### 10.2 Example
+
+```proto
+mock: {
+  chinese_name_rule: {
+    type: NAME
+  }
+}
+```
+
+---
+
+## 11. ChinaAddressRule (Chinese Addresses)
+
+### 11.1 Type Enum
+
+| Enum Value | Description | Example |
+|---|---|---|
+| `REGION` | Region | 华北, 华东 |
+| `PROVINCE` | Province | 陕西省 |
+| `CITY` | City | 淮北市 |
+| `COUNTY` | District/County | 东昌区 |
+| `ADDRESS` | Full address | 上海市，闵行区，联航路1188号 |
+
+### 11.2 Fields
+
+| Field | Type | Description |
+|---|---|---|
+| `type` | Type enum | Address level |
+| `with_prefix` | bool | Include administrative prefix |
+
+### 11.3 Example
+
+```proto
+mock: {
+  china_address_rule: {
+    type: ADDRESS;
+    with_prefix: true;
+  }
+}
+```
+
+---
+
+## 12. Array and Map Rules
+
+### 12.1 ArrayRule
+
+Wrap any mock rule for array generation with size control:
+
+```proto
+message ArrayRule {
+  oneof rule {
+    Nature nature = 1;
+    StringRule string_rule = 3;
+    // ... all other rule types
+    NumberRule number_rule = 11;
+  }
+  uint32 max = 100;  // max array size
+  uint32 min = 101;  // min array size
+}
+```
+
+**Shortcut**: Use `max`/`min` directly on the `Mock` message for list size control:
+
+```proto
+mock: {
+  nature: EMAIL;
+  max: 10;  // max 10 items
+  min: 3;   // min 3 items
+}
+```
+
+### 12.2 MapRule
+
+Generate key-value pairs with independent key and value rules:
+
+```proto
+message MapRule {
+  oneof keyRule {
+    Nature key_nature = 1;
+    StringRule key_string_rule = 3;
+    // ... all other rule types
+  }
+  oneof valueRule {
+    Nature val_nature = 101;
+    StringRule val_string_rule = 102;
+    // ... all other rule types
+  }
+  uint32 max = 200;
+  uint32 min = 201;
+}
+```
+
+---
+
+## 13. Quick Reference
+
+### Common Mock Patterns
+
+| Use Case | Mock Configuration |
+|---|---|
+| Email | `mock: { nature: EMAIL }` |
+| Phone (China) | `mock: { nature: CN_PHONE }` |
+| UUID | `mock: { nature: GUID }` |
+| Random name | `mock: { nature: NAME }` |
+| Avatar | `mock: { nature: AVATAR }` |
+| Enum values | `mock: { string_rule: { candidates: ["A", "B", "C"] } }` |
+| Price | `mock: { number_rule: { min: 1; max: 9999; max_fraction: 2 } }` |
+| Birthday | `mock: { date_rule: { birth_day: { min_age: 18; max_age: 60 } } }` |
+| Recent date | `mock: { date_rule: { time_gap: 30; time_unit: DAYS; dir: PAST } }` |
+| Chinese name | `mock: { chinese_name_rule: { type: NAME } }` |
+| Chinese address | `mock: { china_address_rule: { type: ADDRESS } }` |
+| Color | `mock: { color_rule: { type: HEX } }` |
+| Placeholder image | `mock: { image_rule: { width: 200; height: 200 } }` |

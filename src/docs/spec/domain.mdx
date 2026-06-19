@@ -1,0 +1,714 @@
+export const title = "Database Directive Specification";
+export const description =
+  "Database Modeling Extension User Manual — map proto messages to database table structures (entities).";
+
+Map proto message to database table structure (entity).
+
+- **Extension Package**: `apihug/protobuf/domain/annotations.proto`
+- **Scope**: Message(table) + Field(column)
+- **Scenarios**: entity, DDL generation, Liquibase
+
+---
+
+## Forbidden Rules
+
+### 1. Forbid file-level option
+
+**NEVER** add any file-level option declarations in proto files:
+
+```proto
+// Forbidden to use the following options (rely on default code generation configuration)
+option java_package = "...";
+option java_multiple_files = true;
+option go_package = "...";
+```
+
+All code generation configurations are automatically managed by the build system.
+
+### 2. Forbid cross-layer reference
+
+**Domain layer (domain/) must maintain architectural purity**:
+
+```proto
+// Forbidden to reference API layer messages
+import "com/example/api/user/api.proto";  // Wrong!
+import "com/example/api/order/request.proto";  // Wrong!
+```
+
+**Allowed references**:
+```proto
+// Allow referencing constant layer (infra/)
+import "com/example/infra/settings/user_constant.proto";
+
+// Allow referencing other domain entities
+import "com/example/domain/entities/order.proto";
+
+message UserEntity {
+  UserStatusEnum status = 1;  // Enums can be shared
+  OrderEntity order = 2;  // Domain internal reference
+}
+```
+
+---
+
+## 1. Import and Syntax
+
+### 1.1 Import
+
+```proto
+import "apihug/protobuf/domain/annotations.proto";
+```
+
+**Note**: `annotations.proto` imports `persistence.proto`, which in turn imports `view.proto` for entity view definitions.
+
+### 1.2 Extension Points (from source)
+
+From `apihug/protobuf/domain/annotations.proto`:
+
+```proto
+extend google.protobuf.MessageOptions {
+  Table table = 1772;
+}
+
+extend google.protobuf.FieldOptions {
+  Column column = 1773;
+}
+```
+
+### 1.3 Basic Syntax
+
+**Table Level (Message)**:
+
+```proto
+message EntityName {
+  option (hope.persistence.table) = {
+    name: "TableName";
+    description: "Table description";
+    // Other configurations...
+  };
+}
+```
+
+**Column Level (Field)**:
+
+```proto
+string field_name = sequence [(hope.persistence.column) = {
+  name: "ColumnName";
+  description: "Column description";
+  nullable: false;
+  type: VARCHAR;
+}];
+```
+
+### 1.4 Quick Example
+
+```proto
+syntax = "proto3";
+package com.example.pet.domain;
+
+import "apihug/protobuf/domain/annotations.proto";
+
+message Category {
+  option (hope.persistence.table) = {
+    name: "CATEGORY",
+    description: "Pet category",
+    wires: [IDENTIFIABLE]
+  };
+
+  string name = 1 [(hope.persistence.column) = {
+    name: "NAME",
+    description: "Category name",
+    nullable: false,
+    length: 32,
+    unique: true,
+    type: VARCHAR
+  }];
+}
+```
+
+---
+
+## 2. Table Extension Details
+
+### 2.1 Basic Fields
+
+#### `name` (string)
+
+- **Function**: Database table name
+- **Recommendation**: Use uppercase underscore style (`CATEGORY`, `USER_ORDER`)
+
+#### `description` (string)
+
+- **Function**: Business description of the table
+
+#### `catalog` (string)
+
+- **Function**: Database Catalog (multi-database environments)
+
+#### `schema` (string)
+
+- **Function**: Database Schema (Oracle/PostgreSQL)
+
+### 2.2 Constraint Definition
+
+#### `unique_constraints` (repeated UniqueConstraint)
+
+**Fields**:
+- `name` (string): Constraint name
+- `column_list` (repeated string): Column name array
+
+```proto
+unique_constraints: {
+  name: "UK_PET_NAME_CATEGORY",
+  column_list: ["name", "category"]
+}
+```
+
+#### `indexes` (repeated Index)
+
+**Fields**:
+- `name` (string): Index name
+- `column_list` (repeated string): Column name array
+- `unique` (bool): Whether unique index
+
+```proto
+indexes: {
+  name: "IDX_PET_NAME",
+  column_list: ["name"]
+}
+
+indexes: {
+  name: "IDX_CATEGORY_UNIQUE",
+  column_list: ["category"],
+  unique: true
+}
+```
+
+### 2.3 Built-in Features (Wire Protocol)
+
+#### `wires` (repeated Wire enum)
+
+**Function**: Enable platform built-in common features
+
+| Enum Value     | Meaning              | Auto-added Fields                                      |
+|----------------|----------------------|--------------------------------------------------------|
+| `ALL`          | Enable all features  | id + audit + delete flag + tenant + version            |
+| `IDENTIFIABLE` | Only add primary key | `id` (Long)                                            |
+| `AUDITABLE`    | Audit fields         | `created_at`, `updated_at`, `created_by`, `updated_by` |
+| `DELETABLE`    | Logical delete       | `deleted` (Boolean)                                    |
+| `TENANTABLE`   | Multi-tenant         | `tenant_id` (Long)                                     |
+| `VERSIONABLE`  | Optimistic lock      | `version` (Integer)                                    |
+| `NONE`         | Fully custom         | None                                                   |
+
+```proto
+wires: [IDENTIFIABLE]                          // Only primary key
+wires: [IDENTIFIABLE, AUDITABLE, DELETABLE]    // Audit + logical delete
+wires: [ALL]                                   // Full features
+wires: [NONE]                                  // Fully custom
+```
+
+### 2.4 View Definition
+
+#### `views` (repeated View message)
+
+**Warning**: Do not add views unless explicitly required!
+
+**Fields**:
+- `name` (string): View name
+- `description` (string): View description
+- `includes` (repeated string): Included field list
+- `excludes` (repeated string): Excluded field list
+- `references` (repeated ReferenceView): Associated entities
+- `aggregated_fields` (repeated AggregatedField): Aggregated fields
+
+```proto
+views: [{
+  name: "PetView",
+  description: "Pet list view",
+  includes: ["id", "name", "category", "size"]
+}]
+
+views: [{
+  name: "PetDetailView",
+  description: "Pet detail view (with category info)",
+  includes: ["id", "name", "category"],
+  references: [{
+    entity: "Category",
+    includes: ["description"],
+    join_type: INNER,
+    left_field: "category",
+    right_field: "name"
+  }]
+}]
+```
+
+### 2.5 Liquibase Integration
+
+#### `liquibase` (repeated Liquibase message)
+
+**Fields**:
+- `version` (uint32): Version number (append only)
+- `comment` (string): Change description
+- `dbms` (repeated DBMS enum): Target database
+- `negative` (bool): Exclude listed dbms
+- `sql` (repeated string): SQL statements
+
+**DBMS enum values**: `MYSQL`, `POSTGRESQL`, `ORACLE`, `SQLSERVER`, `DB2`, `H2`, `HSQLDB`, `SQLITE`, `SYBASE`, `INFORMIX`, `DERBY`, `MARIADB`
+
+```proto
+liquibase: {
+  version: 1,
+  comment: "MySQL special index",
+  dbms: [MYSQL],
+  sql: [
+    "CREATE FULLTEXT INDEX idx_pet_name_ft ON PET(name)"
+  ]
+}
+
+liquibase: {
+  version: 2,
+  comment: "Partitioned table for non-H2 databases",
+  dbms: [H2],
+  negative: true,
+  sql: [
+    "ALTER TABLE PET PARTITION BY RANGE (id)"
+  ]
+}
+```
+
+---
+
+## 3. Column Extension Details
+
+### 3.1 Basic Fields
+
+#### `name` (string)
+
+- **Function**: Database column name
+- **Recommendation**: Uppercase underscore style (`USER_NAME`, `CREATED_AT`)
+
+#### `description` (string)
+
+- **Function**: Business description of the column
+
+### 3.2 Constraint Fields
+
+| Field | Type | Description |
+|---|---|---|
+| `nullable` | bool | Allow NULL (`true`) or NOT NULL (`false`) |
+| `unique` | bool | Unique constraint |
+| `insertable` | bool | Participate in INSERT statement |
+| `updatable` | bool | Participate in UPDATE statement |
+| `searchable` | bool | Used for WHERE condition queries |
+| `sortable` | bool | Used for ORDER BY sorting |
+
+### 3.3 Type and Length
+
+#### `type` (Column.Type enum)
+
+**Function**: Explicitly specify SQL type (override proto type inference)
+
+| Enum Value  | SQL Type  | Use Case               |
+|-------------|-----------|------------------------|
+| `VARCHAR`   | VARCHAR   | String                 |
+| `CHAR`      | CHAR      | Fixed-length character |
+| `INTEGER`   | INTEGER   | Integer                |
+| `BIGINT`    | BIGINT    | Long integer           |
+| `DOUBLE`    | DOUBLE    | Float                  |
+| `NUMERIC`   | NUMERIC   | Explicit numeric type  |
+| `DECIMAL`   | DECIMAL   | Precise decimal        |
+| `DATE`      | DATE      | Date                   |
+| `TIME`      | TIME      | Time                   |
+| `TIMESTAMP` | TIMESTAMP | Timestamp              |
+| `TIME_WITH_TIMEZONE` | TIME_WITH_TIMEZONE | Time with timezone |
+| `TIMESTAMP_WITH_TIMEZONE` | TIMESTAMP_WITH_TIMEZONE | Timestamp with timezone |
+| `BOOLEAN`   | BOOLEAN   | Boolean                |
+| `ROWID`     | ROWID     | Database row id        |
+| `BLOB`      | BLOB      | Binary large object    |
+| `VARBINARY` | VARBINARY | Binary column          |
+| `LONGVARBINARY` | LONGVARBINARY | Large binary column |
+| `CLOB`      | CLOB      | Character large object |
+| `LONGVARCHAR` | LONGVARCHAR | Large text column  |
+
+#### `length` (uint32)
+
+String length (only valid for VARCHAR/CHAR): `length: 255`
+
+#### `precision` / `scale` (uint32)
+
+DECIMAL total digits and decimal places: `precision: 10, scale: 2` = DECIMAL(10,2)
+
+### 3.4 Enum Mapping
+
+#### `enum_type` (EnumType enum)
+
+| Enum Value | Persisted Content | Description |
+|------------|-------------------|-------------|
+| `STRING`   | Enum name         | Default, stores "AVAILABLE" |
+| `CODE`     | code field        | Stores business code |
+
+```proto
+com.example.enumeration.Size size = 1 [(hope.persistence.column) = {
+  name: "SIZE",
+  enum_type: STRING,
+  type: VARCHAR,
+  length: 32
+}];
+```
+
+### 3.5 Primary Key and Auto-increment
+
+#### `id` (bool)
+
+Mark as primary key.
+
+#### `generated_value` (GeneratedValue message)
+
+**Fields**:
+- `strategy` (GenerationType enum): Generation strategy
+- `generator` (string): Generator name (optional)
+
+**Strategy enum**:
+
+| Enum Value | Description           | Use Case             |
+|------------|-----------------------|----------------------|
+| `TABLE`    | Table sequence        | Generic              |
+| `SEQUENCE` | Database sequence     | Oracle/PostgreSQL    |
+| `IDENTITY` | Auto-increment column | MySQL/SQL Server     |
+| `UUID`     | UUID generation       | Distributed systems  |
+| `AUTO`     | Auto select           | Let framework decide |
+
+```proto
+int64 id = 1 [(hope.persistence.column) = {
+  name: "ID",
+  id: true,
+  nullable: false,
+  generated_value: {
+    strategy: UUID
+  }
+}];
+```
+
+### 3.6 Advanced Fields
+
+| Field | Type | Description |
+|---|---|---|
+| `transient` | bool | Non-persistent field (view/calculated) |
+| `default_value` | string | Column default (SQL level) |
+| `column_definition` | string | Full custom DDL |
+| `table` | string | Specify auxiliary table |
+
+```proto
+string status = 5 [(hope.persistence.column) = {
+  name: "STATUS",
+  default_value: "ACTIVE"
+}];
+
+string full_name = 10 [(hope.persistence.column) = {
+  transient: true
+}];
+```
+
+---
+
+## 4. Key Type Identification
+
+### 4.1 bool vs string
+
+**Wrong**:
+```proto
+nullable: "false"  // String, wrong!
+unique: "true"     // String, wrong!
+```
+
+**Correct**:
+```proto
+nullable: false  // bool type
+unique: true     // bool type
+```
+
+### 4.2 uint32 vs wrapper type
+
+**Wrong** (old syntax):
+```proto
+length: {value: 32}  // Old syntax!
+precision: {value: 10}
+```
+
+**Correct**:
+```proto
+length: 32  // uint32 type
+precision: 10
+scale: 2
+```
+
+### 4.3 Proto type to SQL type mapping
+
+| proto type | Default SQL | Explicit options |
+|------------|-------------|-----------------|
+| `string`   | VARCHAR     | `CHAR`, `CLOB`  |
+| `int32`    | INTEGER     | `SMALLINT`      |
+| `int64`    | BIGINT      | `BIGINT`        |
+| `double`   | DOUBLE      | `DECIMAL`       |
+| `float`    | FLOAT       | `FLOAT`         |
+| `bool`     | BOOLEAN     | `BIT`           |
+| `bytes`    | BLOB        | `VARBINARY`     |
+| enum       | VARCHAR     | With `enum_type`|
+
+---
+
+## 5. Complete Examples
+
+### 5.1 Basic Entity: Pet Table
+
+```proto
+syntax = "proto3";
+package com.example.pet.domain;
+
+import "domain/annotations.proto";
+import "com/example/pet/enumeration/constants.proto";
+
+message Pet {
+  option (hope.persistence.table) = {
+    name: "PET",
+    description: "Pet information table",
+
+    unique_constraints: {
+      name: "UK_PET_NAME_CATEGORY",
+      column_list: ["name", "category"]
+    },
+
+    indexes: {
+      name: "IDX_PET_NAME",
+      column_list: ["name"]
+    },
+
+    wires: [IDENTIFIABLE, AUDITABLE, DELETABLE]
+  };
+
+  string name = 1 [(hope.persistence.column) = {
+    name: "NAME",
+    description: "Pet name",
+    nullable: false,
+    length: 32,
+    type: VARCHAR
+  }];
+
+  string category = 3 [(hope.persistence.column) = {
+    name: "CATEGORY",
+    description: "Category (associated CATEGORY#NAME)",
+    nullable: false,
+    length: 32,
+    type: VARCHAR
+  }];
+
+  com.example.pet.enumeration.Size size = 4 [(hope.persistence.column) = {
+    name: "SIZE",
+    description: "Pet size",
+    nullable: false,
+    enum_type: STRING,
+    type: VARCHAR,
+    length: 32
+  }];
+
+  double weight = 5 [(hope.persistence.column) = {
+    name: "WEIGHT",
+    description: "Pet weight(kg)",
+    nullable: false,
+    type: DOUBLE
+  }];
+}
+```
+
+### 5.2 Complex Entity: Order Table
+
+```proto
+syntax = "proto3";
+package com.example.order.domain;
+
+import "domain/annotations.proto";
+import "com/example/order/enumeration/constants.proto";
+
+message Order {
+  option (hope.persistence.table) = {
+    name: "USER_ORDER",
+    description: "Order table",
+
+    indexes: {
+      name: "IDX_ORDER_USER",
+      column_list: ["user_id"]
+    },
+    indexes: {
+      name: "IDX_ORDER_STATUS",
+      column_list: ["status"]
+    },
+
+    wires: [ALL]
+  };
+
+  int64 id = 1 [(hope.persistence.column) = {
+    name: "ID",
+    description: "Order ID",
+    id: true,
+    nullable: false,
+    generated_value: {
+      strategy: UUID
+    }
+  }];
+
+  int64 user_id = 2 [(hope.persistence.column) = {
+    name: "USER_ID",
+    description: "User ID",
+    nullable: false,
+    searchable: true,
+    type: BIGINT
+  }];
+
+  com.example.order.enumeration.OrderStatus status = 3 [(hope.persistence.column) = {
+    name: "STATUS",
+    description: "Order status",
+    nullable: false,
+    enum_type: CODE,
+    type: INTEGER
+  }];
+
+  double total_amount = 4 [(hope.persistence.column) = {
+    name: "TOTAL_AMOUNT",
+    description: "Order total amount",
+    nullable: false,
+    type: DECIMAL,
+    precision: 10,
+    scale: 2
+  }];
+
+  string remark = 5 [(hope.persistence.column) = {
+    name: "REMARK",
+    description: "Order remark",
+    nullable: true,
+    length: 500,
+    type: VARCHAR
+  }];
+
+  string user_name = 10 [(hope.persistence.column) = {
+    transient: true
+  }];
+}
+```
+
+---
+
+## 6. Common Errors
+
+### 6.1 Type Confusion
+
+**Wrong**:
+```proto
+nullable: "false"
+length: {value: 32}
+unique: "true"
+```
+
+**Correct**:
+```proto
+nullable: false
+length: 32
+unique: true
+```
+
+### 6.2 Enum Mapping Error
+
+**Wrong**: `enum_type: ORDINAL` (deprecated)
+**Correct**: `enum_type: STRING` or `enum_type: CODE`
+
+### 6.3 DECIMAL Configuration
+
+**Wrong**: Missing `precision` and `scale`
+**Correct**: Always specify both: `precision: 10, scale: 2`
+
+---
+
+## 7. Best Practices
+
+### 7.1 Wire Selection Guide
+
+```
+Only need primary key → wires: [IDENTIFIABLE]
+Need audit → wires: [IDENTIFIABLE, AUDITABLE]
+Need logical delete → wires: [IDENTIFIABLE, DELETABLE]
+Multi-tenant → wires: [IDENTIFIABLE, TENANTABLE]
+Full features → wires: [ALL]
+Fully custom → wires: [NONE]
+```
+
+### 7.2 Type Selection Guide
+
+```
+Short string (<255) → VARCHAR + length
+Long text → CLOB
+Integer primary key → BIGINT
+UUID primary key → VARCHAR(36) or framework handling
+Amount → DECIMAL(10,2)
+Date → DATE / TIMESTAMP
+Boolean → BOOLEAN
+Enum → VARCHAR + enum_type:STRING
+```
+
+### 7.3 Index Design
+
+1. Add index for foreign keys
+2. Add index for frequently queried fields
+3. Pay attention to order in composite indexes (leftmost prefix)
+4. Avoid too many indexes (affects write performance)
+
+---
+
+## 8. Quick Reference
+
+### Basic Template
+
+```proto
+syntax = "proto3";
+package your_package;
+
+import "domain/annotations.proto";
+
+message EntityName {
+  option (hope.persistence.table) = {
+    name: "TABLE_NAME",
+    description: "Description",
+    wires: [IDENTIFIABLE]
+  };
+
+  field_type field_name = sequence [(hope.persistence.column) = {
+    name: "COLUMN_NAME",
+    description: "Description",
+    nullable: false,
+    type: SQL_TYPE
+  }];
+}
+```
+
+### Primary Key Template
+
+```proto
+int64 id = 1 [(hope.persistence.column) = {
+  name: "ID",
+  id: true,
+  nullable: false,
+  generated_value: {
+    strategy: UUID
+  }
+}];
+```
+
+### DECIMAL Template
+
+```proto
+double field_name = sequence [(hope.persistence.column) = {
+  name: "COLUMN_NAME",
+  nullable: false,
+  type: DECIMAL,
+  precision: 10,
+  scale: 2
+}];
+```

@@ -1,0 +1,33 @@
+export const title = "How support response header manipulate";
+export const description =
+  "support change header value of the response";
+
+It's very simple and doesn't require any additional settings. 
+
+In your service implementation, you can set the desired response object, including the body and headers. It's super easy to implement!
+
+## Implement
+
+```java
+private static HttpCookie buildCookie(final String jwt){
+  return
+          ResponseCookie.from("Authorization",jwt)
+                  .path("/")
+                  .maxAge(Duration.ofDays(1))
+                  .httpOnly(true).build();
+}
+
+@Override
+public void login(
+    final SimpleResultBuilder<LoginResponse> builder, final LoginRequest loginRequest) {
+      //...
+      builder.body().header(HttpHeaders.SET_COOKIE, buildCookie(jwt).toString());
+      //....
+}
+```
+As demo, we will set `cookie` in the HTTP response.
+
+## 😆 Video Guide
+
+1. [ApiHug101-Bilibili](https://space.bilibili.com/666522636)
+2. [ApiHug101-Youtube](https://youtube.com/@ApiHug?si=C1yw0poHA01zbmyj)

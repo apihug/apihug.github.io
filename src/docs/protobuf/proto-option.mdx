@@ -1,0 +1,146 @@
+export const title = "Protocol Buffers Option";
+export const description =
+  "Current ApiHug protobuf extension registrations and where each option applies.";
+
+ApiHug uses protobuf custom options as its contract layer. The important part is the actual extension registrations shipped in `it-proto-extend`, not generic examples from other protobuf ecosystems.
+
+## Descriptor Targets
+
+Custom options are attached to protobuf descriptor types:
+
+- `google.protobuf.FileOptions`
+- `google.protobuf.ServiceOptions`
+- `google.protobuf.MethodOptions`
+- `google.protobuf.MessageOptions`
+- `google.protobuf.FieldOptions`
+- `google.protobuf.EnumOptions`
+- `google.protobuf.EnumValueOptions`
+
+The same field number can be reused on different descriptor types. That is why several ApiHug extensions share `1042` or `31143` without conflicting.
+
+## Current Extension Packages
+
+### OpenAPI / Swagger
+
+Import:
+
+```proto
+import "apihug/protobuf/swagger/annotations.proto";
+```
+
+Registered in `swagger/annotations.proto`:
+
+| Descriptor | Extension point | Field number | Payload type |
+|---|---|---:|---|
+| `MethodOptions` | `(hope.swagger.operation)` | 1042 | `Operation` |
+| `MessageOptions` | `(hope.swagger.schema)` | 1042 | `Schema` |
+| `ServiceOptions` | `(hope.swagger.svc)` | 1044 | `ServiceSchema` |
+| `FieldOptions` | `(hope.swagger.field)` | 1042 | `JSONSchema` |
+| `EnumOptions` | `(hope.swagger.enm)` | 1042 | `JSONSchema` |
+
+Use these when defining HTTP paths, request and response metadata, validation rules, enum display metadata, and mock data.
+
+### Persistence / Entity
+
+Import:
+
+```proto
+import "apihug/protobuf/domain/annotations.proto";
+```
+
+Registered in `domain/annotations.proto`:
+
+| Descriptor | Extension point | Field number | Payload type |
+|---|---|---:|---|
+| `MessageOptions` | `(hope.persistence.table)` | 1772 | `Table` |
+| `FieldOptions` | `(hope.persistence.column)` | 1773 | `Column` |
+
+Use these when mapping domain messages to database tables, columns, views, and Liquibase customization.
+
+### Enum / Error Metadata
+
+Import:
+
+```proto
+import "apihug/protobuf/extend/constant.proto";
+```
+
+Registered in `constant.proto`:
+
+| Descriptor | Extension point | Field number | Payload type |
+|---|---|---:|---|
+| `EnumValueOptions` | `(hope.constant.field)` | 37020 | `Meta` |
+
+Use this for business codes, localized labels, and structured error metadata on enum values.
+
+### Version Tracking
+
+Import:
+
+```proto
+import "apihug/protobuf/extend/version.proto";
+```
+
+`version.proto` is **deprecated**, but it still exists in the source and should be understood when auditing older projects.
+
+| Descriptor | Extension point | Field number | Payload type |
+|---|---|---:|---|
+| `FileOptions` | `(hope.version.file)` | 31142 | `repeated Version` |
+| `MethodOptions` | `(hope.version.method)` | 31142 | `repeated Version` |
+| `MessageOptions` | `(hope.version.msg)` | 31143 | `repeated Version` |
+| `ServiceOptions` | `(hope.version.svc)` | 31143 | `repeated Version` |
+| `EnumOptions` | `(hope.version.enm)` | 31143 | `repeated Version` |
+| `FieldOptions` | `(hope.version.field)` | 31143 | `repeated Version` |
+
+## Minimal Example
+
+```proto
+syntax = "proto3";
+package com.example.pet;
+
+import "apihug/protobuf/swagger/annotations.proto";
+import "apihug/protobuf/domain/annotations.proto";
+import "apihug/protobuf/extend/constant.proto";
+
+service PetApi {
+  option (hope.swagger.svc) = {
+    path: "/pets";
+    description: "Pet API";
+  };
+
+  rpc ListPets (PetQuery) returns (PetView) {
+    option (hope.swagger.operation) = {
+      get: "";
+      description: "List pets";
+    };
+  }
+}
+
+message Pet {
+  option (hope.persistence.table) = {
+    name: "PET";
+    description: "Pet table";
+  };
+
+  string name = 1 [(hope.persistence.column) = {
+    name: "NAME";
+    nullable: false;
+    length: 64;
+  }];
+}
+
+enum PetStatus {
+  PET_STATUS_UNSPECIFIED = 0 [(hope.constant.field) = {
+    code: 0;
+    message: "unspecified";
+    message2: "unspecified";
+  }];
+}
+```
+
+## See Also
+
+1. [API Directive Specification](/docs/spec/swagger)
+2. [Database Directive Specification](/docs/spec/domain)
+3. [Enum Type Specification](/docs/spec/constant)
+4. [Version Change Specification](/docs/spec/version)
