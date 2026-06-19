@@ -215,6 +215,13 @@ test("docs index route redirects to what-is-apihug", () => {
   assert.match(docsIndexPage, /\/docs\/start\/what-is-apihug/);
 });
 
+test("pagination supports both english and zhCN docs trees", () => {
+  const pagination = fs.readFileSync(path.join(repoRoot, "src", "components", "pagination.tsx"), "utf8");
+
+  assert.doesNotMatch(pagination, /import index from "..\/app\/\(docs\)\/docs\/index"/);
+  assert.match(pagination, /currentPath/);
+  assert.match(pagination, /navIndex/);
+});
 test("zhCN docs index route redirects to what-is-apihug", () => {
   const zhDocsIndexPage = fs.readFileSync(
     path.join(repoRoot, "src", "app", "(docs)", "zhCN-docs", "page.tsx"),
