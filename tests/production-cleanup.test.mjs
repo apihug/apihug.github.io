@@ -251,3 +251,10 @@ test("legacy duplicate components and home demo layer are removed", () => {
     assert.equal(exists(...relPath.split("/")), false, relPath);
   }
 });
+
+test("live snippet group does not depend on deleted editor infrastructure", () => {
+  const snippetGroup = read("src", "components", "SnippetGroup.js");
+
+  assert.doesNotMatch(snippetGroup, /@\/components\/Editor/);
+  assert.doesNotMatch(snippetGroup, /\bFrame\b\s+from/);
+});
