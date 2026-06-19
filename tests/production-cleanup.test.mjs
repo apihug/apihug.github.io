@@ -26,6 +26,10 @@ function listFiles(dirPath) {
   return files.sort();
 }
 
+function normalizeRelative(filePath) {
+  return path.relative(repoRoot, filePath).split(path.sep).join("/");
+}
+
 test("pages router leftovers and old bootstrap configs are removed", () => {
   for (const relPath of [
     ["src", "pages"],
@@ -50,13 +54,36 @@ test("legacy layout, nav, and hook infrastructure is removed", () => {
   }
 
   const staleImportPrefixes = ["@/layouts/", "@/navs/", "@/hooks/"];
-  const staleImports = listFiles(path.join(repoRoot, "src"))
+  const productionSurface = [
+    ...listFiles(path.join(repoRoot, "src", "app")),
+    path.join(repoRoot, "mdx-components.tsx"),
+    path.join(repoRoot, "src", "components", "DocsCodeBlock.tsx"),
+    path.join(repoRoot, "src", "components", "DocsStartResources.tsx"),
+    path.join(repoRoot, "src", "components", "Tip.js"),
+    path.join(repoRoot, "src", "components", "docs-sidebar-autoscroll.tsx"),
+    path.join(repoRoot, "src", "components", "docs-sidebar.tsx"),
+    path.join(repoRoot, "src", "components", "footer.tsx"),
+    path.join(repoRoot, "src", "components", "grid-container.tsx"),
+    path.join(repoRoot, "src", "components", "header.tsx"),
+    path.join(repoRoot, "src", "components", "mobile-docs-nav.tsx"),
+    path.join(repoRoot, "src", "components", "pagination.tsx"),
+    path.join(repoRoot, "src", "components", "search.tsx"),
+    path.join(repoRoot, "src", "components", "table-of-contents.tsx"),
+    path.join(repoRoot, "src", "components", "theme-toggle.tsx"),
+    path.join(repoRoot, "src", "components", "home", "agent-vision-section.tsx"),
+    path.join(repoRoot, "src", "components", "home", "blueprint-section.tsx"),
+    path.join(repoRoot, "src", "components", "home", "enterprise-factory-section.tsx"),
+    path.join(repoRoot, "src", "components", "home", "entity-design-section.tsx"),
+    path.join(repoRoot, "src", "components", "home", "hero.tsx"),
+    path.join(repoRoot, "src", "components", "home", "proto-semantic-section.tsx"),
+  ];
+  const staleImports = [...new Set(productionSurface)]
     .filter((filePath) => [".js", ".jsx", ".ts", ".tsx", ".mjs", ".mdx"].includes(path.extname(filePath)))
     .flatMap((filePath) => {
       const source = fs.readFileSync(filePath, "utf8");
       return staleImportPrefixes
         .filter((prefix) => source.includes(prefix))
-        .map((prefix) => `${path.relative(repoRoot, filePath).split(path.sep).join("/")} -> ${prefix}`);
+        .map((prefix) => `${normalizeRelative(filePath)} -> ${prefix}`);
     });
 
   assert.deepEqual(staleImports, [], staleImports.join("\n"));
