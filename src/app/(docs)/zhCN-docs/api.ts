@@ -112,7 +112,7 @@ export function generateTableOfContentsFromMarkdown(markdown: string): TOCEntry[
 
     slug ??= `#${text
       .replace(/`([^`]+)`/g, "$1")
-      .replace(/[^\w\s-]/g, "")
+      .replace(/[^\p{L}\p{N}\s-]/gu, "")
       .trim()
       .replace(/\s+/g, "-")
       .toLowerCase()}`;
