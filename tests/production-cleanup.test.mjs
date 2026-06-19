@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 const repoRoot = process.cwd();
+const sourceExtensions = [".ts", ".tsx", ".js", ".jsx", ".mjs", ".mdx"];
 
 function exists(...segments) {
   return fs.existsSync(path.join(repoRoot, ...segments));
@@ -30,6 +31,85 @@ function normalizeRelative(filePath) {
   return path.relative(repoRoot, filePath).split(path.sep).join("/");
 }
 
+function isSourceFile(filePath) {
+  return sourceExtensions.includes(path.extname(filePath));
+}
+
+function extractLocalImports(source) {
+  const imports = new Set();
+  const patterns = [
+    /\bimport\s+[^'"]*?\sfrom\s*["']([^"']+)["']/g,
+    /\bexport\s+[^'"]*?\sfrom\s*["']([^"']+)["']/g,
+    /\bimport\s*["']([^"']+)["']/g,
+  ];
+
+  for (const pattern of patterns) {
+    for (const match of source.matchAll(pattern)) {
+      const specifier = match[1];
+      if (specifier.startsWith("@/") || specifier.startsWith("./") || specifier.startsWith("../")) {
+        imports.add(specifier);
+      }
+    }
+  }
+
+  return [...imports];
+}
+
+function resolveLocalImport(fromPath, specifier) {
+  const basePath = specifier.startsWith("@/")
+    ? path.join(repoRoot, "src", specifier.slice(2))
+    : path.resolve(path.dirname(fromPath), specifier);
+  const candidates = [
+    basePath,
+    ...sourceExtensions.map((ext) => `${basePath}${ext}`),
+    ...sourceExtensions.map((ext) => path.join(basePath, `index${ext}`)),
+  ];
+
+  for (const candidate of candidates) {
+    if (!fs.existsSync(candidate) || !isSourceFile(candidate)) {
+      continue;
+    }
+
+    const normalized = path.normalize(candidate);
+    if (
+      normalized === path.join(repoRoot, "mdx-components.tsx") ||
+      normalized.startsWith(path.join(repoRoot, "src") + path.sep)
+    ) {
+      return normalized;
+    }
+  }
+
+  return null;
+}
+
+function getReachableProductionFiles() {
+  const roots = [
+    ...listFiles(path.join(repoRoot, "src", "app")).filter(isSourceFile),
+    path.join(repoRoot, "mdx-components.tsx"),
+  ];
+  const reachable = new Set();
+  const queue = [...roots];
+
+  while (queue.length > 0) {
+    const filePath = queue.shift();
+    if (reachable.has(filePath)) {
+      continue;
+    }
+
+    reachable.add(filePath);
+
+    const source = fs.readFileSync(filePath, "utf8");
+    for (const specifier of extractLocalImports(source)) {
+      const resolved = resolveLocalImport(filePath, specifier);
+      if (resolved && !reachable.has(resolved)) {
+        queue.push(resolved);
+      }
+    }
+  }
+
+  return reachable;
+}
+
 test("pages router leftovers and old bootstrap configs are removed", () => {
   for (const relPath of [
     ["src", "pages"],
@@ -54,31 +134,18 @@ test("legacy layout, nav, and hook infrastructure is removed", () => {
   }
 
   const staleImportPrefixes = ["@/layouts/", "@/navs/", "@/hooks/"];
-  const productionSurface = [
-    ...listFiles(path.join(repoRoot, "src", "app")),
-    path.join(repoRoot, "mdx-components.tsx"),
-    path.join(repoRoot, "src", "components", "DocsCodeBlock.tsx"),
-    path.join(repoRoot, "src", "components", "DocsStartResources.tsx"),
-    path.join(repoRoot, "src", "components", "Tip.js"),
-    path.join(repoRoot, "src", "components", "docs-sidebar-autoscroll.tsx"),
-    path.join(repoRoot, "src", "components", "docs-sidebar.tsx"),
-    path.join(repoRoot, "src", "components", "footer.tsx"),
-    path.join(repoRoot, "src", "components", "grid-container.tsx"),
-    path.join(repoRoot, "src", "components", "header.tsx"),
-    path.join(repoRoot, "src", "components", "mobile-docs-nav.tsx"),
-    path.join(repoRoot, "src", "components", "pagination.tsx"),
-    path.join(repoRoot, "src", "components", "search.tsx"),
-    path.join(repoRoot, "src", "components", "table-of-contents.tsx"),
-    path.join(repoRoot, "src", "components", "theme-toggle.tsx"),
-    path.join(repoRoot, "src", "components", "home", "agent-vision-section.tsx"),
-    path.join(repoRoot, "src", "components", "home", "blueprint-section.tsx"),
-    path.join(repoRoot, "src", "components", "home", "enterprise-factory-section.tsx"),
-    path.join(repoRoot, "src", "components", "home", "entity-design-section.tsx"),
-    path.join(repoRoot, "src", "components", "home", "hero.tsx"),
-    path.join(repoRoot, "src", "components", "home", "proto-semantic-section.tsx"),
-  ];
-  const staleImports = [...new Set(productionSurface)]
-    .filter((filePath) => [".js", ".jsx", ".ts", ".tsx", ".mjs", ".mdx"].includes(path.extname(filePath)))
+  const productionSurface = getReachableProductionFiles();
+
+  for (const relPath of [
+    "src/components/icon-button.tsx",
+    "src/components/logo.tsx",
+    "src/components/nav-list.tsx",
+    "src/components/docs-sidebar-link.tsx",
+  ]) {
+    assert.ok(productionSurface.has(path.join(repoRoot, ...relPath.split("/"))), relPath);
+  }
+
+  const staleImports = [...productionSurface]
     .flatMap((filePath) => {
       const source = fs.readFileSync(filePath, "utf8");
       return staleImportPrefixes
