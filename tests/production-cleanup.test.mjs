@@ -13,6 +13,19 @@ function read(...segments) {
   return fs.readFileSync(path.join(repoRoot, ...segments), "utf8");
 }
 
+function listFiles(dirPath) {
+  const files = [];
+  for (const entry of fs.readdirSync(dirPath, { withFileTypes: true })) {
+    const entryPath = path.join(dirPath, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...listFiles(entryPath));
+      continue;
+    }
+    files.push(entryPath);
+  }
+  return files.sort();
+}
+
 test("pages router leftovers and old bootstrap configs are removed", () => {
   for (const relPath of [
     ["src", "pages"],
@@ -35,6 +48,18 @@ test("legacy layout, nav, and hook infrastructure is removed", () => {
   ]) {
     assert.equal(exists(...relPath), false, relPath.join("/"));
   }
+
+  const staleImportPrefixes = ["@/layouts/", "@/navs/", "@/hooks/"];
+  const staleImports = listFiles(path.join(repoRoot, "src"))
+    .filter((filePath) => [".js", ".jsx", ".ts", ".tsx", ".mjs", ".mdx"].includes(path.extname(filePath)))
+    .flatMap((filePath) => {
+      const source = fs.readFileSync(filePath, "utf8");
+      return staleImportPrefixes
+        .filter((prefix) => source.includes(prefix))
+        .map((prefix) => `${path.relative(repoRoot, filePath).split(path.sep).join("/")} -> ${prefix}`);
+    });
+
+  assert.deepEqual(staleImports, [], staleImports.join("\n"));
 });
 
 test("app router entrypoints still point at the active runtime", () => {
