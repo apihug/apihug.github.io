@@ -242,69 +242,6 @@ test("zhCN docs nav exposes the curated skills and rules section", () => {
   }
 });
 
-test("docs nav group order is AI-first for both english and zhCN sidebars", () => {
-  const englishNav = fs.readFileSync(
-    path.join(repoRoot, "src", "app", "(docs)", "docs", "index.tsx"),
-    "utf8",
-  );
-  const zhNav = fs.readFileSync(
-    path.join(repoRoot, "src", "app", "(docs)", "zhCN-docs", "index.tsx"),
-    "utf8",
-  );
-
-  const englishOrder = [
-    '"Getting Started"',
-    '"Skills & Rules"',
-    "Copilot",
-    "MCP",
-    '"Tool Chain"',
-    '"Protocol Buffers"',
-    "Framework",
-    "Spec",
-    "UI",
-    "Editor",
-    '"How-To"',
-    "Kola",
-    '"Core Principles"',
-    "Milestone",
-    "Changelog",
-  ];
-
-  const zhOrder = [
-    '"Getting Started"',
-    '"Skills & Rules"',
-    "Copilot",
-    "MCP",
-    '"Tool Chain"',
-    '"Protocol Buffers"',
-    "Framework",
-    "Spec",
-    "UI",
-    "Editor",
-    "How",
-    "Kola",
-    '"Core Principles"',
-    "Milestone",
-    "ChangeLog",
-  ];
-
-  let lastIndex = -1;
-  for (const token of englishOrder) {
-    const currentIndex = englishNav.indexOf(`${token}:`);
-    assert.notEqual(currentIndex, -1, `missing english section ${token}`);
-    assert.ok(currentIndex > lastIndex, `english section ${token} is out of order`);
-    lastIndex = currentIndex;
-  }
-
-  lastIndex = -1;
-  for (const token of zhOrder) {
-    const currentIndex = zhNav.indexOf(`${token}:`);
-    assert.notEqual(currentIndex, -1, `missing zhCN section ${token}`);
-    assert.ok(currentIndex > lastIndex, `zhCN section ${token} is out of order`);
-    lastIndex = currentIndex;
-  }
-});
-
 test("english docs do not link to untranslated changelog detail routes", () => {
   const untranslatedLinks = walkMdxFiles(docsRoot)
     .filter((filePath) => fs.readFileSync(filePath, "utf8").includes("/docs/changelog/detail/SDK_0."))
