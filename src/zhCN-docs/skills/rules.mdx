@@ -1,0 +1,72 @@
+export const title = "规则";
+export const description =
+  "ApiHug 的核心规则文档，以及它们分别约束什么。";
+
+# Rules
+
+ApiHug 的规则文档可以看作 contract-first 交付的工作宪法：哪些建模方式是允许的，哪些代码应该手写，哪些实现偏差需要在评审时被拦下。
+
+## 涵盖内容
+
+### API 扩展规则
+
+`apihug-proto-api-extension-guide`
+
+定义 service、operation、request、response、authorization、分页与 schema 元数据如何通过 ApiHug swagger 扩展表达。
+
+站内对应文档：
+
+- [Swagger 规范](/zhCN-docs/spec/swagger)
+- [Protobuf 与 OAS](/zhCN-docs/protobuf/proto-oas)
+
+### 数据建模规则
+
+`apihug-proto-database-modeling-guide`
+
+定义 entity message 如何映射到 table、column、wire、index 和持久化约定。
+
+站内对应文档：
+
+- [Domain 规范](/zhCN-docs/spec/domain)
+- [Protobuf Entity](/zhCN-docs/protobuf/proto-entity)
+
+### 枚举与错误规则
+
+`apihug-proto-enum-error-extension-guide`
+
+定义业务枚举元数据、多语言消息和结构化错误负载的设计方式。
+
+站内对应文档：
+
+- [Constant 规范](/zhCN-docs/spec/constant)
+
+### 后端实现规则
+
+`apihug-impl-golden-rule`
+
+定义生成后的 service skeleton、repository trait、安全边界与领域逻辑应该如何落地。
+
+### 前端实现规则
+
+`apihug-impl-front-vben-guide`
+
+定义生成 SDK、页面结构、路由生成以及 Vben 前端约定。
+
+## 为什么重要
+
+这些文档不是通用编码规范，而是用来保护 ApiHug 的生成模型：
+
+- proto 是 source of truth
+- 生成代码继续保持生成代码
+- 手写逻辑必须留在约定的可写边界中
+- review 流程才能判断实现是否仍然忠于设计
+
+## 如何使用
+
+设计契约时看 proto 规则，写业务逻辑和做代码评审时看实现规则。当工作流技能要求你做 review 时，这些规则就是评审的依据。
+
+## 下一步
+
+1. 先读 [工作流](/zhCN-docs/skills/workflow)
+2. 做契约检查时参考 [Proto Review](/zhCN-docs/skills/proto-review)
+3. 做实现检查时参考 [Implementation Review](/zhCN-docs/skills/impl-review)

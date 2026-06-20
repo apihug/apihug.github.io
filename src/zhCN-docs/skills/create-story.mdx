@@ -1,0 +1,40 @@
+export const title = "Create Story";
+export const description =
+  "说明 apihug-create-story 的作用，以及它适合在什么阶段使用。";
+
+# Create Story
+
+`apihug-create-story` 是高层规划与实际实现之间的交接技能。
+
+## 它是什么
+
+它会把已经确认范围的需求，整理成一份带有 ApiHug 边界信息的 implementation-ready story。
+
+## 为什么重要
+
+在 ApiHug 项目里，普通 story 不够用。story 必须明确说明：
+
+- protobuf-first 的上下文
+- 生成代码和手写代码的边界
+- 影响实现的框架规则
+- 后续应该怎么 review
+
+## 它如何融入整体流程
+
+它适合放在需求澄清之后、正式编码之前使用。
+
+典型输入：
+
+- 已批准的需求或 story 范围
+- 相关 proto、domain、spec 上下文
+- 已经定下来的架构或工作流决策
+
+典型输出：
+
+- 一份实现范围明确的 story
+- 被显式标出的 ApiHug 约束
+- 足够交给 `apihug-dev-story` 执行的上下文
+
+## 下一步
+
+它不是做宽泛产品探索的工具。story 准备好之后，继续看 [Dev Story](/zhCN-docs/skills/dev-story)。

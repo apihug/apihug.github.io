@@ -1,0 +1,39 @@
+export const title = "Implementation Review";
+export const description =
+  "How apihug-impl-review checks handwritten code against ApiHug golden rules.";
+
+# Implementation Review
+
+`apihug-impl-review` validates whether the handwritten implementation still respects the framework architecture after code generation.
+
+## What It Is
+
+This skill reviews handwritten code after generation has already produced the framework surface.
+
+## Why It Matters
+
+Most ApiHug regressions come from logic drifting into generated layers or from teams bypassing the intended SDK and service boundaries.
+
+## How It Fits
+
+Its main focus areas are:
+
+- service implementation discipline
+- repository trait usage
+- security boundary placement
+- generated vs handwritten code separation
+- frontend SDK and page usage patterns
+
+Typical issues it should catch include:
+
+- business logic leaking into generated layers
+- security rules implemented outside the intended framework path
+- frontend code bypassing the generated SDK
+- implementation structure drifting away from the golden rules
+
+## Next Step
+
+Use these rule guides as the review source of truth:
+
+- `apihug-impl-golden-rule`
+- `apihug-impl-front-vben-guide`

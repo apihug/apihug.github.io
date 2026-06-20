@@ -1,0 +1,40 @@
+export const title = "Proto Review";
+export const description =
+  "How apihug-proto-review validates protobuf design against ApiHug rules.";
+
+# Proto Review
+
+`apihug-proto-review` validates whether contract design still matches ApiHug protobuf rules.
+
+## What It Is
+
+This skill reviews the protobuf contract itself rather than the generated output.
+
+## Why It Matters
+
+Weak contracts produce weak generation. Proto review catches design drift before it spreads into code, SDKs, or downstream integrations.
+
+## How It Fits
+
+Its main focus areas are:
+
+- service and operation metadata quality
+- request and response modeling
+- paging and repeated collection semantics
+- domain modeling boundaries
+- enum and error metadata completeness
+
+Typical issues it should catch include:
+
+- cross-layer imports that violate ApiHug boundaries
+- stale or deprecated option usage
+- weak request modeling that should be a real message
+- missing metadata that reduces API clarity or discoverability
+
+## Next Step
+
+Apply the related rule surfaces during review:
+
+- `apihug-proto-api-extension-guide`
+- `apihug-proto-database-modeling-guide`
+- `apihug-proto-enum-error-extension-guide`

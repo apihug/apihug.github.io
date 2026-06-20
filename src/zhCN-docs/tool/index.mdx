@@ -1,19 +1,38 @@
-export const title = "ApiHug Gradle";
+export const title = "工具链";
 export const description =
-  "ApiHug toolchain base on the Gradle";
+  "ApiHug 的工具链，用来承载 AI 工作流、命令行操作、契约质量检查与代码生成。";
 
+ApiHug 不是一个单命令工具，而是一整套围绕 contract-first 交付设计的工具链。
 
-<TipInfo>To be done 🏗️</TipInfo>
+## 它是什么
 
-ApiHug toolchain base on the Gradle
+这一组工具包括：
 
-[Maven Central](https://search.maven.org/artifact/com.apihug/it-bom)
+- 面向 AI 工作流的 BMAD 能力
+- 适合命令行场景的 ApiHug REPL
+- 用于契约质量检查的 lint
+- 面向 proto 模块的 `wire`
+- 面向应用模块的 `stub`
 
+## 为什么重要
 
-[JetBrains Marketplace](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
+这些工具是按协作关系设计的：
 
+- 规划与设计始终围绕契约
+- 生成流程可以稳定重复执行
+- 质量问题在 drift 扩大之前就被发现
+- 团队既可以在 IntelliJ 里工作，也可以走纯终端流程
 
-## Detail
+## 它如何融入整体流程
 
-1. [Gradle Wire](/zhCN-docs/tool/gradle-wire)
-2. [Gradle Stub](/zhCN-docs/tool/gradle-stub)
+按职责使用就可以：
+
+1. [ApiHug BMAD](/zhCN-docs/tool/apihug-bmad) 负责 AI 驱动交付工作流
+2. [ApiHug REPL](/zhCN-docs/tool/apihug-repl) 负责命令行交互
+3. [ApiHug Lint](/zhCN-docs/tool/apihug-lint) 负责契约质量检查
+4. [Gradle Wire](/zhCN-docs/tool/gradle-wire) 负责 proto 模块生成
+5. [Gradle Stub](/zhCN-docs/tool/gradle-stub) 负责应用模块脚手架生成
+
+## 下一步
+
+如果你刚接触这套栈，建议先读 BMAD 或 REPL，再继续看 `wire` 和 `stub`。

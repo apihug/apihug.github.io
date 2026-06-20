@@ -1,118 +1,84 @@
-export const title = "What is ApiHug?";
+export const title = "什么是 ApiHug？";
 export const description =
-  "ApiHug brings brand-new idea & thoughtful features to power your complete API lifecycle.";
+  "ApiHug 是一个 AI 原生的企业架构工厂，用一份 protobuf 契约驱动 API、服务、数据库、SDK 与 AI 工作流。";
 
+ApiHug 把 protobuf 契约放到系统中心位置，再围绕这份契约组织设计、生成、实现、评审和分发流程。
 
-import apiPlatform from '@/img/editor/apihug-platform.svg'
+<figure className="my-8">
+  <img
+    src="/arch.svg"
+    alt="ApiHug 架构总览"
+    className="w-full rounded-2xl border border-gray-200 bg-white"
+  />
+  <figcaption className="mt-3 text-sm text-gray-500">
+    ApiHug 架构总览
+  </figcaption>
+</figure>
 
-ApiHug revolutionizes your API lifecycle with innovative ideas and thoughtful features.
+## 它是什么
 
-Streamline the entire API journey, from Design, Build, Test to Integrate, making it faster and easier than ever before.
+ApiHug 把四类能力收拢到同一个产品面里：
 
-Unite all roles on a single platform, enabling seamless collaboration throughout the entire lifecycle of APIs.
+- 基于 protobuf 的 contract-first API 设计
+- 面向后端、元数据和客户端产物的生成能力
+- 保证手写代码不越界的规则体系
+- 理解同一份契约与规则的 AI 工作流
 
-<img className="rounded-lg" src={apiPlatform} alt="ApiHug Platform"  style={{ margin: 0 }} />
+换句话说，一份契约不只定义接口，也定义了后续生成、实现、集成和 AI 辅助交付的边界。
 
-## Why should I use ApiHug?
+## 为什么重要
 
-ApiHug is user-friendly, design driven ,straightforward and satisfying.
+API 团队最容易出问题的地方，往往不是单点设计，而是设计、实现和评审之间逐步漂移。ApiHug 通过让契约成为 source of truth，把这类漂移压到最低。
 
-ApiHug revolutionizes the separation of API design and implementation by adopting a domain-specific language (DSL) and employing object-oriented methods to design and define API components. This approach significantly enhances API reusability.
+这会直接带来几件事：
 
-ApiHug leverages git for API management and utilizes repositories for API distribution. By building upon existing systems and frameworks, ApiHug completely transforms the paradigm of API development and management.
+- 设计和实现更容易保持同步
+- 可以安全地重复生成，而不是反复手改
+- 评审依据更明确，不再停留在泛泛的代码风格层面
+- 对 AI、SDK 使用方和内部协作方暴露出更清晰的系统表面
 
-### Key features:
+## 它如何融入整体流程
 
-- Effortless Visual API Design with IDEA plugin integration.
-- Object-oriented(Domain specific language) approach for highly reusable API design.
-- Compliance with OAS design standards for industry best practices.
-- Design, test & implementation in one platform
-- Integration exist CI/CD's facilities
-- Base mature toolchains(gradle) & IDEs(IDEA) & framework(Spring)
+ApiHug 贯穿从设计到集成的完整交付链路：
 
-## What is ApiHug used for?
+### 设计
 
-### API Design
+用 protobuf 定义 service、operation、message、enum 和持久化元数据。
 
-ApiHug is a design-first platform that follow the standard [OAS(3.1.0)](https://spec.openapis.org/oas/latest.html), it introduces Common Language (DSL) to bridge the gap between:
+### 构建
 
-- Domain Experts
-- Technical Experts
-- Working Software & Tests
-- 3rd party Partners
+基于契约生成后端脚手架、OAS 输出和其他框架产物。
 
-With its intuitive interface, ApiHug empowers the complete API design lifecycle.
+### 实现
 
-### API Implement
+业务逻辑只写在允许手写的层里。
 
-Accelerate your development Converting your APIs into Software Artifacts:
+### 评审
 
-- API Definitions Meta
-- Application Framework Backend(SpringBoot/Cloud)
-- Tool Chain: Gradle + IDEA Plugin
+用 ApiHug 的规则和工作流技能校验契约与实现是否仍然一致。
 
-### API Management
+### 分发
 
-ApiHug revolutionizes API management by bringing the common project management concept to the API full lifecycle management. With native Git support, it simplifies version control and enables users to seamlessly design, document, mock, test, and share APIs.
+通过 Maven 等既有仓库基础设施发布带版本的产物。
 
-The collaboration features facilitate efficient teamwork, allowing teams to easily collaborate and share their work in a streamlined manner.
+## 常见问题
 
-### API Distribution
+### ApiHug 可以免费使用吗？
 
-Distributing different versions of APIs has always been a challenge in API management.
+可以。无论是商业项目还是内部平台项目，都可以使用 ApiHug。
 
-ApiHug tackles this issue by leveraging existing package distribution mechanisms, such as Maven repository (similar to Node.js npm), to ensure a more robust and controllable API distribution process.
+### ApiHug 是开源的吗？
 
-### API Integration
+SDK 会发布到公共 Maven 仓库。IntelliJ 插件源码当前没有公开。
 
-API design and implementation typically focus on solutions for API providers. However, ultimately, APIs need to be consumed by API consumers.
+### 为什么叫 ApiHug？
 
-ApiHug offers a solution for API consumer clients. The API distribution mechanism ensures synchronization of different API versions. Additionally, API integration enables automatic generation of client-side stub code.
+> We Build What We Love & Love What We Built
 
+`API` 是契约本身，`Hug` 表示把工程师、消费者和 AI 工具放进同一个共享系统模型里。
 
-## FAQ
+## 下一步
 
-### Is ApiHug Free
-
-Absolutely! ApiHug can be utilized in various types of projects, including commercial ones.
-It offers versatility and flexibility to cater to your project requirements.
-
-### Is ApiHug Open Source
-
-To clarify, the source code for the IDEA plugin part of ApiHug is not shared.
-
-However, for the SDK, you can access it from the public maven repository.
-
-### Why name ApiHug
-
-> We Build What We Love
-> &
-> Love What We Built
-
-
-Why Empathy-Driven Development is important?
-
-> Sure, engineers are excellent problem solvers. 
-> But I think what gets overlooked is that engineers are also, inherently, communicators. 
-> Coding is all about delivering messages to people, as well as machines.
-
-
-- [Empathy-Driven Development: How Engineers Can Tap into This Critical Skill](https://review.firstround.com/empathy-driven-development-how-engineers-can-tap-into-this-critical-skill)
-- [How Empathy Can Make You a Better Software Engineer](https://www.freecodecamp.org/news/how-empathy-makes-you-a-better-software-engineer/)
-- [Cultivating empathy](https://www.apa.org/monitor/2021/11/feature-cultivating-empathy)
-- [Developer empathy](https://apiguide.readthezhCN-docs.io/en/latest/principles/empathy.html)
-- [How Empathy Can Be a Software Developer’s Superpower](https://simpleprogrammer.com/empathy-software-developers/)
-- [Empathy Mapping: The First Step in Design Thinking](https://www.nngroup.com/articles/empathy-mapping/)
-- [Become a Better Developer by Increasing Your Empathy](https://www.welcometothejungle.com/en/articles/better-developer-empathy)
-
-
-## Get involved
-
-We love our community! Please do stay in touch and:
-
-- [GitHub](https://github.com/apihug/)  Raise your PR
-- [Youtube](https://youtube.com/@ApiHug) Watch our video cookbook
-- [Bilibili](https://space.bilibili.com/666522636) Watch our video cookbook(China)
-- [Gitee](https://gitee.com/dearxuecom/apihug.com) Raise your PR(China)
-- Reach out to our dev team via [email](mailto:dev@apihug.com) with your ApiHug ideas, dreams, and wishes!
-
+1. 从 [快速开始](/zhCN-docs/start) 进入实际项目
+2. 阅读 [技能与规则](/zhCN-docs/skills)
+3. 继续了解 [工具链](/zhCN-docs/tool)

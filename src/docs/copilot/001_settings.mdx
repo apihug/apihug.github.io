@@ -1,475 +1,107 @@
-export const title = "ApiSmart Settings";
+export const title = "Copilot Settings";
 export const description =
-  "ApiSmart Settings & Support Vendors";
+  "Configure runtime options, vendor profiles, and prompt shortcuts for ApiHug Copilot.";
 
-ApiHug's ApiSmart leverage the [Langchain4j](https://github.com/langchain4j/langchain4j/) to talk to the LLM vendors; so basically any Langchain4j support vendor can be support by ApiSmart;
+ApiHug Copilot uses [Langchain4j](https://github.com/langchain4j/langchain4j/) as its model integration layer. That means the settings model is based on vendor profiles, runtime defaults, and reusable prompts.
 
-But now as limitation of our capacity; we need to add and test one by one; this will take some time;
+`Toolbar > ApiHug > Settings > AI`
 
-Eventually all of them can be in our support list.
+## What It Is
 
-`Toolbar>ApiHug>Settings>AI`
+The settings page has three responsibilities:
 
-## Settings
+- define runtime defaults shared by chat sessions
+- store one or more vendor profiles
+- manage reusable prompt shortcuts
 
-`Toolbar>ApiHug>Settings>AI>Settings`
+## Why It Matters
 
-Common LLM runtime settings, all of them has default value, no need to specify if keep default.
+Clean configuration prevents two common problems:
 
-| Name              | Comment                                                                                                                                                                                                                                        | Mandatory |
-|-------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
-| Chat Memory Size  | Memory window size, default 10                                                                                                                                                                                                                 | Y         |
-| Top-P             | Top-P is a text generation method that focuses on the most likely tokens until a cumulative probability threshold is reached. It helps balance diversity and certainty in generated text. Use it with care, adjusting it for desired outcomes. | Y         |
-| Max Output Tokens | Maximum attempts                                                                                                                                                                                                                               | Y         |
-| Timeout(s)        | Time out in second                                                                                                                                                                                                                             | Y         |
-| Max Attempts      | Max attempts                                                                                                                                                                                                                                   | Y         |
-| Temperature       | What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.                                                           | Y         |
-| Stream            | Support stream                                                                                                                                                                                                                                 | Y         |
-| System Prompt     | System prompt                                                                                                                                                                                                                                  | Y         |
-| Show Detail       | Show time or token cost etc                                                                                                                                                                                                                    | Y         |
+- low-signal answers caused by unstable sampling or missing prompts
+- environment confusion when teams switch between cloud, internal, and local models
 
-## Vendors
+## Runtime Settings
 
-Support List:
+`Toolbar > ApiHug > Settings > AI > Settings`
 
-1. Open AI
-2. Azure
-3. Gemini
-4. Anthropic
-5. DeepInfra
-6. Mooshot
-7. Zhipu
-8. DeepSeek
-9. Qianfan
-10. Grop
-11. Ollama
-12. Mistral
-13. LMStudio
-14. OpenRouter
-15. Jan
-16. GPT4All
-17. Tongyi(Aliyun)通义-阿里
-18. Hunyuan(Tencent)混元-腾讯
+These values apply to normal chat execution unless a session overrides them.
 
-Any other suppliers that support the OpenAI-style API can integrate seamlessly.
+| Name              | What it controls                                  |
+|-------------------|---------------------------------------------------|
+| Chat Memory Size  | how many recent messages stay in working memory   |
+| Top-P             | probability sampling window                       |
+| Max Output Tokens | upper bound for response length                   |
+| Timeout(s)        | request timeout                                   |
+| Max Attempts      | retry count                                       |
+| Temperature       | response variability                              |
+| Stream            | streamed output                                   |
+| System Prompt     | default system instruction                        |
+| Show Detail       | timing and token detail in the UI                 |
 
-`Toolbar>ApiHug>Settings>AI>Vendor`
+## Vendor Profiles
 
-In theory [language-models](https://docs.langchain4j.dev/category/language-models) is the full list;
+`Toolbar > ApiHug > Settings > AI > Vendor`
 
-ApiSmart support you configure multiple instance for one LLM vendor, like for different env;
+Copilot supports multiple profiles per provider, which is useful for development, staging, production, or model comparisons.
 
-so each setting will have a specific name and description, you should make them straightforward for example `Openai-test-env` will be a good sample.
+Use straightforward names such as `OpenAI-dev`, `Azure-prod`, or `Local-Ollama`.
 
-| Name        | Comment                               | Mandatory |
-|-------------|---------------------------------------|-----------|
-| Name        | Name of this LLM configuration        | Y         |
-| Description | Description of this LLM configuration | N         |
+Common provider families include:
 
-### OpenAI
+- OpenAI-style APIs
+- Azure OpenAI
+- Gemini
+- Anthropic
+- DeepSeek
+- Qianfan
+- Zhipu
+- Ollama
+- LM Studio
+- Jan
+- OpenRouter
+- Tongyi and Hunyuan
 
-| Name         | Comment                              | Mandatory |
-|--------------|--------------------------------------|-----------|
-| URL          | `https://api.openai.com/` as default | N         |
-| Api Key      | Key for the API                      | Y         |
-| Project Id   | Not used yet                         | N         |
-| Organization | Not used yet                         | N         |
+### Profile fields
 
-### Azure AI
+| Name        | Purpose                         |
+|-------------|---------------------------------|
+| Name        | the profile label shown in the UI |
+| Description | optional explanation for the profile |
 
-| Name         | Comment                                                         | Mandatory |
-|--------------|-----------------------------------------------------------------|-----------|
-| URL          | `https://***.openai.azure.com/` like endpoint                   | Y         |
-| Api Key      | Key for the API                                                 | Y         |
-| Model        | Default Model name(deployment), you can put manually on runtime | N         |
+### Typical connection fields
 
-### LLM Studio
+| Provider type | Common fields                    |
+|---------------|----------------------------------|
+| OpenAI-style  | URL, API Key, optional model     |
+| Azure AI      | endpoint, API Key, deployment    |
+| Local runtime | local URL and optional model     |
+| Qianfan       | API Key, Secret Key, model       |
+| Zhipu         | API Key, model                   |
 
-| Name         | Comment                                                         | Mandatory |
-|--------------|-----------------------------------------------------------------|-----------|
-| URL          | `http://localhost:1234/v/1/` default local URL                  | Y         |
+Any provider that exposes a compatible OpenAI-style API can usually be modeled as a custom vendor profile.
 
-[lmstudio](https://lmstudio.ai/) Discover, download, and run local LLMs
+## Prompt Library
 
-[Local LLM Server](https://lmstudio.ai/docs/basics/server), You can serve local LLMs from LM Studio's Developer tab, either on localhost or on the network.
+`Toolbar > ApiHug > Settings > AI > Prompt`
 
-### Jan
+Prompt shortcuts let teams standardize repeated asks such as `/explain`, `/review`, or `/api`.
 
-| Name         | Comment                                                         | Mandatory |
-|--------------|-----------------------------------------------------------------|-----------|
-| URL          | `https://***.openai.azure.com/` like endpoint                   | Y         |
+| Name   | Purpose                                      |
+|--------|----------------------------------------------|
+| name   | the slash command, such as `/explain`        |
+| prompt | the full instruction body behind that command |
 
-[Enable the Jan API Server](https://jan.ai/integrations/coding/continue-dev#step-2-enable-the-jan-api-server)
+Keep prompt names short, unique, and easy to recognize.
 
-### OpenRouter
+### Prompt guidance
 
-**TBD**
+- write prompts for one clear job
+- include project-specific constraints when needed
+- keep reusable prompts stable and versionable
+- prefer prompt libraries over repeating long instructions by hand
 
-| Name         | Comment                                                         | Mandatory |
-|--------------|-----------------------------------------------------------------|-----------|
-| URL          | `https://***.openai.azure.com/` like endpoint                   | Y         |
-| Api Key      | Key for the API                                                 | Y         |
-| Model        | Default Model name(deployment), you can put manually on runtime | N         |
+## Next Step
 
-### Qianfan
-
-| Name       | Comment                                              | Mandatory |
-|------------|------------------------------------------------------|-----------|
-| Api Key    | Key for the API                                      | Y         |
-| Secret Key | Secret Key for the API                               | Y         |
-| Model      | default model, you can input manually during runtime | Y         |
-
-[百度智能云千帆大模型](https://console.bce.baidu.com/qianfan/ais/console/applicationConsole/application)
-
-BTW `Yi-34B-Chat` is free;
-
-### Zhipu
-
-<img src={require('@/img/editor/054_ai_zhipu.gif').default.src} alt="ApiHug Zhipu AI" width={2362} height={1608}
-     className="rounded-lg"/>
-
-| Name       | Comment                                              | Mandatory |
-|------------|------------------------------------------------------|-----------|
-| Api Key    | Key for the API                                      | Y         |
-| Model      | default model, you can input manually during runtime | Y         |
-
-1. [ApiKey](https://www.bigmodel.cn/usercenter/apikeys)
-2. [Register](https://www.bigmodel.cn/invite?icode=jo8%2FWK7FG7riwcqcY0VTu33uFJ1nZ0jLLgipQkYjpcA%3D)
-
-### TBD
-
-1. Google
-2. ...
-
-## Prompt
-
-`Toolbar>ApiHug>Settings>AI>Prompt`
-
-| Name   | Comment                                                                       | Mandatory |
-|--------|-------------------------------------------------------------------------------|-----------|
-| name   | shortcut style, can be refer `/{name}` when ask, `/explain` is a good example | Y         |
-| prompt | body of the prompt                                                            | Y         |
-
----
-
-⚠️Ensure **name** is short, unique, and easily recognizable⚠️
-
-<TipInfo>
-  The quality of prompt words directly affects the effectiveness of the answers produced by large models;
-  
-  this is a task that requires patience and experience!
-  
-  If you don't ask good questions, of course, you won't get good answers.
-</TipInfo>
-
-[Prompt-Engineering-Guide-git](https://github.com/dair-ai/Prompt-Engineering-Guide)
-
-Prompt engineering is a relatively new discipline for developing and optimizing prompts to efficiently use language models (LMs) for a wide variety of applications and research topics. 
-
-Prompt engineering skills help to better understand the capabilities and limitations of large language models (LLMs).
-
-We will collect some tips here: [apismart prompts](https://github.com/apihug/apismart-prompts/)
-
----
-
-ApiHug `api/` prompt ([apismart-prompts/api](https://github.com/apihug/apismart-prompts/blob/main/src/api/api.md)):
-
-As a seasoned ApiHug developer, you'll design API endpoints using ApiHug's Protocol Buffers-based DSL.
-
-Here is an example of a Proto definition using ApiHug:
-
-```protobuf
-syntax = "proto3";
-
-package com.apihug.sample;
-
-import "extend/domain.proto";
-import "google/protobuf/empty.proto";
-import "swagger/annotations.proto";
-
-service SampleService {
-  option (hope.swagger.svc) = {
-    path: "/sample";
-    description: "Service for Sample";
-    tag:{
-      name: "demo"
-      description: "all demo apis"
-    }
-  };
-
-  rpc ExampleSayHello (google.protobuf.Empty) returns (google.protobuf.Empty) {
-    option (hope.swagger.operation) = {
-      get: "/hello-world";
-      description: "Say hello to the world";
-      tags: "project";
-      pageable: true;
-      input_plural: true;
-      out_plural: false;
-      priority: HIGH;
-      //only include this part, when you really need pass parameters
-      parameters:{
-        parameter:{
-          name: "name";
-          in: QUERY;
-          schema:{
-            format: STRING;
-            blank: FALSE
-          }
-        }
-      }
-     //only include this part, when you need authorization
-     authorization:{
-        //low_limit_risky_mode: LOGIN
-        rbac:{
-          roles: {
-            roles: 'USER_ADD'
-          }
-        }
-     }
-    };
-  };
-}
-
-```
-
-## Basic Tips
-
-### `hope.swagger.svc`
-
-Specify the base path, description, and tags for your service.
-
-### `hope.swagger.operation`
-
-Specify HTTP method, summary, and parameters with the `Operation` message. Omit `bool` properties with default `false`.
-
-```protobuf
-message Operation {
-  repeated string tags = 1;
-  string summary = 2;
-  string description = 3;
-  map<string, Response> responses = 9;
-  repeated Scheme schemes = 10;
-  bool deprecated = 11;
-  Priority priority = 14; //LOW,MIDDE,HIGH,CRITICAL,FATAL
-  string request_name = 15;
-  optional bool pageable = 51; //Pageable request and response, default false
-  optional bool raw = 52; //keep raw response 
-  optional bool request = 53;
-  optional bool input_plural = 56; //Input is a List, only set when need
-  optional bool out_plural = 57; //Output is a list, only set when need
-  optional Parameters parameters = 100;
-  oneof pattern {
-    string get = 302;
-    string put = 303;
-    string post = 304;
-    string delete = 305;
-    string patch = 306;
-  }
-  optional Authorization authorization = 402;
-  bool body_empty = 600;
-  repeated string questions = 800; //Tips for AI prompt for this operation
-}
-```
-
-### `authorization`
-
-Set API security and authorization with `Authorization` messages, avoiding OAS methods in favor of the ApiHug approach.
-
-```protobuf
-
-message RBAC {
-  enum Combinator {
-    AND = 0;
-    OR = 1;
-  }
-
-  enum PredefinedRoleCheckerType {
-    NA = 0 [deprecated = true];
-    PLATFORM = 1;
-    PLATFORM_MANAGER = 2;
-    PLATFORM_OWNER = 3;
-    TENANT = 4;
-    TENANT_MANAGER = 5;
-    TENANT_OWNER = 6;
-  }
-
-  message Roles {
-    repeated string roles = 1;
-  }
-
-  oneof role {
-    PredefinedRoleCheckerType predefined_role_checker = 3;
-    Roles roles = 2;
-  }
-
-message Authorization {
-  enum LowLimitRiskyMode {
-    ANONYMOUS = 0;
-    LOGIN = 1;
-    ACTIVE = 2;
-  }
-  oneof kind {
-    LowLimitRiskyMode low_limit_risky_mode = 1;
-    RBAC rbac = 2;
-    string expression = 15;
-  }
-}
-```
-
-### `parameters`
-
-- Use `Parameters` and `Parameter` to define API parameters and responses.
-- Omit parameter definitions if not required, especially for POST requests where input and output are specified in the rpc method.
-
-```protobuf
-message Parameters {
-  repeated Parameter parameter = 1;
-}
-
-message Parameter {
-  enum IN {
-    QUERY = 0;
-    HEADER = 1;
-    PATH = 2;
-    COOKIE = 3;
-    SESSION = 4;
-  }
-  string name = 1;
-  IN in = 2;
-  JSONSchema schema = 10;
-  hope.common.BoolType plural = 20;
-}
-```
-
-### RPC `returns` or input
-
-Define the JSON schema for your API using the `JSONSchema` message. This includes details like the title, description, and format of the schema.
-
-```protobuf
-enum JSONSchemaFormat {
-    //Not used, default to string or the explicit type of the field in the message
-    UNKNOWN = 0;
-    //what we care about
-    //same: `format = bool`
-    BOOLEAN = 4;
-    //same: `format = int32`
-    INTEGER = 5;
-    //same: `format = double`
-    DOUBLE = 6;
-    STRING = 7;
-    //same: `format = float`
-    FLOAT = 8;
-    //same: `format = big-decimal`
-    BIG_DECIMAL = 9;
-    //same: `format = int64`
-    LONG = 10;
-    //same: `format = date`
-    DATE = 11;
-    //same: `format = date-time`
-    DATE_TIME = 12;
-    //same: `format = time`
-    TIME = 13;
-    //same: `format = uuid`
-    UUID = 14;
-    //same: `format = password`
-    PASSWORD = 15;
-    //same: `format = email`
-    EMAIL = 16;
-    //same: `format = binary`
-    BINARY = 17;
-  }
-message JSONSchema {
-  string ref = 3;
-  string title = 5;
-  string description = 6;
-  string default = 7;
-  bool read_only = 8;
-  string example = 9;
-  google.protobuf.DoubleValue multiple_of = 10;
-  google.protobuf.DoubleValue maximum = 11;
-  hope.common.BoolType exclusive_maximum = 12;
-  google.protobuf.DoubleValue minimum = 13;
-  hope.common.BoolType exclusive_minimum = 14;
-  google.protobuf.UInt64Value max_length = 15;
-  google.protobuf.UInt64Value min_length = 16;
-  string pattern = 17;
-  google.protobuf.UInt64Value max_items = 20;
-  google.protobuf.UInt64Value min_items = 21;
-  hope.common.BoolType unique_items = 22;
-  google.protobuf.UInt64Value max_properties = 24;
-  google.protobuf.UInt64Value min_properties = 25;
-  repeated string required = 26;
-  repeated string array = 34;
-  JSONSchemaFormat format = 36;
-  repeated string enum = 46;
-  FieldConfiguration field_configuration = 1001;
-  hope.common.BoolType empty = 48;
-  hope.common.BoolType blank = 49;
-  hope.common.BoolType assert = 1011;
-  string decimal_max = 1012;
-  string decimal_min = 1013;
-  google.protobuf.Int32Value digits_integer = 1014;
-  google.protobuf.Int32Value digits_fraction = 1015;
-  hope.common.BoolType email = 1016;
-  optional TimeConstraintType time_constraint_type = 1017;
-  oneof format_of_date {
-    DateFormat date_format = 1018;
-    string customized_date_format = 1019;
-  }
-  optional mock.Mock mock = 1020;
-}
-```
-
-This is a Sample:
-
-```protobuf
-message SampleRequest {
-  option (hope.swagger.schema) = {
-    json_schema: {
-      description: "A sample plain object definition";
-    };
-  };
-  uint64 age = 1 [(hope.swagger.field) = {
-    description: "age of human";
-    example: "Example of this field";
-    empty: FALSE;
-  }];
-
-  string name = 2 [(hope.swagger.field) = {
-    description: "name of a chinese people";
-    mock:{
-      chinese_name_rule:{
-        type: NAME
-      }
-    }
-  }];
-}
-```
-
-###  Date Formats
-
-Define date formats using the `DateFormat` enum for consistency across your API.
-```protobuf
-enum DateFormat {
-  BASIC_ISO_DATE = 0;
-  ISO_LOCAL_DATE = 1;
-  ISO_TIME = 2;
-  ISO_LOCAL_TIME = 3;
-  ISO_LOCAL_DATE_TIME = 7;
-  YYYY_MM_DD_HH_MM_SS = 15;
-  YYYY_MM_DD_HH_MM_SS_SSS = 16;
-  SLASH_YYYY_MM_DD = 17;
-  SLASH_YYYY_MM_DD_HH_MM_SS = 18;
-  SLASH_YYYY_MM_DD_HH_MM_SS_SSS = 19;
-  HH_MM = 20;
-}
-```
-
-## Standards Compliance
-
-1. Use proto3 syntax for all protocol buffer definitions.
-2. Ensure precise and meaningful names and descriptions in API definitions.
-3. Adhere strictly to the ApiHug and OpenAPI specification.
-
-**END**
-
+1. Continue to [Copilot Features](/docs/copilot/002_functions)
+2. Review [Skills & Rules](/docs/skills) if you want framework-aware prompt workflows

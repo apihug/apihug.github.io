@@ -1,46 +1,45 @@
-export const title = "ApiSmart Api design Copilot";
+export const title = "ApiHug Copilot";
 export const description =
-  "ApiSmart make your api design and implement happier";
+  "ApiHug Copilot brings prompt-driven coding and contract-aware assistance into IntelliJ.";
 
-## Latest
+ApiHug Copilot adds an AI workspace to IntelliJ so you can ask questions, reuse prompts, and move between design context and implementation context without leaving the IDE.
 
-⚠️Always keep your SDK & IDEA to latest version⚠️
+## What It Is
 
-**SDK Version**
+This surface combines:
 
-[Maven Central](https://search.maven.org/artifact/com.apihug/it-bom)
+- vendor and model selection
+- reusable prompt shortcuts
+- a chat panel for code explanation, review, and drafting
+- editor actions that send project context into the conversation
 
-**Plugin Version**
+<img
+  src={require('@/img/editor/050_api_smart.gif').default.src}
+  alt="ApiHug Copilot"
+  width={2378}
+  height={1612}
+  className="rounded-lg"
+/>
 
-[JetBrains Marketplace](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
+## Why It Matters
 
-[Install the IntelliJ plugin](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
+ApiHug already gives your project a structured contract model. Copilot makes that structure easier to use during day-to-day development:
 
-[Plugin Release Note](/docs/changelog/plugin)
+- explain existing code and generated output
+- draft prompt templates for repeated tasks
+- review code in the context of the project
+- move from a design question to an implementation question without switching tools
 
-Latest **0.5.6 2024-10-31**
+## How It Fits
 
-Since Plugin **0.5.5 2024-10-25**
+Use Copilot alongside the rest of the ApiHug workflow:
 
-## Smart
+1. configure vendors and prompts in [Settings](/docs/copilot/001_settings)
+2. use the editor, chat panel, and context actions described in [Features](/docs/copilot/002_functions)
+3. combine it with [Skills & Rules](/docs/skills) when you need framework-aware delivery guidance
 
-<img src={require('@/img/editor/050_api_smart.gif').default.src} alt="Install ApiHug Plugin" width={2378} height={1612}
-     className="rounded-lg"/>
+## Next Step
 
-### Features
-
-- LLM Vendor Configuration, Language Model Configuration Selection
-- Prompt Configuration
-- LLM Parameter Configuration
-- Code Explanation, Review, Test Cases, and Code Prompt Generation
-- [ApiSmart Settings](/docs/copilot/001_settings)
-
-## TODO
-
-- Inline Edit
-- File explain
-- Integrate with the domain context
-
-## Refer
-
-- [DevoxxGenieIDEAPlugin](https://github.com/devoxx/DevoxxGenieIDEAPlugin) DevoxxGenie is a plugin for IntelliJ IDEA that uses local LLM's (Ollama, LMStudio, GPT4All, Llama.cpp and Exo) and Cloud based LLMs to help review, test, explain your project code.
+1. Open [Copilot Settings](/docs/copilot/001_settings)
+2. Review [Copilot Features](/docs/copilot/002_functions)
+3. Return to [Quick Start](/docs/start) if you still need the base project setup

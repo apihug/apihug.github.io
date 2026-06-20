@@ -1,81 +1,73 @@
-export const title = "ApiSmart 功能演示";
+export const title = "Copilot 功能";
 export const description =
-  "ApiSmart 功能演示";
+  "如何使用 ApiHug Copilot 的输入编辑器、聊天面板和 IntelliJ 操作入口。";
 
-ApiHug 的 ApiSmart 利用 [Langchain4j](https://github.com/langchain4j/langchain4j/) 与大型语言模型（LLM）供应商进行通信；因此基本上任何 Langchain4j 支持的供应商都可以被 ApiSmart 支持；
+ApiHug Copilot 的设计目标，不是做一个独立聊天窗口，而是把 AI 能力嵌进 IDE 的真实工作流里。
 
-但由于我们目前的能力有限，我们需要逐个添加和测试，这将需要一些时间；
+## 它是什么
 
-最终，所有这些供应商都能够进入我们的支持列表。
+功能主要分布在三个位置：
 
-[Plugin Release Note](/zhCN-docs/changelog/plugin)
+- 用来输入 Prompt 和快捷指令的编辑器
+- 右侧 Tool Window 或独立聊天面板
+- 把当前代码上下文送入对话的编辑器操作入口
 
-Latest **0.5.6 2024-10-31**
+## 为什么重要
 
-**Plugin Version**
+这样设计的好处是，查看代码、提问、复用 prompt 和处理结果可以连续发生，不需要在 IDE 和外部工具之间反复跳转。
 
-[Maven Central](https://search.maven.org/artifact/com.apihug/it-bom)
+## 它如何融入整体流程
 
+### 支持 Prompt 的输入编辑器
 
-[JetBrains Marketplace](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
+<img
+  src={require('@/img/editor/051_api_smart_auto.gif').default.src}
+  alt="ApiHug Copilot Prompt 自动补全"
+  width={2378}
+  height={1612}
+  className="rounded-lg"
+/>
 
+输入编辑器在普通 Markdown 之上增加了几类 IDE 感知能力：
 
-## 配置
+- 输入 `/` 可以打开 Prompt 自动补全
+- 使用 `file:` 可以附加项目文件
+- 如果没有匹配到快捷指令，也可以继续输入普通自然语言
 
-[ApiSmart 配置](/zhCN-docs/copilot/001_settings)
+### Tool Window 与独立面板
 
-1. 添加供应商
-2. 添加 prompt
+右侧 Tool Window 主要包含：
 
-## Editor
+- 会话控制
+- Vendor 与模型选择
+- 主聊天区域
+- 输入框和发送动作
 
-<img src={require('@/img/editor/051_api_smart_auto.gif').default.src} alt="Apismart Autocomplete" width={2378} height={1612}
-     className="rounded-lg"/>
+如果右侧空间太挤，可以从 Tool Window 工具栏打开独立面板。两者能力一致，只是独立面板更宽。
 
-ApiSmart 编辑器(输入框)， 在 `Markdown` 上做了扩展：
+### 对话面板
 
--  支持 `/` 一键触发 prompt 自动完成；如内置： `/explain`, `/api` etc
--  `file:` 打开文件选择器;
--  ....
+聊天面板支持：
 
-<TipInfo>
-  '/' 输入后系统会自动提示，回车换行，如果系统没有匹配到， 这个指令无效，会作为普通文本处理！
-</TipInfo>
-
-## Toolwindow
-
-右侧栏的 Toolwindow 可以随时打开或者关闭包含三部分：
-
-- 上方 toolbar 按钮菜单： 重启会话，打开配置， 打开独立面板
-- 服务供应商，和模型列表选择
-- 对话聊天主面板
-- 输入框和发送按钮
-
-
-## 对话面板
-
-对话面板遵循主流对话聊天模式， 用户提问， AI 回答模式：
-
-- 支持 markdown 渲染
+- Markdown 渲染
 - 项目文件链接
-- prompt链接和查看 collapse 方式
-- 代码块，定制操作
-   - 复制到粘贴板
-   - 插入到当前编辑器位置(无打开文件自动忽略)
-- 删除对话
+- Prompt 链接与上下文折叠
+- 代码块复制、插入当前编辑器等操作
+- 删除对话以重开一个干净线程
 
+### 编辑器 Ask 入口
 
-## Main Editor
+<img
+  src={require('@/img/editor/052_api_smart_ask.gif').default.src}
+  alt="ApiHug Copilot Ask 入口"
+  width={2378}
+  height={1612}
+  className="rounded-lg"
+/>
 
-如果你觉得 Toolwindow 太局促， 在 Toolwindow 顶上的 toolbar 中选择打开独立窗口就可以；
+在编辑器中右键选择 `Ask`，就可以把当前上下文直接发给 Copilot。
 
-和 toolwindow 一模一样的功能， 只不过界面更宽裕
+## 下一步
 
-
-## Editor Menu
-
-<img src={require('@/img/editor/052_api_smart_ask.gif').default.src} alt="ApiSmart Menu" width={2378} height={1612}
-     className="rounded-lg"/>
-
-任何编辑器右击菜单唤起 `Ask` 发送到 toolwindow 继续愉快 AI 对话；
-
+1. 回到 [Copilot 设置](/zhCN-docs/copilot/001_settings) 调整 Vendor 与 Prompt
+2. 如果要做 ApiHug 规则约束下的交付工作，再结合 [技能与规则](/zhCN-docs/skills)

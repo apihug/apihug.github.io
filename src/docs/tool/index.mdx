@@ -1,12 +1,38 @@
-export const title = "ApiHug Gradle";
+export const title = "Tool Chain";
 export const description =
-  "ApiHug toolchain base on the Gradle";
+  "The ApiHug toolchain for AI workflow, command-line operations, linting, and code generation.";
 
-<TipInfo>To be done 🏗️</TipInfo>
+ApiHug ships as a toolchain, not a single command. Each tool handles a different part of the contract-first delivery loop.
 
-ApiHug toolchain base on the Gradle
+## What It Is
 
-## Detail
+The tool chain includes:
 
-1. [Gradle Wire](/docs/tool/gradle-wire)
-2. [Gradle Stub](/docs/tool/gradle-stub)
+- BMAD-oriented AI workflow support
+- the ApiHug REPL for terminal-first work
+- linting for contract quality
+- `wire` for proto-side generation
+- `stub` for application-side scaffolding
+
+## Why It Matters
+
+The tools are designed to work together:
+
+- design and planning stay aligned with the contract
+- generation remains repeatable
+- quality checks run before drift becomes expensive
+- teams can work from IntelliJ, terminal flows, or both
+
+## How It Fits
+
+Use the tools by responsibility:
+
+1. [ApiHug BMAD](/docs/tool/apihug-bmad) for AI-driven delivery workflows
+2. [ApiHug REPL](/docs/tool/apihug-repl) for command-line interaction
+3. [ApiHug Lint](/docs/tool/apihug-lint) for contract quality checks
+4. [Gradle Wire](/docs/tool/gradle-wire) for proto-module generation
+5. [Gradle Stub](/docs/tool/gradle-stub) for application-module generation
+
+## Next Step
+
+Start with the page that matches your immediate job. If you are new to the stack, read BMAD or REPL first, then move into `wire` and `stub`.

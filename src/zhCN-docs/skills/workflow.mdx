@@ -1,0 +1,59 @@
+export const title = "工作流";
+export const description =
+  "ApiHug 从 proto 设计到实现评审的 contract-first 工作流。";
+
+# Workflow
+
+ApiHug 采用 contract-first 工作流：先设计契约，再生成框架表面，然后只在允许手写的边界内实现业务逻辑，最后按规则做评审。
+
+## 它是什么
+
+这条工作流的目标，是把一份 protobuf 契约贯穿到设计、生成、实现和评审的全过程。
+
+## 为什么重要
+
+生成式框架最昂贵的错误，不是某个单独 bug，而是团队把代码写错层级，慢慢偏离契约。contract-first 工作流的价值，就是把这种偏移尽早拦住。
+
+## 它如何融入整体流程
+
+标准的 contract-first 生命周期如下：
+
+1. 设计 API、Domain、Enum、Error 等 protobuf 契约
+2. 生成后端结构和 SDK 产物
+3. 只实现可写边界内的业务逻辑
+4. 生成或更新前端路由与 SDK 使用层
+5. 用 ApiHug 规则检查 proto 与实现质量
+
+### 核心 skill 在哪里介入
+
+### `apihug-create-story`
+
+把已经收敛的工作项整理成可直接执行、且带有 ApiHug 上下文的 story。
+
+### `apihug-dev-story`
+
+指导实现过程始终停留在生成边界允许的位置。
+
+### `apihug-proto-review`
+
+检查契约设计是否仍然符合 ApiHug protobuf 规则。
+
+### `apihug-impl-review`
+
+检查手写实现是否仍然符合 ApiHug 后端与前端 golden rules。
+
+### contract-first 的前提是 source set 纪律
+
+这条工作流只有在“生成物继续保持可生成”的前提下才成立。落到实践里就是：
+
+- 在 `src/main/proto` 里维护 proto 源文件
+- 在手写 source set 中实现业务逻辑
+- 不要手工改写生成出来的 DTO、Entity、Repository 或 SDK 输出
+
+正是这种分离，让 ApiHug 可以安全重复生成，同时保住手写业务代码。
+
+## 下一步
+
+1. 用 [Create Story](/zhCN-docs/skills/create-story) 把需求收敛为可执行 story
+2. 再用 [Dev Story](/zhCN-docs/skills/dev-story) 推进实现
+3. 最后做 [Proto Review](/zhCN-docs/skills/proto-review) 与 [Implementation Review](/zhCN-docs/skills/impl-review)

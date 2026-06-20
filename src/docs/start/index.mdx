@@ -1,150 +1,137 @@
-export const title = "Quick start";
+export const title = "Quick Start";
 export const description =
-  "This page outlines how you can start using ApiHug to start a new API develop in 15 minutes.";
+  "Create an ApiHug project, understand the module layout, and run the contract-first toolchain.";
 
 import { DocsCodeBlock } from '@/components/DocsCodeBlock'
 import { DocsJetBrainsMarketplaceCard, DocsMavenCentralBadge } from '@/components/DocsStartResources'
 import { SnippetGroup } from '@/components/SnippetGroup'
 
-This page outlines how you can use ApiHug to create quick demos in **15 minutes**.
+Use this page to go from an empty directory to a running ApiHug demo project. The path is simple: prepare your machine, generate a project, run the build loop, and inspect the generated API surface.
 
 <TipGood>
-  Since 3.0.0+ Version, only support spring boot 4.0+
+  ApiHug 3.x targets Spring Boot 4.0 and newer. Review the Spring Boot 4.0 migration guide before upgrading an existing project.
 </TipGood>
 
-## One-Click Initialization
+## What You Will Do
 
-Transform an empty directory into an Apihug workspace with a single command.  
-The script automatically downloads and runs the Apihug installer for your platform.
+In a typical first run, you will:
 
-### Windows
+1. initialize an ApiHug workspace
+2. generate a demo project from the IntelliJ wizard
+3. understand the `-proto` and application module split
+4. run `wire`, `stub`, and the application
+5. open the generated OAS document
 
-**PowerShell** (run in PowerShell):
+## Before You Start
+
+Prepare the standard development stack first:
+
+1. JDK 17 or newer
+2. Gradle 8 or newer
+3. IntelliJ IDEA 2022 or newer
+4. the `ApiHug - API design Copilot` plugin
+5. access to Spring Initializr or an equivalent internal bootstrap flow
+
+<DocsMavenCentralBadge />
+
+### IntelliJ Plugin
+
+Install the plugin from JetBrains Marketplace, then restart IntelliJ.
+
+<DocsJetBrainsMarketplaceCard />
+
+If you prefer a terminal-first workflow later, ApiHug REPL is a good companion. For first-time setup, the IntelliJ wizard is still the fastest way to understand the generated project shape.
+
+### Plugin Install Path
+
+1. Open `File > Settings > Plugins`
+2. Search for `ApiHug`
+3. Install the plugin
+4. Restart IntelliJ
+
+<img src={require('@/img/editor/001_install_plugin.gif').default.src} alt="Install ApiHug Plugin" width={2316} height={1768} className="rounded-lg" />
+
+## Initialize a Workspace
+
+ApiHug provides bootstrap scripts for common shells.
+
+### Windows PowerShell
 
 ```powershell
 iex (irm 'https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.ps1')
 ```
 
-**Command Prompt** (run in cmd.exe):
+### Windows Command Prompt
 
 ```shell
 powershell -c "irm https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.ps1 | iex"
 ```
 
-### Bash (Linux, Unix, macOS)
+### Bash
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.sh | bash
 ```
 
-### Spring 4.0 Migration
+If you are upgrading an existing Spring project, review the [Spring Boot 4.0 Migration Guide](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.0-Migration-Guide) before moving the ApiHug SDK forward.
 
-**SDK 3.0** is still undergoing rapid upgrades and constant updates, with many compatibility issues yet to be discovered. How to upgrade Spring to 4.0. Note [Spring Boot 4.0 Migration Guide](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.0-Migration-Guide)
+## Generate a Project
 
-## Prerequisites
+The IntelliJ wizard gives you a complete starting point for contract-first development.
 
-1. ✅ JDK 17+  [OpenJDK](https://openjdk.org/) or Oracle's
-2. ✅ [Gradle](https://gradle.org/install/) 8+
-3. ✅ [IDEA](https://www.jetbrains.com/idea/)  2022+ (Optional)
-4. ✅ [ApiHug - API design Copilot](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
-5. ✅ [Spring Initializr](https://start.spring.io/) - Accessible or Local Deployment Alternatives
+### 1. Start an ApiHug Project
 
-<DocsMavenCentralBadge />
-
-### IDEA plugin
-
-[Plugin Release](https://github.com/apihug/apihug-ide-plugin/releases)
-
-<DocsJetBrainsMarketplaceCard />
-
-⚠️ The IDEA plugin will no longer be upgraded frequently in the future, IDEA support is no longer the main direction, you can use Apihug REPL for most things!
-
-### Plugin Install
-
-1. File
-2. Settings
-3. Plugin
-4. Search `ApiHug`
-5. Install & Restart
-
-<img src={require('@/img/editor/001_install_plugin.gif').default.src} alt="Install ApiHug Plugin" width={2316} height={1768} className="rounded-lg" />
-
-## Project Wizard
-
-[ApiHug - API design Copilot](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)  provides a highly friendly and intuitive project template to kickstart your API development. It guides you through step-by-step creation of API projects that adhere to best practices.
-
-### 01-Start ApiHug Project
-
-1. File
-2. New -> Project
-3. ApiHug
+1. Open `File > New > Project`
+2. Select `ApiHug`
+3. Continue to the project settings step
 
 <img src={require('@/img/editor/002_start_project.gif').default.src} alt="Start project from ApiHug Plugin" width={2316} height={1768} className="rounded-lg" />
 
-### 02-Project Settings
+### 2. Fill in Project Settings
 
-1. Project settings
-2. package
-3. name
-4. description
-5. SDK Settings
-6. version
-7. DB Vendor
-8. Cache
-9. Port
+Set the package, project name, description, SDK options, database vendor, cache, and port.
 
 <img src={require('@/img/editor/003_project_settings.gif').default.src} alt="ApiHug Project Settings" width={2316} height={1768} className="rounded-lg" />
 
 <TipGood>
-
-  Better keep the default settings at first time!
-
+  Keep the default choices for your first project unless your team already has a standard template.
 </TipGood>
 
+An ApiHug project usually starts with two modules:
+
+```text
+order
+|- order-app
+`- order-app-proto
 ```
-├─order <1>
-    │  
-    ├─order-app <2>
-    │  
-    └─order-app-proto<3>
-```
 
-This is a common structure of a project;
+1. `order` is the root workspace
+2. `order-app` is the handwritten application module
+3. `order-app-proto` is the contract module that drives generation
 
-1. `<1>` name of this project
-2. `<2>` application module: Implementation & Service
-3. `<3>` protocol module: API Definition, suffix application name with `-proto` 
+### 3. Pick Spring Components
 
-### 03-Spring Settings
-
-This is a standard [Start Spring](https://start.spring.io/) configuration:
-
-1. Select Type
-2. Choice the components for example `Spring Web`
+This step follows the same mental model as [Spring Initializr](https://start.spring.io/). Pick the base project type, then add starter dependencies such as `Spring Web`.
 
 <img src={require('@/img/editor/004_spring_settings.gif').default.src} alt="ApiHug Project Spring Settings" width={2316} height={1768} className="rounded-lg" />
 
-Eventually click **Create -> Open Project** to open the project:
+Finish with **Create -> Open Project**.
 
-### 04-Start Project
+### 4. Load the Project as Gradle
 
-<TipGood>The SDK version may update while our project goes on;please check:</TipGood>
+If IntelliJ does not auto-import the project, reload it as `Gradle`. You should see both `demo-app` and `demo-app-proto`.
+
+<TipGood>
+  For existing projects, update `gradle/libs.versions.toml` and then reload Gradle so the new SDK version is applied consistently.
+</TipGood>
 
 <DocsMavenCentralBadge />
 
-For an exist project, then you can upgrade them manually:
-
-1. YOUR_PROJECT > gradle > **libs.versions.toml**
-2. `apihug = "0.9.2-RELEASE"` update to latest version
-
-Follow the IDEA's instruction:
-
-1. load this project as `Gradle`, if not please manually reload(check Notification)
-2. two modules `demo-app-proto` & `demo-app` should be recognized
-
 <img src={require('@/img/editor/005_load_project.gif').default.src} alt="ApiHug Load Project" width={2316} height={1768} className="rounded-lg" />
 
-The simplest project layout will be like ([simplest-demo](https://github.com/apihug/simplest-demo)):
+## Understand the Project Layout
+
+The simplest demo looks like [simplest-demo](https://github.com/apihug/simplest-demo):
 
 ```shell
 +---gradle
@@ -176,46 +163,44 @@ The simplest project layout will be like ([simplest-demo](https://github.com/api
 |           |                   \---infra
 |           \---resources
 |                   hope-wire.json (5)
-````
+```
 
-| File                         | Comment                          |
-|------------------------------|----------------------------------|
-| **(1)** `libs.versions.toml` | Version toml configuration       |
-| **(2)** `demo-app`           | Application module               |
-| **(3)** `hope-stub.json`     | Application module configuration |
-| **(4)** `demo-app-proto`     | Protocol module                  |
-| **(5)** `hope-wire.json`     | Protocol module configuration    |
+| File                         | Role                                 |
+|------------------------------|--------------------------------------|
+| **(1)** `libs.versions.toml` | version catalog and plugin aliases   |
+| **(2)** `demo-app`           | application and handwritten logic    |
+| **(3)** `hope-stub.json`     | application-module generation config |
+| **(4)** `demo-app-proto`     | protobuf contracts and wire output   |
+| **(5)** `hope-wire.json`     | proto-module metadata                |
 
 <SnippetGroup>
 
 <div
   filename="libs.versions.toml"
-  code={`# libraries
-apihug = "0.9.9-RELEASE"
-# plugins
-springBoot = "3.2.5"
-springDependency = "1.1.4"
+  code={`# versions
+apihug = "<current-version>"
+springBoot = "4.0.0"
+springDependency = "1.1.7"
 
-#Apihug Common
+# libraries
 apihugBom = { group = "com.apihug", name = "it-bom", version.ref = "apihug" }
 
-#Spring plugin
+# plugins
 springBoot = { id = "org.springframework.boot", version.ref = "springBoot" }
 springDependency = { id = "io.spring.dependency-management", version.ref = "springDependency" }`}
 >
   <DocsCodeBlock
     compact
     className="language-toml"
-    code={`# libraries
-apihug = "0.9.9-RELEASE"
-# plugins
-springBoot = "3.2.5"
-springDependency = "1.1.4"
+    code={`# versions
+apihug = "<current-version>"
+springBoot = "4.0.0"
+springDependency = "1.1.7"
 
-#Apihug Common
+# libraries
 apihugBom = { group = "com.apihug", name = "it-bom", version.ref = "apihug" }
 
-#Spring plugin
+# plugins
 springBoot = { id = "org.springframework.boot", version.ref = "springBoot" }
 springDependency = { id = "io.spring.dependency-management", version.ref = "springDependency" }`}
   />
@@ -236,7 +221,6 @@ hopeStub {
 }
 
 dependencies {
-  //Hope START
   implementation project(':demo-app-proto')
   implementation 'org.springframework.boot:spring-boot-starter-web'
 }`}
@@ -257,7 +241,6 @@ hopeStub {
 }
 
 dependencies {
-  //Hope START
   implementation project(':demo-app-proto')
   implementation 'org.springframework.boot:spring-boot-starter-web'
 }`}
@@ -274,7 +257,7 @@ dependencies {
     "artifact": {
       "groupId": "com.apihug",
       "artifactId": "demo-app-proto",
-      "version": "0.1.1-SNAPSHOT"
+      "version": "0.1.0-SNAPSHOT"
     },
     "module": "demo-app-proto",
     "domain": "demo",
@@ -294,7 +277,7 @@ dependencies {
     "artifact": {
       "groupId": "com.apihug",
       "artifactId": "demo-app-proto",
-      "version": "0.1.1-SNAPSHOT"
+      "version": "0.1.0-SNAPSHOT"
     },
     "module": "demo-app-proto",
     "domain": "demo",
@@ -347,7 +330,7 @@ hopeWire {
     "enumClass": "com.apihug.demo.proto.infra.settings.DemoAuthorityEnum",
     "codePrefix": 10240000
   },
-  "createdAt": "2024-05-19",
+  "createdAt": "2026-06-20",
   "createdBy": "admin"
 }`}
 >
@@ -367,7 +350,7 @@ hopeWire {
     "enumClass": "com.apihug.demo.proto.infra.settings.DemoAuthorityEnum",
     "codePrefix": 10240000
   },
-  "createdAt": "2024-05-19",
+  "createdAt": "2026-06-20",
   "createdBy": "admin"
 }`}
   />
@@ -375,73 +358,65 @@ hopeWire {
 
 </SnippetGroup>
 
-#### 04.1-Wire
+## Run the Contract-First Loop
 
-**Wire** task of the proto module response for verify and compile the protocol buffers files.
+### 1. Run Wire
 
-1. Open `README.md` > `0. Build All`;
-2. find the command, parse to the `Terminal`, Example: `gradlew clean build -x test -x wireTest -x stubTest`;
-3. press `Enter` to execute;
-4. Check the `demo-app-proto` path `main > wire` for updates;
+`wire` validates the proto module and generates the neutral build output.
+
+1. Open `README.md > 0. Build All`
+2. Copy the command into your terminal, for example `gradlew clean build -x test -x wireTest -x stubTest`
+3. Run it
+4. Check the generated output under `demo-app-proto`
 
 <img src={require('@/img/editor/006_wire.gif').default.src} alt="ApiHug Wire Project" width={2316} height={1768} className="rounded-lg" />
 
-#### 04.2-Stub
+### 2. Run Stub
 
-**Stub** task of the application module response for generate the stub code from the protocol definition.
+`stub` generates the application-side scaffolding from the contract module.
 
-1. Open `README.md` > `2. Build Stub (Individual)`;
-2. find the command, parse to the `Terminal`, Example: `gradlew.bat demo-app:clean stub build -x test -x stubTest`;
-3. press `Enter` to execute;
-4. Check the `demo-app` path `main > stub` for updates;
+1. Open `README.md > 2. Build Stub (Individual)`
+2. Run the command, for example `gradlew.bat demo-app:clean stub build -x test -x stubTest`
+3. Review the generated output under `demo-app`
 
 <img src={require('@/img/editor/007_stub.gif').default.src} alt="ApiHug Stub Project" width={2316} height={1768} className="rounded-lg" />
 
-#### 04.3-Boot
+### 3. Run the Application
 
-1. Open `README.md` > `3. Run Application`;
-2. find the command, parse to the `Terminal`,  Example: `gradlew demo-app:bootRun`;
-3. press `Enter` to execute;
-4. Check the log print of `demo-app`;
+1. Open `README.md > 3. Run Application`
+2. Run `gradlew demo-app:bootRun`
+3. Confirm the application starts cleanly
 
-<img src={require('@/img/editor/008_boot.gif').default.src} alt="ApiHug Spting Boot" width={2316} height={1768} className="rounded-lg" />
+<img src={require('@/img/editor/008_boot.gif').default.src} alt="ApiHug Spring Boot" width={2316} height={1768} className="rounded-lg" />
 
 ```shell
-----------------------------------------------------------
-
 Application 'demo-app' is running! Access URLs:
 
 Local                             http://localhost:18089/
-External                          http://192.168.0.115:18089/
-OAS                               http://192.168.0.115:18089/v3/api-docs
-Actuator                          http://192.168.0.115:18089/management
-Api-Errors                        http://192.168.0.115:18089/hope/meta/errors
-Api-Dictionaries                  http://192.168.0.115:18089/hope/meta/dictionaries
-Api-Authorities                   http://192.168.0.115:18089/hope/meta/authorities
+OAS                               http://localhost:18089/v3/api-docs
+Actuator                          http://localhost:18089/management
+Api-Errors                        http://localhost:18089/hope/meta/errors
+Api-Dictionaries                  http://localhost:18089/hope/meta/dictionaries
+Api-Authorities                   http://localhost:18089/hope/meta/authorities
 Profile(s)                        dev
 ```
 
-#### 04.4-Check OAS
+### 4. Check the OAS Output
 
-1. copy the url(`/v3/api-docs`) from the console;
-2. parse them in the Chrome to view;
+Copy the `/v3/api-docs` URL from the console, open it in your browser, and verify the generated contract surface.
 
 <img src={require('@/img/editor/009_OAS.gif').default.src} alt="ApiHug API Information" width={2316} height={1768} className="rounded-lg" />
 
-## ApiHug Tool Window
+## Open the ApiHug Tool Window
 
-**ApiHug Tool Window** should dock on the right side of the IDE, if not you can also bring it up from the top menu bar: `ApiHug > ApiHug Designer`:
+The IntelliJ tool window should appear on the right side of the IDE. If not, open it from `ApiHug > ApiHug Designer`.
 
 <img src={require('@/img/editor/010_toolwindow.gif').default.src} alt="ApiHug Tool Window" width={2316} height={1768} className="rounded-lg" />
 
-Congratulations! You have successfully finished a perfect API development joinery!
+## Next Step
 
-## Summary
+Once the demo is running, move to:
 
-During the last 15-minute demo, we went through the typical steps involved in API design and development. These steps often include various trivial tasks that distract us from focusing on the core business logic design. However, with ApiHug, you can leave behind all the tedious and troublesome steps.
-
-ApiHug automates these tasks and generates high-quality designs with a user-friendly and easily understandable structure and code details. In the upcoming lessons, we will delve deeper into exploring the capabilities of ApiHug.
-
-In fact, the techniques used by ApiHug are not entirely new inventions. Platforms like [Jhipster](https://www.jhipster.tech/), [Spring Starter](https://start.spring.io/), Grails, and Ruby on Rails have paved the way for similar approaches.
-
-ApiHug builds upon the best practices and lessons learned from these predecessors, making them more practical and straightforward for everyday use. We acknowledge and appreciate the contributions of these platforms in shaping the foundation of ApiHug.
+1. [What is ApiHug?](/docs/start/what-is-apihug) to understand the platform model
+2. [Skills & Rules](/docs/skills) to learn the AI workflow
+3. [Tool Chain](/docs/tool) to go deeper on REPL, BMAD, lint, wire, and stub

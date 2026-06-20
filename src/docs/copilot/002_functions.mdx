@@ -1,79 +1,73 @@
-export const title = "ApiSmart Feature Demonstration";
+export const title = "Copilot Features";
 export const description =
-  "ApiSmart Feature Demonstration";
+  "How to use the ApiHug Copilot editor, chat panel, and IntelliJ actions.";
 
-ApiHug's ApiSmart communicates with large language model (LLM) vendors using [Langchain4j](https://github.com/langchain4j/langchain4j/); therefore, essentially any vendor supported by Langchain4j can be supported by ApiSmart;
+ApiHug Copilot is designed to feel like part of the IDE rather than a detached chat window.
 
-However, due to our current limited capabilities, we need to add and test them one by one, which will take some time;
+## What It Is
 
-Ultimately, all these vendors will be able to enter our support list.
+The feature set is split across three places:
 
-[Plugin Release Note](/docs/changelog/plugin)
+- the input editor for prompt entry and shortcuts
+- the tool window or standalone chat panel
+- editor actions that send local code context into the conversation
 
-Latest **0.5.6 2024-10-31**
+## Why It Matters
 
-[Maven Central](https://search.maven.org/artifact/com.apihug/it-bom)
+This layout keeps the workflow tight. You can inspect code, ask a question, reuse a prompt, and apply the result without jumping between unrelated tools.
 
-[Install the IntelliJ plugin](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
+## How It Fits
 
-## Settings
+### Prompt-aware editor
 
-[ApiSmart Settings](/docs/copilot/001_settings); including:
+<img
+  src={require('@/img/editor/051_api_smart_auto.gif').default.src}
+  alt="ApiHug Copilot prompt autocomplete"
+  width={2378}
+  height={1612}
+  className="rounded-lg"
+/>
 
-1. Add a vendor
-2. Add a prompt
+The input editor extends normal Markdown entry with IDE-aware helpers:
 
-## Editor
+- type `/` to open prompt completion
+- use `file:` to attach project files
+- keep writing free-form instructions when no shortcut applies
 
-<img src={require('@/img/editor/051_api_smart_auto.gif').default.src} alt="Apismart Autocomplete" width={2378} height={1612}
-     className="rounded-lg"/>
+### Tool window and standalone panel
 
-The ApiSmart editor (input box) has extended the functionality of `Markdown`:
+The right-side tool window includes:
 
-- Supports `/` to trigger prompt autocompletion with one click; such as built-in: `/explain`, `/api`, etc.
-- `file:` opens the file selector;
-- ...
+- session controls
+- provider and model selection
+- the main chat stream
+- the input box and send action
 
-<TipInfo>
-  When you input '/', the system will automatically prompt. 
-  
-  Pressing enter will create a new line. 
-  
-  If the system does not match to any command, the instruction will be invalid and will be treated as regular text!
-  
-</TipInfo>
+If you want more space, open the standalone panel from the tool window toolbar. It uses the same capabilities with a wider layout.
 
-## Toolwindow
+### Conversation panel
 
-The Toolwindow on the right side can be opened or closed at any time and includes three parts:
+The chat panel supports:
 
-- The top toolbar button menu: Restart session, open configuration, open standalone panel
-- Service provider and model list selection
-- Main dialogue chat panel
-- Input box and send button
+- Markdown rendering
+- project file links
+- prompt links and collapsible context
+- code block actions such as copy or insert into the current editor
+- conversation deletion when you want a clean thread
 
-## Dialogue Panel
+### Editor ask action
 
-The dialogue panel follows the mainstream chat mode, where users ask questions and AI responds:
+<img
+  src={require('@/img/editor/052_api_smart_ask.gif').default.src}
+  alt="ApiHug Copilot ask action"
+  width={2378}
+  height={1612}
+  className="rounded-lg"
+/>
 
-- Supports markdown rendering
-- Project file links
-- Prompt links and view collapse method
-- Code Block custom operations
-   - Copy to clipboard
-   - Insert into the current editor position (automatically ignored if no file is open)
-- Delete conversation
+Right-click inside an editor and use `Ask` to send the current context to Copilot.
 
-## Main Editor
+## Next Step
 
-If you find the Toolwindow too cramped, you can choose to open a standalone window from the toolbar at the top of the Toolwindow;
-
-It has the exact same functionality as the Toolwindow, but with a more spacious interface.
-
-## Editor Menu
-
-<img src={require('@/img/editor/052_api_smart_ask.gif').default.src} alt="ApiSmart Menu" width={2378} height={1612}
-     className="rounded-lg"/>
-
-In any editor, right-clicking the menu will invoke the `Ask` feature to send your query to the Toolwindow, allowing you to continue your enjoyable AI conversation.
-
+1. Tune providers and prompts in [Copilot Settings](/docs/copilot/001_settings)
+2. Pair Copilot with [Skills & Rules](/docs/skills) for ApiHug-specific delivery work

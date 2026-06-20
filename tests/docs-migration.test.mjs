@@ -242,6 +242,69 @@ test("zhCN docs nav exposes the curated skills and rules section", () => {
   }
 });
 
+test("docs nav group order is AI-first for both english and zhCN sidebars", () => {
+  const englishNav = fs.readFileSync(
+    path.join(repoRoot, "src", "app", "(docs)", "docs", "index.tsx"),
+    "utf8",
+  );
+  const zhNav = fs.readFileSync(
+    path.join(repoRoot, "src", "app", "(docs)", "zhCN-docs", "index.tsx"),
+    "utf8",
+  );
+
+  const englishOrder = [
+    '"Getting Started"',
+    '"Skills & Rules"',
+    "Copilot",
+    "MCP",
+    '"Tool Chain"',
+    '"Protocol Buffers"',
+    "Framework",
+    "Spec",
+    "UI",
+    "Editor",
+    '"How-To"',
+    "Kola",
+    '"Core Principles"',
+    "Milestone",
+    "Changelog",
+  ];
+
+  const zhOrder = [
+    '"Getting Started"',
+    '"Skills & Rules"',
+    "Copilot",
+    "MCP",
+    '"Tool Chain"',
+    '"Protocol Buffers"',
+    "Framework",
+    "Spec",
+    "UI",
+    "Editor",
+    "How",
+    "Kola",
+    '"Core Principles"',
+    "Milestone",
+    "ChangeLog",
+  ];
+
+  let lastIndex = -1;
+  for (const token of englishOrder) {
+    const currentIndex = englishNav.indexOf(`${token}:`);
+    assert.notEqual(currentIndex, -1, `missing english section ${token}`);
+    assert.ok(currentIndex > lastIndex, `english section ${token} is out of order`);
+    lastIndex = currentIndex;
+  }
+
+  lastIndex = -1;
+  for (const token of zhOrder) {
+    const currentIndex = zhNav.indexOf(`${token}:`);
+    assert.notEqual(currentIndex, -1, `missing zhCN section ${token}`);
+    assert.ok(currentIndex > lastIndex, `zhCN section ${token} is out of order`);
+    lastIndex = currentIndex;
+  }
+});
+
 test("english docs do not link to untranslated changelog detail routes", () => {
   const untranslatedLinks = walkMdxFiles(docsRoot)
     .filter((filePath) => fs.readFileSync(filePath, "utf8").includes("/docs/changelog/detail/SDK_0."))
@@ -356,6 +419,41 @@ test("what-is-apihug introduces the architecture diagram near the top of the pag
   assert.match(whatIsApiHug, /src="\/arch\.svg"/);
   assert.match(whatIsApiHug, /alt="ApiHug architecture overview"/);
   assert.match(whatIsApiHug, /ApiHug architecture overview/);
+});
+
+test("overview docs use the standard onboarding section pattern in both locales", () => {
+  const englishOverviewPages = [
+    path.join(docsRoot, "start", "what-is-apihug.mdx"),
+    path.join(docsRoot, "skills", "index.mdx"),
+    path.join(docsRoot, "skills", "workflow.mdx"),
+    path.join(docsRoot, "copilot", "index.mdx"),
+    path.join(docsRoot, "mcp", "001_start.mdx"),
+    path.join(docsRoot, "tool", "index.mdx"),
+  ];
+  const zhOverviewPages = [
+    path.join(zhDocsRoot, "start", "what-is-apihug.mdx"),
+    path.join(zhDocsRoot, "skills", "index.mdx"),
+    path.join(zhDocsRoot, "skills", "workflow.mdx"),
+    path.join(zhDocsRoot, "copilot", "index.mdx"),
+    path.join(zhDocsRoot, "mcp", "001_start.mdx"),
+    path.join(zhDocsRoot, "tool", "index.mdx"),
+  ];
+
+  for (const filePath of englishOverviewPages) {
+    const source = fs.readFileSync(filePath, "utf8");
+    assert.match(source, /## What It Is/);
+    assert.match(source, /## Why It Matters/);
+    assert.match(source, /## How It Fits/);
+    assert.match(source, /## Next Step/);
+  }
+
+  for (const filePath of zhOverviewPages) {
+    const source = fs.readFileSync(filePath, "utf8");
+    assert.match(source, /## 它是什么/);
+    assert.match(source, /## 为什么重要/);
+    assert.match(source, /## 它如何融入整体流程/);
+    assert.match(source, /## 下一步/);
+  }
 });
 
 test("zhCN skills docs localize the curated ApiHug rules and workflow surface", () => {

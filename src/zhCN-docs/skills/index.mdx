@@ -1,0 +1,47 @@
+export const title = "技能与规则";
+export const description =
+  "ApiHug 的技能、规则与工作流文档，用来说明 contract-first 开发如何落地。";
+
+# Skills & Rules
+
+这一组文档只覆盖 ApiHug 自己定义的 AI 工作流表面：规则、contract-first 交付流程，以及围绕这些边界工作的核心技能。
+
+## 它是什么
+
+这里主要讲三类内容：
+
+- 用来约束设计与实现的框架规则
+- 从 proto 到交付的 contract-first 工作流
+- 创建、实现、评审 story 时会用到的核心技能
+
+它不是整个 BMAD 目录的镜像，而是聚焦到真正影响 ApiHug 项目落地的部分。
+
+## 为什么重要
+
+AI 工作流只有在边界清晰时才可靠。ApiHug Skills 解决的是“所有人到底按什么模型协作”这个问题：
+
+- proto 是 source of truth
+- 生成物继续保持可生成
+- 手写代码只放在允许手写的层
+- 评审依据是 ApiHug 规则，而不是泛化的建议
+
+## 它如何融入整体流程
+
+ApiHug 借用了 BMAD 的规划与执行思路，但把它收束到了 ApiHug 栈本身：
+
+- protobuf-first 的 API 与领域设计
+- 明确的后端与前端生成边界
+- 由规则驱动的契约评审和实现评审
+
+也正因为如此，工作流页面和规则页面必须配套阅读。更大的 **ApiHug Skills** 仓库里可能还有其他内容，但站内文档只保留与 ApiHug 项目直接相关的部分。
+
+## 下一步
+
+建议按这个顺序阅读：
+
+1. [工作流](/zhCN-docs/skills/workflow)
+2. [规则](/zhCN-docs/skills/rules)
+3. [Create Story](/zhCN-docs/skills/create-story)
+4. [Dev Story](/zhCN-docs/skills/dev-story)
+5. [Proto Review](/zhCN-docs/skills/proto-review)
+6. [Implementation Review](/zhCN-docs/skills/impl-review)

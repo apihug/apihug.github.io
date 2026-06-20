@@ -1,0 +1,40 @@
+export const title = "Proto Review";
+export const description =
+  "说明 apihug-proto-review 如何按 ApiHug 规则检查 protobuf 设计。";
+
+# Proto Review
+
+`apihug-proto-review` 用来判断当前契约设计是否仍然符合 ApiHug protobuf 规则。
+
+## 它是什么
+
+这个技能评审的是 protobuf 契约本身，而不是生成后的代码。
+
+## 为什么重要
+
+契约弱，生成物就会弱。Proto review 的价值在于：在问题扩散到代码、SDK 和集成层之前，先把建模偏差拦下来。
+
+## 它如何融入整体流程
+
+它重点关注这些方面：
+
+- service 与 operation 元数据质量
+- request / response 建模质量
+- 分页与 repeated 集合语义
+- domain 建模边界
+- enum 与 error 元数据完整性
+
+它通常应该抓住的问题包括：
+
+- 违反 ApiHug 分层边界的跨层 import
+- 仍在使用过时 option
+- 本该建成 request message 却过于随意的参数设计
+- 缺少关键元数据，导致 API 可读性或可发现性下降
+
+## 下一步
+
+评审时，把这些规则文档当作依据：
+
+- `apihug-proto-api-extension-guide`
+- `apihug-proto-database-modeling-guide`
+- `apihug-proto-enum-error-extension-guide`

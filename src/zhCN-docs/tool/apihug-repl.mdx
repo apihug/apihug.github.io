@@ -1,127 +1,79 @@
 export const title = "ApiHug REPL";
 export const description =
-  "ApiHug 命令行工具";
+  "通过 ApiHug REPL 在终端里发现模块、安装工作流并管理命令式工具。";
 
+ApiHug REPL 是面向终端的统一入口，用来发现模块、安装工作流和执行命令式操作。
 
-更新于 **2025-12-18**
+## 它是什么
 
-<TipInfo>ApiHug 命令行工具 REPL（Read-Eval-Print Loop）</TipInfo>
+REPL 提供：
 
-[Maven Central](https://search.maven.org/artifact/com.apihug/it-bom)
+- ApiHug 工具的命令交互壳
+- 感知多模块项目的导航能力
+- BMAD 的安装与更新命令
+- 适合终端与脚本场景的统一操作面
 
+## 为什么重要
 
-[JetBrains Marketplace](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
+并不是每个团队都希望只在 IDE 内工作。REPL 让 ApiHug 工具链拥有一套稳定、可脚本化的终端界面。
 
+## 它如何融入整体流程
 
-## REPL
+### 1. 启用插件
 
-从 SDK 版本 `2.0.2-RELEASE` 起，ApiHug 引入了 REPL（Read-Eval-Print Loop），以简化命令行操作。
-
-### 设置步骤
-
-**步骤 1**：在您的 `gradle/libs.versions.toml` 文件中添加以下内容：
+在 `gradle/libs.versions.toml` 中加入 REPL 插件：
 
 ```toml
 [versions]
-# make sure 2.0.2+
 apihugVersion = "2.0.2-RELEASE"
 
-
 [plugins]
-# Hug 插件
-# TODO: 添加以下行：
 hope-repl = { id = "com.apihug.repl", version.ref = "apihugVersion" }
 ```
 
-**步骤 2**：更新您的 `build.gradle` 文件：
+然后在 `build.gradle` 中启用：
 
 ```groovy
 plugins {
-    // 其他插件...
-    // TODO: 添加或取消注释以下行：
-    alias(libs.plugins.hope.repl)
-
-    // 如果需要重命名 proto 包名，请使用：
-    // id("hope.rename")
+  alias(libs.plugins.hope.repl)
 }
 ```
 
-**步骤 3**：初始化 REPL：
+### 2. 初始化 REPL
 
 ```bash
 ./gradlew :hope
 ```
 
-**步骤 4**：启动命令行界面：
+执行后会生成 `apihug` 和 `apihug.bat` 启动脚本。
 
-初始化脚本会生成两个可执行文件：`apihug.bat`（Windows）和 `apihug`（类 Unix 系统）。根据您的操作系统运行相应命令以启动 REPL：
+### 3. 开始使用
 
-```
-Starting ApiHug REPL...
+最常见的入门命令：
 
- ________  ________  ___  ___  ___  ___  ___  ________
-|\   __  \|\   __  \|\  \|\  \|\  \|\  \|\  \|\   ____\
-\ \  \|\  \ \  \|\  \ \  \ \  \\\  \ \  \\\  \ \  \___|
- \ \   __  \ \   ____\ \  \ \   __  \ \  \\\  \ \  \  ___
-  \ \  \ \  \ \  \___|\ \  \ \  \ \  \ \  \\\  \ \  \|\  \
-   \ \__\ \__\ \__\    \ \__\ \__\ \__\ \_______\ \_______\
-    \|__|\|__|\|__|     \|__|\|__|\|__|\|_______|\|_______|
-
-2025-12-17 15:51:43 : Started REPL in 2.646 seconds (process running for 3.31)
-apihug> ls
-┌──────────────┬────┐
-│Module Name   │Type│
-├──────────────┼────┤
-│same-app      │STUB│
-└──────────────┴────┘
-
-apihug> cd --module-name same-app-proto 
-Entered module: same-app-proto
-apihug:same-app-proto> pwd
-┌───────────┬─────────────────────────────────────────────────────────┐
-│Property   │Value                                                    │
-├───────────┼─────────────────────────────────────────────────────────┤
-│Module Name│same-app-proto                                           │
-│Type       │WIRE                                                     │
-│Directory  │D:\Aaron\workspace\projects\ais\okai2\same\same-app-proto│
-└───────────┴─────────────────────────────────────────────────────────┘
+```text
+help
+ls
+cd --module-name demo-app-proto
+pwd
 ```
 
-您随时可以输入 `help` 查看所有可用命令。祝您使用愉快！
+## 故障排查
 
-## 常见问题（FAQ）
+### 执行 `:hope` 时出现 “Cannot resolve external dependency”
 
-### "Cannot resolve external dependency" 错误
-
-如果您遇到以下错误：
-
-```
-* What went wrong:
-Execution failed for task ':hope'.
-> Could not resolve all files for configuration ':detachedConfiguration1'.
-   > Cannot resolve external dependency com.apihug:it-repl:2.0.2-RELEASE because no repositories are defined.
-     Required by:
-         root project :
-```
-
-这是因为旧版项目模板未在根目录的 `build.gradle` 中配置仓库地址。请添加以下代码块以解决此问题：
+老项目往往缺少根 `build.gradle` 的仓库声明。补上之后再重试：
 
 ```groovy
-// 新增内容
 repositories {
-    mavenLocal()
-    mavenCentral()
-
-    maven { url "https://repo.spring.io/libs-release" }
-    maven { url "https://repo.spring.io/milestone" }
-}
-
-// ---- 其他配置
-configure(subprojects) {
+  mavenLocal()
+  mavenCentral()
+  maven { url "https://repo.spring.io/libs-release" }
+  maven { url "https://repo.spring.io/milestone" }
 }
 ```
 
-## 待办事项（TBD）
+## 下一步
 
-1. 集成我们的 LLM 规范
-2. 提供更简洁的交互命令
+1. 用 REPL 安装 [ApiHug BMAD](/zhCN-docs/tool/apihug-bmad)
+2. 回到 [工具链](/zhCN-docs/tool) 查看其他生成命令

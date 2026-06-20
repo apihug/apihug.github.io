@@ -1,50 +1,45 @@
-export const title = "ApiSmart Api design Copilot";
+export const title = "ApiHug Copilot";
 export const description =
-  "ApiSmart make your api design and implement happier";
+  "ApiHug Copilot 把 prompt 驱动的编码体验和契约感知能力带进 IntelliJ。";
 
+ApiHug Copilot 在 IntelliJ 里提供一个 AI 工作面，让你可以围绕代码、契约和实现上下文持续提问，而不必在多个工具之间来回切换。
 
-## Latest
+## 它是什么
 
-⚠️请及时更新 SDK + IDEA插件保持先进⚠️
+这一块能力主要由四部分组成：
 
-**SDK Version**
+- Vendor 与模型选择
+- 可复用的 prompt 快捷指令
+- 用于解释、评审和草拟代码的聊天面板
+- 把编辑器上下文直接送进对话的操作入口
 
-[Maven Central](https://search.maven.org/artifact/com.apihug/it-bom)
+<img
+  src={require('@/img/editor/050_api_smart.gif').default.src}
+  alt="ApiHug Copilot"
+  width={2378}
+  height={1612}
+  className="rounded-lg"
+/>
 
-**Plugin Version**
+## 为什么重要
 
-[JetBrains Marketplace](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
+ApiHug 已经给项目建立了结构化契约模型，Copilot 的价值在于让这套结构真正进入日常开发流程：
 
-[JetBrains Marketplace](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
+- 理解已有代码和生成输出
+- 标准化重复使用的 prompts
+- 在项目上下文里做解释、评审和草稿生成
+- 从设计问题顺滑过渡到实现问题
 
-[Plugin Release Note](/zhCN-docs/changelog/plugin)
+## 它如何融入整体流程
 
-Latest **0.5.6 2024-10-31**
+推荐这样使用：
 
-Since Plugin **0.5.5 2024-10-25**
+1. 先在 [设置](/zhCN-docs/copilot/001_settings) 里配置 Vendor 和 Prompt
+2. 再在 [功能说明](/zhCN-docs/copilot/002_functions) 里熟悉编辑器、聊天面板和右键入口
+3. 当你需要遵循 ApiHug 规则和工作流时，再配合 [技能与规则](/zhCN-docs/skills) 一起使用
 
+## 下一步
 
-## Smart
-
-<img src={require('@/img/editor/050_api_smart.gif').default.src} alt="Install ApiHug Plugin" width={2378} height={1612}
-     className="rounded-lg"/>
-
-
-### Features
-
-- LLM供应商配置，Language Model 配置选择
-- Prompt 配置
-- LLM参数配置
-- 代码解释，检查，测试用例，提示代码生成
-- [ApiSmart 配置](/zhCN-docs/copilot/001_settings)
-
-## TODO
-
-- Inline Edit
-- File explain
-- Integrate with the domain context
-
-
-## Refer
-
-- [DevoxxGenieIDEAPlugin](https://github.com/devoxx/DevoxxGenieIDEAPlugin) DevoxxGenie is a plugin for IntelliJ IDEA that uses local LLM's (Ollama, LMStudio, GPT4All, Llama.cpp and Exo) and Cloud based LLMs to help review, test, explain your project code.
+1. 打开 [Copilot 设置](/zhCN-docs/copilot/001_settings)
+2. 阅读 [Copilot 功能](/zhCN-docs/copilot/002_functions)
+3. 如果基础项目还没搭起来，回到 [快速开始](/zhCN-docs/start)

@@ -1,0 +1,40 @@
+export const title = "Create Story";
+export const description =
+  "What the apihug-create-story skill does and when to use it.";
+
+# Create Story
+
+`apihug-create-story` is the handoff skill between high-level planning and implementation.
+
+## What It Is
+
+`apihug-create-story` turns approved scope into an implementation-ready story that already reflects ApiHug boundaries.
+
+## Why It Matters
+
+In ApiHug projects, a generic story is not enough. The story must explicitly call out:
+
+- protobuf-first context
+- generated versus handwritten boundaries
+- framework rules that affect implementation
+- the expected review path
+
+## How It Fits
+
+Use it after discovery and before coding, when a requirement has already been scoped and you need a story that speaks ApiHug language.
+
+Typical inputs:
+
+- approved requirements or story scope
+- relevant proto, domain, and spec context
+- architecture or workflow decisions that should not be rediscovered later
+
+Expected outputs:
+
+- a story with clear implementation scope
+- ApiHug-specific constraints called out explicitly
+- enough context for `apihug-dev-story` to execute safely
+
+## Next Step
+
+Do not use it for broad discovery. Once the story is ready, continue with [Dev Story](/docs/skills/dev-story).

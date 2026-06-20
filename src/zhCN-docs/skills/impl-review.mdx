@@ -1,0 +1,39 @@
+export const title = "Implementation Review";
+export const description =
+  "说明 apihug-impl-review 如何按照 ApiHug golden rules 检查手写实现。";
+
+# Implementation Review
+
+`apihug-impl-review` 用来检查代码生成之后的手写实现，是否仍然遵守 ApiHug 的框架边界。
+
+## 它是什么
+
+这个技能评审的是手写代码，而不是生成出来的框架产物。
+
+## 为什么重要
+
+ApiHug 项目里最常见的回归，通常来自两类问题：业务逻辑渗入生成层，或者实现绕开了原本应该复用的 SDK 与服务边界。
+
+## 它如何融入整体流程
+
+它主要关注：
+
+- service 实现纪律
+- repository trait 的使用方式
+- 安全边界放置位置
+- 生成代码与手写代码的分离
+- 前端 SDK 与页面使用模式
+
+它应该能抓住的典型问题包括：
+
+- 业务逻辑泄漏到生成层
+- 安全规则落在框架约定之外的位置
+- 前端绕过生成 SDK 直接访问接口
+- 实现结构逐渐偏离 golden rules
+
+## 下一步
+
+做 review 时，以下规则文档就是你的判断依据：
+
+- `apihug-impl-golden-rule`
+- `apihug-impl-front-vben-guide`

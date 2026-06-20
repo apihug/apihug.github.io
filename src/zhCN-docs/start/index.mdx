@@ -1,155 +1,137 @@
-export const title = "快速开启";
+export const title = "快速开始";
 export const description =
-  "如何在15分钟内，使用 ApiHug 启动一个API开发项目.";
+  "创建一个 ApiHug 项目，理解模块结构，并跑通 contract-first 工具链。";
 
-
+import { DocsCodeBlock } from '@/components/DocsCodeBlock'
+import { DocsJetBrainsMarketplaceCard, DocsMavenCentralBadge } from '@/components/DocsStartResources'
 import { SnippetGroup } from '@/components/SnippetGroup'
 
-
-如何在**15分钟**内，使用 ApiHug 启动一个API开发项目。
+这一页带你从空目录走到一个可运行的 ApiHug 演示项目。路径很直接：先准备环境，再生成项目，接着跑通 `wire`、`stub` 和应用启动，最后检查生成出的 OAS 接口文档。
 
 <TipGood>
-  3.0 后，仅支持 spring boot 4.0+ 不再支持 spring boot 3.0
+  ApiHug 3.x 面向 Spring Boot 4.0 及以上版本。升级老项目前，建议先阅读 Spring Boot 4.0 迁移指南。
 </TipGood>
 
-## 一键初始化
+## 你会完成什么
 
-通过一条命令将空目录转换为 Apihug 工作空间。  
-脚本会自动下载并运行适用于您平台的 Apihug 安装程序。
+第一次体验通常会完成以下几件事：
 
-### Windows
+1. 初始化一个 ApiHug 工作目录
+2. 用 IntelliJ 向导生成一个演示项目
+3. 理解 `-proto` 模块与应用模块的分工
+4. 依次执行 `wire`、`stub` 和应用启动
+5. 打开生成出来的 OAS 文档
 
-**PowerShell**（在 PowerShell 中运行）：
+## 开始之前
+
+先准备好基础环境：
+
+1. JDK 17 或更高版本
+2. Gradle 8 或更高版本
+3. IntelliJ IDEA 2022 或更高版本
+4. `ApiHug - API design Copilot` 插件
+5. 可访问的 Spring Initializr，或你们团队自己的等价初始化流程
+
+<DocsMavenCentralBadge />
+
+### IntelliJ 插件
+
+先从 JetBrains Marketplace 安装插件，然后重启 IntelliJ。
+
+<DocsJetBrainsMarketplaceCard />
+
+如果你后续更偏好命令行工作流，可以再配合 ApiHug REPL 使用。首次上手时，IntelliJ 向导仍然是理解项目结构最快的入口。
+
+### 插件安装路径
+
+1. 打开 `File > Settings > Plugins`
+2. 搜索 `ApiHug`
+3. 安装插件
+4. 重启 IntelliJ
+
+<img src={require('@/img/editor/001_install_plugin.gif').default.src} alt="安装 ApiHug 插件" width={2316} height={1768} className="rounded-lg" />
+
+## 初始化工作目录
+
+ApiHug 为常见 shell 提供了启动脚本。
+
+### Windows PowerShell
 
 ```powershell
 iex (irm 'https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.ps1')
 ```
 
-**命令提示符**（在 cmd.exe 中运行）：
+### Windows Command Prompt
 
 ```shell
 powershell -c "irm https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.ps1 | iex"
 ```
 
-### Bash（Linux、Unix、macOS）
+### Bash
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.sh | bash
 ```
 
-### Spring 4.0 迁移
+如果你是在现有 Spring 项目上升级，请先阅读 [Spring Boot 4.0 Migration Guide](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.0-Migration-Guide)，再推进 ApiHug SDK 升级。
 
-**SDK 3.0** 现在还在快速升级中，保持更新，大量的兼容性问题有待发现， 如何升级spring 到 4.0 注意 [Spring Boot 4.0 Migration Guide](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.0-Migration-Guide)
+## 生成项目
 
+IntelliJ 向导会直接给出一个适合 contract-first 开发的起点。
 
-## 准备
+### 1. 创建 ApiHug 项目
 
-1. ✅ JDK 17+  [OpenJDK](https://openjdk.org/) or Oracle's
-2. ✅ [Gradle](https://gradle.org/install/) 8+
-3. ✅ [IDEA](https://www.jetbrains.com/idea/)  2022+ (可选)
-4. ✅ [ApiHug - API design Copilot](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
-5. ✅ [Spring Initializr](https://start.spring.io/) - 可访问或本地部署替代方案
+1. 打开 `File > New > Project`
+2. 选择 `ApiHug`
+3. 进入项目设置步骤
 
-[Maven Central](https://search.maven.org/artifact/com.apihug/it-bom)
+<img src={require('@/img/editor/002_start_project.gif').default.src} alt="从 ApiHug 插件创建项目" width={2316} height={1768} className="rounded-lg" />
 
-### IDEA plugin
+### 2. 填写项目设置
 
-⚠️ IDEA plugin 后续将不再频繁升级， IDEA 支持已不是主要方向，你可以用 Apihug REPL 做绝大部分事情！
+设置 package、项目名、描述、SDK 选项、数据库厂商、缓存和端口。
 
-[Plugin Release](https://github.com/apihug/apihug-ide-plugin/releases)
-
-[JetBrains Marketplace](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
-
-
-
-### 安装插件
-
-1. File
-2. Settings
-3. Plugin
-4. Search `ApiHug`
-5. Install & Restart
-
-<img src={require('@/img/editor/001_install_plugin.gif').default.src} alt="Install ApiHug Plugin" width={2316} height={1768} className="rounded-lg" />
-
-## 项目引导
-
-[ApiHug - API design Copilot](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)  提供了一个十分友好且直观的项目模板,可以帮助你快速启动API开发。它会循序渐进地指导你创建符合最佳实践的API项目。
-
-### 01-开启ApiHug项目
-
-1. File
-2. New -> Project
-3. ApiHug
-
-<img src={require('@/img/editor/002_start_project.gif').default.src} alt="Start project from ApiHug Plugin" width={2316} height={1768} className="rounded-lg" />
-
-### 02-项目设置
-
-1. Project settings
-2. package
-3. name
-4. description
-5. SDK Settings
-6. version
-7. DB Vendor
-8. Cache
-9. Port
-
-<img src={require('@/img/editor/003_project_settings.gif').default.src} alt="ApiHug Project Settings" width={2316} height={1768} className="rounded-lg" />
-
+<img src={require('@/img/editor/003_project_settings.gif').default.src} alt="ApiHug 项目设置" width={2316} height={1768} className="rounded-lg" />
 
 <TipGood>
-
-  第一次，最好完全按照默认指令和配置进行!
-
+  第一次使用时，除非团队已经有固定模板，否则建议先保留默认配置。
 </TipGood>
 
+一个典型的 ApiHug 项目通常从两个模块开始：
+
+```text
+order
+|- order-app
+`- order-app-proto
 ```
-├─order <1>
-    │  
-    ├─order-app <2>
-    │  
-    └─order-app-proto<3>
-```
 
-一般项目结构
+1. `order` 是根工作区
+2. `order-app` 是手写业务逻辑所在的应用模块
+3. `order-app-proto` 是驱动生成的契约模块
 
-1. `<1>` 项目名称
-2. `<2>` 应用模块：实现与服务
-3. `<3>` 协议模块：定义API，应用名称加`-proto`后缀
+### 3. 选择 Spring 组件
 
-### 03-Spring设置
+这一段的心智模型和 [Spring Initializr](https://start.spring.io/) 一致：先选项目类型，再按需加入像 `Spring Web` 这样的 starter。
 
-Spring 配置，等同 [Start Spring](https://start.spring.io/) 习惯:
+<img src={require('@/img/editor/004_spring_settings.gif').default.src} alt="ApiHug 项目 Spring 设置" width={2316} height={1768} className="rounded-lg" />
 
-1. 类型筛选
-2. 选择模块，比如: `Spring Web`
+完成后点击 **Create -> Open Project**。
 
-<img src={require('@/img/editor/004_spring_settings.gif').default.src} alt="ApiHug Project Spring Settings" width={2316} height={1768} className="rounded-lg" />
+### 4. 以 Gradle 方式加载项目
 
+如果 IntelliJ 没有自动导入，请手动按 `Gradle` 项目重新加载。正常情况下你会看到 `demo-app` 和 `demo-app-proto` 两个模块。
 
-最后点击 **Create -> Open Project** 打开项目。
+<TipGood>
+  升级已有项目时，先更新 `gradle/libs.versions.toml`，再重新加载 Gradle，确保 SDK 版本一致生效。
+</TipGood>
 
-### 04-启动项目
+<DocsMavenCentralBadge />
 
-<TipGood>SDK 版本随着时间的推延在不断升级;记得检查maven库里版本:</TipGood>
+<img src={require('@/img/editor/005_load_project.gif').default.src} alt="ApiHug 加载项目" width={2316} height={1768} className="rounded-lg" />
 
-[Maven Central](https://search.maven.org/artifact/com.apihug/it-bom)
+## 理解项目结构
 
-对于已存在项目， 你可以手动升级:
-
-1. 您的项目目录 > gradle > **libs.versions.toml**;
-2. `apihug = "0.9.2-RELEASE"` 更新到最新版本;
-
-根据 IDEA 的引导导入项目:
-
-1. 以 `Gradle` 方式加载项目, 如未提示，请手动检查并且导入(如果你隐藏了IDEA的通知弹窗)
-2. 两个模块 `demo-app-proto` & `demo-app` 应该被`Gradle`正常识别和加载进来
-
-<img src={require('@/img/editor/005_load_project.gif').default.src} alt="ApiHug Load Project" width={2316} height={1768} className="rounded-lg" />
-
-一个最简单的项目模块如下 ([simplest-demo](https://github.com/apihug/simplest-demo)):
+最小示例可以参考 [simplest-demo](https://github.com/apihug/simplest-demo)：
 
 ```shell
 +---gradle
@@ -161,7 +143,7 @@ Spring 配置，等同 [Start Spring](https://start.spring.io/) 习惯:
 |           +---java
 |           |   \---com
 |           |       \---apihug
-|           |           \---demo  
+|           |           \---demo
 |           |               |   DemoAppApplication.java
 |           |               +---domain
 |           |               \---service
@@ -181,175 +163,260 @@ Spring 配置，等同 [Start Spring](https://start.spring.io/) 习惯:
 |           |                   \---infra
 |           \---resources
 |                   hope-wire.json (5)
-````
+```
 
-| File                         | Comment          |
-|------------------------------|------------------|
-| **(1)** `libs.versions.toml` | 版本 toml 配置文件     |
-| **(2)** `demo-app`           | Application 模块   |
-| **(3)** `hope-stub.json`     | Application 模块配置 |
-| **(4)** `demo-app-proto`     | Protocol 模块      |
-| **(5)** `hope-wire.json`     | Protocol 模块配置    |
-
+| 文件                         | 作用                                 |
+|------------------------------|--------------------------------------|
+| **(1)** `libs.versions.toml` | 版本目录与插件别名配置               |
+| **(2)** `demo-app`           | 应用模块与手写业务逻辑               |
+| **(3)** `hope-stub.json`     | 应用模块的生成配置                   |
+| **(4)** `demo-app-proto`     | protobuf 契约模块与 wire 输出        |
+| **(5)** `hope-wire.json`     | proto 模块元数据                     |
 
 <SnippetGroup>
 
-```toml {{ filename: 'libs.versions.toml' }}
-# libraries
-apihug = "0.9.9-RELEASE"
-# plugins
-springBoot = "3.2.5"
-springDependency = "1.1.4"
+<div
+  filename="libs.versions.toml"
+  code={`# versions
+apihug = "<current-version>"
+springBoot = "4.0.0"
+springDependency = "1.1.7"
 
-#Apihug Common
+# libraries
 apihugBom = { group = "com.apihug", name = "it-bom", version.ref = "apihug" }
 
-#Spring plugin
+# plugins
 springBoot = { id = "org.springframework.boot", version.ref = "springBoot" }
-springDependency = { id = "io.spring.dependency-management", version.ref = "springDependency" }
-```
-  
-```gradle {{ filename: 'demo-app' }}
-plugins {
+springDependency = { id = "io.spring.dependency-management", version.ref = "springDependency" }`}
+>
+  <DocsCodeBlock
+    compact
+    className="language-toml"
+    code={`# versions
+apihug = "<current-version>"
+springBoot = "4.0.0"
+springDependency = "1.1.7"
+
+# libraries
+apihugBom = { group = "com.apihug", name = "it-bom", version.ref = "apihug" }
+
+# plugins
+springBoot = { id = "org.springframework.boot", version.ref = "springBoot" }
+springDependency = { id = "io.spring.dependency-management", version.ref = "springDependency" }`}
+  />
+</div>
+
+<div
+  filename="demo-app"
+  code={`plugins {
   id "java"
   alias(libs.plugins.springBoot)
   alias(libs.plugins.springDependency)
   alias(libs.plugins.hopeStub)
   alias(libs.plugins.liquibase)
 }
-  
+
 hopeStub {
   debug = false
 }
 
 dependencies {
-  //Hope START
   implementation project(':demo-app-proto')
   implementation 'org.springframework.boot:spring-boot-starter-web'
+}`}
+>
+  <DocsCodeBlock
+    compact
+    className="language-gradle"
+    code={`plugins {
+  id "java"
+  alias(libs.plugins.springBoot)
+  alias(libs.plugins.springDependency)
+  alias(libs.plugins.hopeStub)
+  alias(libs.plugins.liquibase)
 }
-```
-  
-```json {{ filename: 'hope-stub.json' }}
-  {
-    "packageName": "com.apihug.demo",
-    "name": "demo-app",
-    "domain": "demo",
-    "proto": {
+
+hopeStub {
+  debug = false
+}
+
+dependencies {
+  implementation project(':demo-app-proto')
+  implementation 'org.springframework.boot:spring-boot-starter-web'
+}`}
+  />
+</div>
+
+<div
+  filename="hope-stub.json"
+  code={`{
+  "packageName": "com.apihug.demo",
+  "name": "demo-app",
+  "domain": "demo",
+  "proto": {
     "artifact": {
-    "groupId": "com.apihug",
-    "artifactId": "demo-app-proto",
-    "version": "0.1.1-SNAPSHOT"
-  },
+      "groupId": "com.apihug",
+      "artifactId": "demo-app-proto",
+      "version": "0.1.0-SNAPSHOT"
+    },
     "module": "demo-app-proto",
     "domain": "demo",
     "applied": true
   },
-    "dependencies": [
-    ]
-  }  
-```
+  "dependencies": []
+}`}
+>
+  <DocsCodeBlock
+    compact
+    className="language-json"
+    code={`{
+  "packageName": "com.apihug.demo",
+  "name": "demo-app",
+  "domain": "demo",
+  "proto": {
+    "artifact": {
+      "groupId": "com.apihug",
+      "artifactId": "demo-app-proto",
+      "version": "0.1.0-SNAPSHOT"
+    },
+    "module": "demo-app-proto",
+    "domain": "demo",
+    "applied": true
+  },
+  "dependencies": []
+}`}
+  />
+</div>
 
-```gradle {{ filename: 'demo-app-proto' }}
-plugins {
+<div
+  filename="demo-app-proto"
+  code={`plugins {
   id "java-library"
   alias(libs.plugins.hopeWire)
 }
-  
+
 hopeWire {
   keepProto = false
   verbose = false
+}`}
+>
+  <DocsCodeBlock
+    compact
+    className="language-gradle"
+    code={`plugins {
+  id "java-library"
+  alias(libs.plugins.hopeWire)
 }
-  
-```
 
-```json {{ filename: 'hope-wire.json' }}
-  {
-    "packageName": "com.apihug.demo",
-    "name": "demo-app-proto",
-    "application": "demo-app",
-    "domain": "demo",
-    "persistence" : {
-    "identifyType" : "LONG",
-    "tenantType" : "LONG"
+hopeWire {
+  keepProto = false
+  verbose = false
+}`}
+  />
+</div>
+
+<div
+  filename="hope-wire.json"
+  code={`{
+  "packageName": "com.apihug.demo",
+  "name": "demo-app-proto",
+  "application": "demo-app",
+  "domain": "demo",
+  "persistence": {
+    "identifyType": "LONG",
+    "tenantType": "LONG"
   },
-    "authority" : {
-    "enumClass" : "com.apihug.demo.proto.infra.settings.DemoAuthorityEnum",
-    "codePrefix" : 10240000
+  "authority": {
+    "enumClass": "com.apihug.demo.proto.infra.settings.DemoAuthorityEnum",
+    "codePrefix": 10240000
   },
-    "createdAt": "2024-05-19",
-    "createdBy" : "admin"
-  }
-```  
+  "createdAt": "2026-06-20",
+  "createdBy": "admin"
+}`}
+>
+  <DocsCodeBlock
+    compact
+    className="language-json"
+    code={`{
+  "packageName": "com.apihug.demo",
+  "name": "demo-app-proto",
+  "application": "demo-app",
+  "domain": "demo",
+  "persistence": {
+    "identifyType": "LONG",
+    "tenantType": "LONG"
+  },
+  "authority": {
+    "enumClass": "com.apihug.demo.proto.infra.settings.DemoAuthorityEnum",
+    "codePrefix": 10240000
+  },
+  "createdAt": "2026-06-20",
+  "createdBy": "admin"
+}`}
+  />
+</div>
 
 </SnippetGroup>
 
-#### 04.1-Wire
+## 跑通 Contract-First 工具链
 
-Proto 模块的 **Wire** 命令负责对协议 protocol buffers 文件进行校验和编译。
+### 1. 执行 Wire
 
-1. 打开 `README.md` > `0. Build All`;
-2. 找到对应的命令， 贴入命令行 `Terminal`, 例子： `gradlew clean build -x test -x wireTest -x stubTest`;
-3. 回车 `Enter` 执行
-4. 检查 protocol 模块 `demo-app-proto` 路径 `main > wire` 下的更新；
+`wire` 负责校验 proto 模块，并生成中立的契约构建输出。
 
-<img src={require('@/img/editor/006_wire.gif').default.src} alt="ApiHug Wire Project" width={2316} height={1768} className="rounded-lg" />
+1. 打开 `README.md > 0. Build All`
+2. 复制命令到终端，例如 `gradlew clean build -x test -x wireTest -x stubTest`
+3. 执行命令
+4. 查看 `demo-app-proto` 下的生成结果
 
-#### 04.2-Stub
+<img src={require('@/img/editor/006_wire.gif').default.src} alt="ApiHug Wire 项目" width={2316} height={1768} className="rounded-lg" />
 
-Application 模块的 **Stub** 命令负责从协议模块中的API定义生成stub代码结构。
+### 2. 执行 Stub
 
-1. 打开 `README.md` > `2. Build Stub (Individual)`
-2. 找到对应的命令， 贴入命令行 `Terminal`， 例子: `gradlew.bat demo-app:clean stub build -x test -x stubTest`;
-3. 回车 `Enter` 执行
-4. 检查 application 模块 `demo-app` 路径 `main > stub` 下的更新;
+`stub` 会基于契约模块生成应用侧脚手架。
 
-<img src={require('@/img/editor/007_stub.gif').default.src} alt="ApiHug Stub Project" width={2316} height={1768} className="rounded-lg" />
+1. 打开 `README.md > 2. Build Stub (Individual)`
+2. 执行命令，例如 `gradlew.bat demo-app:clean stub build -x test -x stubTest`
+3. 查看 `demo-app` 下的生成结果
 
-#### 04.3-Boot
+<img src={require('@/img/editor/007_stub.gif').default.src} alt="ApiHug Stub 项目" width={2316} height={1768} className="rounded-lg" />
 
-1. 打开 `README.md` > `3. Run Application`;
-2. 找到对应的命令， 贴入命令行 `Terminal`， 例子: `gradlew demo-app:bootRun`;
-3. 回车 `Enter` 执行;
-4. 检查 `demo-app` 命令行输出;
+### 3. 启动应用
 
-<img src={require('@/img/editor/008_boot.gif').default.src} alt="ApiHug Spting Boot" width={2316} height={1768} className="rounded-lg" />
+1. 打开 `README.md > 3. Run Application`
+2. 执行 `gradlew demo-app:bootRun`
+3. 确认应用正常启动
+
+<img src={require('@/img/editor/008_boot.gif').default.src} alt="ApiHug Spring Boot" width={2316} height={1768} className="rounded-lg" />
 
 ```shell
-----------------------------------------------------------
-
 Application 'demo-app' is running! Access URLs:
 
 Local                             http://localhost:18089/
-External                          http://192.168.0.115:18089/
-OAS                               http://192.168.0.115:18089/v3/api-docs
-Actuator                          http://192.168.0.115:18089/management
-Api-Errors                        http://192.168.0.115:18089/hope/meta/errors
-Api-Dictionaries                  http://192.168.0.115:18089/hope/meta/dictionaries
-Api-Authorities                   http://192.168.0.115:18089/hope/meta/authorities
+OAS                               http://localhost:18089/v3/api-docs
+Actuator                          http://localhost:18089/management
+Api-Errors                        http://localhost:18089/hope/meta/errors
+Api-Dictionaries                  http://localhost:18089/hope/meta/dictionaries
+Api-Authorities                   http://localhost:18089/hope/meta/authorities
 Profile(s)                        dev
 ```
 
-#### 04.4-检查 OAS
+### 4. 检查 OAS 输出
 
-1. 将命令行 `/v3/api-docs` copy 出来;
-2. 粘入您的浏览器(Chrome)查看;
+把控制台里的 `/v3/api-docs` 地址复制到浏览器，确认生成出来的接口面没有问题。
 
-<img src={require('@/img/editor/009_OAS.gif').default.src} alt="ApiHug API Information" width={2316} height={1768} className="rounded-lg" />
+<img src={require('@/img/editor/009_OAS.gif').default.src} alt="ApiHug API 信息" width={2316} height={1768} className="rounded-lg" />
 
-## ApiHug 工具窗口
+## 打开 ApiHug Tool Window
 
-**ApiHug 工具窗口** 应该停靠在IDE的右侧,如果没有,你也可以从顶部菜单栏打开它: `ApiHug > ApiHug Designer`:
+正常情况下，ApiHug Tool Window 会停靠在 IDE 右侧。如果没有出现，可以从 `ApiHug > ApiHug Designer` 手动打开。
 
 <img src={require('@/img/editor/010_toolwindow.gif').default.src} alt="ApiHug Tool Window" width={2316} height={1768} className="rounded-lg" />
 
-🥳 太棒了!你已经成功完成了一个完美的API开发项目!
+## 下一步
 
-## 总结
+演示项目跑通之后，建议继续看：
 
-在之前的15分钟演示中,我们介绍了API设计和开发涉及的典型步骤。这些步骤通常包括各种琐碎的任务,使我们难以集中精力于核心业务逻辑设计。但是使用ApiHug,您可以摆脱所有繁琐和麻烦的步骤。
-
-ApiHug自动化了这些任务,并生成高质量的设计,其结构和代码细节都非常友好易懂。在接下来的课程中,我们将深入探讨ApiHug的功能。
-
-事实上,ApiHug使用的技术并非完全是新发明。平台如[Jhipster](https://www.jhipster.tech/), [Spring Starter](https://start.spring.io/)，Grails和Ruby on Rails最为先驱者，已经经历了大量的探索和工程实践。
-
-ApiHug在这些先驱平台的最佳实践和经验教训的基础上进行了构建,使其更加实用和简单易用。我们感谢这些平台为ApiHug奠定了基础做出的贡献。
+1. [什么是 ApiHug？](/zhCN-docs/start/what-is-apihug)
+2. [技能与规则](/zhCN-docs/skills)
+3. [工具链](/zhCN-docs/tool)

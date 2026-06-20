@@ -1,0 +1,59 @@
+export const title = "Workflow";
+export const description =
+  "The ApiHug contract-first workflow from proto design to implementation review.";
+
+# Workflow
+
+ApiHug uses a contract-first workflow: design the contract, generate the framework surface, implement only the handwritten parts, then review the result against framework rules.
+
+## What It Is
+
+The workflow turns one protobuf contract into a delivery path for design, generation, implementation, and review.
+
+## Why It Matters
+
+The workflow keeps teams out of the most expensive failure mode in generated systems: manually editing the wrong layer and drifting away from the contract.
+
+## How It Fits
+
+The standard contract-first lifecycle is:
+
+1. Design protobuf contracts for API, domain, enums, and errors.
+2. Generate backend structures and SDK artifacts.
+3. Implement only the writable business logic.
+4. Generate or update frontend routes and SDK usage.
+5. Review proto and implementation quality against ApiHug rules.
+
+### Where the main skills fit
+
+### `apihug-create-story`
+
+Turns a scoped unit of work into an implementation-ready story with ApiHug-specific context.
+
+### `apihug-dev-story`
+
+Guides execution across generated backend and frontend boundaries without violating the framework architecture.
+
+### `apihug-proto-review`
+
+Checks whether the contract design still follows ApiHug protobuf rules.
+
+### `apihug-impl-review`
+
+Checks whether the handwritten implementation still follows ApiHug backend and frontend golden rules.
+
+### Contract-first means source-set discipline
+
+The workflow only works if generated outputs remain generated. In practice that means:
+
+- edit proto sources in `src/main/proto`
+- implement business logic in handwritten source sets
+- do not manually rewrite generated DTO, entity, repository, or SDK output
+
+That separation is what lets ApiHug regenerate safely while keeping business logic intact.
+
+## Next Step
+
+1. Use [Create Story](/docs/skills/create-story) to turn scoped work into an implementation-ready story
+2. Move to [Dev Story](/docs/skills/dev-story) for execution
+3. Finish with [Proto Review](/docs/skills/proto-review) and [Implementation Review](/docs/skills/impl-review)

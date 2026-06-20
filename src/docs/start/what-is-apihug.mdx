@@ -2,11 +2,7 @@ export const title = "What is ApiHug?";
 export const description =
   "ApiHug is an AI-native enterprise architecture factory. One protobuf contract generates your APIs, services, databases, SDKs, and AI tooling.";
 
-ApiHug revolutionizes your API lifecycle with innovative ideas and thoughtful features.
-
-Streamline the entire API journey — from Design, Build, Test to Integrate — making it faster and easier than ever before.
-
-Unite all roles on a single platform, enabling seamless collaboration throughout the entire lifecycle of APIs.
+ApiHug is an AI-native enterprise architecture factory. It treats protobuf as the system contract, then uses that contract to drive design, generation, review, and delivery across the stack.
 
 <figure className="my-8">
   <img
@@ -19,78 +15,70 @@ Unite all roles on a single platform, enabling seamless collaboration throughout
   </figcaption>
 </figure>
 
-## Why should I use ApiHug?
+## What It Is
 
-ApiHug is user-friendly, design-driven, straightforward and satisfying.
+ApiHug combines four ideas into one product surface:
 
-ApiHug revolutionizes the separation of API design and implementation by adopting a domain-specific language (DSL) built on Protocol Buffers, employing object-oriented methods to design and define API components. This approach significantly enhances API reusability.
+- contract-first API design based on protobuf
+- generation for backend, metadata, and client-side artifacts
+- review rules that keep handwritten code aligned with generated boundaries
+- AI workflows that understand the same contract and framework rules
 
-ApiHug leverages Git for API management and utilizes repositories for API distribution. By building upon existing systems and frameworks, ApiHug completely transforms the paradigm of API development and management.
+In practice, one contract can shape your API description, application scaffolding, integration surface, and AI-assisted delivery flow.
 
-### Key features
+## Why It Matters
 
-- Effortless visual API design with IDEA plugin integration
-- Object-oriented (domain-specific language) approach for highly reusable API design
-- Compliance with OAS design standards for industry best practices
-- Design, test and implementation on one platform
-- Integration with existing CI/CD facilities
-- Built on mature toolchains (Gradle), IDEs (IntelliJ IDEA), and frameworks (Spring Boot)
+Most API teams lose time in the gaps between design, implementation, and review. ApiHug reduces that drift by making the contract the source of truth.
 
-## What is ApiHug used for?
+That matters because it helps teams:
 
-### API Design
+- keep API design and implementation synchronized
+- regenerate safely without rewriting business logic
+- standardize review around explicit framework rules
+- expose a cleaner surface to AI tools, SDK consumers, and internal teams
 
-ApiHug is a design-first platform that follows the standard [OAS (3.1.0)](https://spec.openapis.org/oas/latest.html). It introduces a Common Language (DSL) to bridge the gap between:
+## How It Fits
 
-- Domain Experts
-- Technical Experts
-- Working Software and Tests
-- Third-party Partners
+ApiHug fits into the delivery lifecycle from design to integration:
 
-With its intuitive interface, ApiHug empowers the complete API design lifecycle.
+### Design
 
-### API Implementation
+Define services, operations, messages, enums, and persistence metadata in protobuf.
 
-Accelerate your development by converting your APIs into Software Artifacts:
+### Build
 
-- API Definitions Meta
-- Application Framework Backend (Spring Boot / Spring Cloud)
-- Tool Chain: Gradle + IDEA Plugin
+Generate backend scaffolding, OAS output, and other framework artifacts from the contract.
 
-### API Management
+### Implement
 
-ApiHug revolutionizes API management by bringing common project management concepts to the full API lifecycle. With native Git support, it simplifies version control and enables users to seamlessly design, document, mock, test, and share APIs.
+Write business logic only in the intended handwritten layers.
 
-### API Distribution
+### Review
 
-Distributing different versions of APIs has always been a challenge. ApiHug tackles this by leveraging existing package distribution mechanisms, such as Maven repositories, to ensure a more robust and controllable API distribution process.
+Use ApiHug rules and workflow skills to verify that contracts and implementations still match the framework model.
 
-### API Integration
+### Distribute
 
-API design and implementation typically focus on solutions for API providers. However, APIs need to be consumed by API consumers.
-
-ApiHug offers a solution for API consumer clients. The API distribution mechanism ensures synchronization of different API versions, and API integration enables automatic generation of client-side stub code.
+Publish versioned artifacts through existing repository infrastructure such as Maven.
 
 ## FAQ
 
 ### Is ApiHug free?
 
-Absolutely! ApiHug can be utilized in various types of projects, including commercial ones. It offers versatility and flexibility to cater to your project requirements.
+Yes. ApiHug can be used in commercial projects as well as internal platform work.
 
 ### Is ApiHug open source?
 
-The SDK is available from the public Maven repository. The IDEA plugin source code is not shared.
+The SDK is published to the public Maven repository. The IntelliJ plugin source is not currently published.
 
 ### Why the name ApiHug?
 
 > We Build What We Love & Love What We Built
 
-**API** — everyone knows what an API is. **Hug** — to embrace. ApiHug embraces both engineers and AI agents with warmth.
+**API** means the contract. **Hug** means keeping engineers, consumers, and AI tools inside one shared system model.
 
-## Get involved
+## Next Step
 
-- [GitHub](https://github.com/apihug/) — Raise your PR
-- [YouTube](https://youtube.com/@ApiHug) — Watch our video cookbook
-- [Bilibili](https://space.bilibili.com/666522636) — Watch our video cookbook (China)
-- [Gitee](https://gitee.com/dearxuecom/apihug.com) — Raise your PR (China)
-- Reach out to our dev team via [email](mailto:dev@apihug.com) with your ApiHug ideas, dreams, and wishes!
+1. Start with the [Quick Start](/docs/start)
+2. Continue to [Skills & Rules](/docs/skills)
+3. Explore the [Tool Chain](/docs/tool)

@@ -1,0 +1,72 @@
+export const title = "Rules";
+export const description =
+  "The main ApiHug rule documents and what each one governs.";
+
+# Rules
+
+The ApiHug rules are the working constitution for contract-first delivery. They explain what can be modeled, where handwritten code belongs, and what reviewers should reject.
+
+## What They Cover
+
+### API extension rules
+
+`apihug-proto-api-extension-guide`
+
+Defines how service, operation, request, response, authorization, paging, and schema metadata are expressed through the ApiHug swagger extensions.
+
+Related site docs:
+
+- [Swagger Spec](/docs/spec/swagger)
+- [Protobuf & OAS](/docs/protobuf/proto-oas)
+
+### Database modeling rules
+
+`apihug-proto-database-modeling-guide`
+
+Defines how entity messages map to tables, columns, wires, indexes, and persistence conventions.
+
+Related site docs:
+
+- [Domain Spec](/docs/spec/domain)
+- [Protobuf Entity](/docs/protobuf/proto-entity)
+
+### Enum and error rules
+
+`apihug-proto-enum-error-extension-guide`
+
+Defines business enum metadata, multilingual messages, and structured error payload design.
+
+Related site docs:
+
+- [Constant Spec](/docs/spec/constant)
+
+### Backend implementation rules
+
+`apihug-impl-golden-rule`
+
+Defines how generated service skeletons, repository traits, security boundaries, and domain logic should be implemented.
+
+### Frontend implementation rules
+
+`apihug-impl-front-vben-guide`
+
+Defines the generated SDK, page structure, route generation, and Vben-based frontend conventions.
+
+## Why They Matter
+
+These are not generic style guides. They exist to preserve the ApiHug generation model:
+
+- proto is the source of truth
+- generated code stays generated
+- handwritten logic stays in the intended writable boundaries
+- review workflows can validate whether implementation still matches design
+
+## How To Use Them
+
+Use the proto rule guides while designing contracts. Use the implementation rules while writing or reviewing handwritten code. When a workflow skill asks for a review, these are the rule surfaces it should apply.
+
+## Next Step
+
+1. Read [Workflow](/docs/skills/workflow) for the end-to-end sequence
+2. Use [Proto Review](/docs/skills/proto-review) when checking contract quality
+3. Use [Implementation Review](/docs/skills/impl-review) when checking handwritten code

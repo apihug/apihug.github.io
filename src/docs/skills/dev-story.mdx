@@ -1,0 +1,43 @@
+export const title = "Dev Story";
+export const description =
+  "How apihug-dev-story guides implementation across generated and handwritten boundaries.";
+
+# Dev Story
+
+`apihug-dev-story` is the implementation workflow for executing an ApiHug story without breaking the framework's generation model.
+
+## What It Is
+
+`apihug-dev-story` is the execution layer for an approved ApiHug story.
+
+## Why It Matters
+
+ApiHug gains speed from regeneration. That only works when implementation stays inside the intended writable layers.
+
+## How It Fits
+
+It guides developers through:
+
+- reading the story in framework context
+- identifying writable source sets
+- implementing business logic in the correct layer
+- leaving generated output untouched
+
+### Key boundaries
+
+Typical writable areas include:
+
+- proto source definitions
+- handwritten service logic
+- repository trait extensions
+- handwritten frontend views
+
+Typical non-writable areas include:
+
+- generated DTOs
+- generated repository skeletons
+- generated frontend SDK output
+
+## Next Step
+
+After implementation, run [Proto Review](/docs/skills/proto-review) and [Implementation Review](/docs/skills/impl-review).

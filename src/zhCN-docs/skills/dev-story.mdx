@@ -1,0 +1,43 @@
+export const title = "Dev Story";
+export const description =
+  "说明 apihug-dev-story 如何在生成边界与手写边界之间指导实现。";
+
+# Dev Story
+
+`apihug-dev-story` 是执行 ApiHug story 的实现工作流，目标是在不破坏生成模型的前提下完成开发。
+
+## 它是什么
+
+`apihug-dev-story` 是已批准 story 的执行层。
+
+## 为什么重要
+
+ApiHug 的效率来自可重复生成，而可重复生成的前提，是实现始终停留在允许手写的层里。
+
+## 它如何融入整体流程
+
+它会指导开发者完成这些事情：
+
+- 在框架上下文里理解 story
+- 识别真正可写的 source set
+- 在正确的层里实现业务逻辑
+- 保证生成输出不被手工污染
+
+### 关键边界
+
+典型可写区域包括：
+
+- proto 源定义
+- 手写 service 逻辑
+- repository trait 扩展
+- 手写前端页面
+
+典型不可写区域包括：
+
+- 生成 DTO
+- 生成 repository skeleton
+- 生成 frontend SDK 输出
+
+## 下一步
+
+实现完成后，再做 [Proto Review](/zhCN-docs/skills/proto-review) 和 [Implementation Review](/zhCN-docs/skills/impl-review)。

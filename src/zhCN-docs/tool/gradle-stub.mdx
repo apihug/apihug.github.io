@@ -1,103 +1,68 @@
-export const title = "ApiHug Gradle Stub Command";
+export const title = "Gradle Stub";
 export const description =
-  "How ApiHug Stub gradle task work";
+  "使用 ApiHug stub 任务，把已准备好的 proto 模块生成到应用侧脚手架。";
 
+`stub` 是 ApiHug Gradle 工具链里偏应用侧的生成任务。
 
-<TipInfo>May be a bit out of date ⚠️⚠️⚠️</TipInfo>
+## 它是什么
 
+它会消费 proto 模块，并生成后续手写业务代码所依赖的应用层脚手架。
 
-`Stub` used to generate the template implement code, and 3rd party dependencies integrated.
+## 为什么重要
 
-## Setup
+`stub` 是 contract-first 设计变成可运行应用结构的关键一步，也是“哪些代码是生成的、哪些代码应该手写”的边界显形之处。
 
-Please refer to [apihug-full-demo demo-user/build.gradle](https://github.com/apihug/apihug-full-demo/blob/main/demo-user/build.gradle):
+## 它如何融入整体流程
+
+### 基础插件配置
 
 ```groovy
 plugins {
-    id "java"
-    alias(libs.plugins.springBoot)
-    alias(libs.plugins.springDependency)
-    alias(libs.plugins.hopeStub)
-    alias(libs.plugins.liquibase)
-
+  id "java"
+  alias(libs.plugins.springBoot)
+  alias(libs.plugins.springDependency)
+  alias(libs.plugins.hopeStub)
+  alias(libs.plugins.liquibase)
 }
 
 hopeStub {
-    debug = false
+  debug = false
 }
 ```
 
-Meta information [apihug-full-demo demo-user/hope-stub.json](https://github.com/apihug/apihug-full-demo/blob/main/demo-user/src/main/resources/hope-stub.json):
+### 常用 `hopeStub` 选项
 
-```json
-{
-  "packageName": "com.apihug.demo.user",
-  "name": "demo-user",
-  "domain": "user",
-  "proto": {
-    "artifact": {
-      "groupId": "com.apihug",
-      "artifactId": "demo-user-proto",
-      "version": "0.1.1-SNAPSHOT"
-    },
-    "module": "demo-user-proto",
-    "domain": "user",
-    "applied": true
-  },
-  "dependencies": [
-  ]
-}
-```
+| 选项               | 说明                                 |
+|--------------------|--------------------------------------|
+| `debug`            | 只做配置检查，不继续生成             |
+| `verbose`          | 输出详细执行日志                     |
+| `generatedVersion` | 在生成元数据中记录插件版本           |
+| `generatedTime`    | 在生成元数据中记录生成时间           |
+| `enableFrontVue`   | 生成实验性的前端脚手架               |
 
-## Configuration
+### `hope-stub.json` 关键字段
 
+| 字段                      | 说明                                 |
+|---------------------------|--------------------------------------|
+| `packageName`             | 应用模块 Java 包根                   |
+| `name`                    | 应用模块名                           |
+| `domain`                  | 主业务域                             |
+| `proto.artifact.*`        | 本服务 proto 依赖坐标                |
+| `proto.module`            | 本地契约的运行时模块名               |
+| `proto.domain`            | 本地契约所属 domain                  |
+| `proto.applied`           | 该依赖是否已在 Gradle 中引入         |
+| `dependencies.*`          | 可选的第三方 proto 依赖              |
 
-`hopeStub` Configuration:
+依赖管理尽量保持一种方式。除非有明确原因，否则不要把手写 Gradle 依赖和相互冲突的 `hope-stub.json` 配置混用。
 
-| Name              | Description                    | Type      | (Default) | Remarks                                                                                                                                                                       |
-|-------------------|--------------------------------|-----------|-----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| debug             | Plugin Debugging               | `boolean` | `false`   | Exit after configuration check, without completing any code generation                                                                                                        |
-| verbose           | Enable Execution Log           | `boolean` | `false`   | Open full log for debugging when issues arise                                                                                                                                 |
-| generatedVersion  | Include Plugin Version         | `boolean` | `false`   | Whether the `@Generated` annotation in the generated code includes the plugin version                                                                                         |
-| generatedTime     | Include Generation Timestamp   | `boolean` | `false`   | Whether the `@Generated` annotation in the generated code includes the generation timestamp                                                                                   |
-| pluginMainVersion | Plugin Auxiliary Version       | `String`  |           | The version dependency of the wire plugin at runtime, do not set unless necessary. Apihug's overall package is released with BOM, and this version should not be manually set |
-| pluginMainClass   | Plugin Auxiliary Main Entry    | `String`  |           | Do not set unless the plugin is extended                                                                                                                                      |
-| enableFrontVue    | Generate Front Vue Scaffolding | `boolean` | `false`   | Experimental stage                                                                                                                                                            |
-| adminStub         | Generate Admin Management Code | `boolean` | `false`   | Not enabled                                                                                                                                                                   |
+## 如何执行
 
-Meta configuration `resources\hope-stub.json`:
-
-1. Self-service Protocol Definition Dependencies: In the `proto` configuration, define dependencies for a single self-service protocol.
-2. Third-party Service Protocol Definition Dependencies: In the `dependencies`, understand as dependencies on other microservices, which can be multiple.
-3. Artifact Section: If dependencies have already been introduced in various ways through dependencies in your own `build.gradle`, this section is not necessary. Incorrect configurations can lead to compilation errors and may cause runtime errors! ⚠️⚠️⚠️
-   1. The dependencies of the service protocol `proto` package can be controlled through standard Gradle dependencies. 
-   2. Dependencies can also be managed by configuring in the `resources\hope-stub.json` file, and the plugin will handle it for you. 
-   3. Maintain a unified approach and avoid mixing usage, as this can make problem location troublesome.
-
-| Name                             | Description                           | Type      | (Default) | Remarks                                                                                                                                              |
-|----------------------------------|---------------------------------------|-----------|-----------|------------------------------------------------------------------------------------------------------------------------------------------------------|
-| packageName                      | Package Name                          | `String`  | Required  | Project package name, must conform to Java package naming conventions, cannot contain reserved keywords: `wire`, `stub`                              |
-| name                             | Project Name                          | `String`  | Required  | Project identifier, must conform to artifact ID, lowercase, Chinese characters, e.g., user-info, corresponds to the application of the proto project |
-| domain                           | Domain                                | `String`  | Required  | The domain it belongs to                                                                                                                             |
-| proto.artifact.groupId           | Self-service Proto Group ID           | `String`  | Optional  | Self-service, dependency package group ID                                                                                                            |
-| proto.artifact.artifactId        | Self-service Proto Artifact ID        | `String`  | Optional  | Self-service, dependency package artifact ID                                                                                                         |
-| proto.artifact.version           | Self-service Proto Version            | `String`  | Optional  | Self-service, dependency package version                                                                                                             |
-| proto.module                     | Self-service Proto Module             | `String`  | Required  | Used for service locator at runtime to locate, **if not set**, `proto.artifact.artifactId` is used instead                                           |
-| proto.domain                     | Self-service Proto Domain             | `String`  | Optional  | **If not set**, it is the same as the main project domain                                                                                            |
-| proto.applied                    | Self-service Proto Included           | `boolean` | Required  | Whether it has been included, if already included in `gradle > dependencies`, the plugin will not include the lib again                              |
-| dependencies.artifact.groupId    | Third-party Service Proto Group ID    | `String`  | Optional  | Third-party service, dependency package group ID                                                                                                     |
-| dependencies.artifact.artifactId | Third-party Service Proto Artifact ID | `String`  | Optional  | Third-party service, dependency package artifact ID                                                                                                  |
-| dependencies.artifact.version    | Third-party Service Proto Version     | `String`  | Optional  | Third-party service, dependency package version                                                                                                      |
-| dependencies.module              | Third-party Service Proto Module      | `String`  | Required  | Third-party service, module name, **if not set**, it should be consistent with `artifact.artifactId`                                                 |
-| dependencies.domain              | Third-party Service Proto Domain      | `String`  | Required  | Third-party service, domain                                                                                                                          |
-| dependencies.applied             | Third-party Service Proto Included    | `boolean` | `false`   | Whether it has been included, if already included in `gradle > dependencies`, the plugin will not include the lib again                              |
-
-## Run
-
-Every Auto generated project include a detail `README` example: [README](https://github.com/apihug/apihug-full-demo/blob/main/README.md), include detail instruction how to use it.
-
-NOT like  [Wire](./gradle-wire.md) which integrate with gradle's default compile task, **stub** must run manually as you manually trigger it: 
+和 `wire` 不同，`stub` 通常需要显式触发：
 
 ```shell
-sh gradlew {YOUR_MODULE}:clean stub build -x test -x stubTest
+gradlew {YOUR_MODULE}:clean stub build -x test -x stubTest
 ```
+
+## 下一步
+
+`stub` 跑完之后，业务逻辑只写在允许手写的层里，然后用 [Implementation Review](/zhCN-docs/skills/impl-review) 做检查。
