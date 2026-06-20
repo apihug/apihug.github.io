@@ -186,6 +186,25 @@ test("docs nav includes the remaining milestone and changelog detail pages", () 
   }
 });
 
+test("docs nav exposes the curated skills and rules section", () => {
+  const navIndex = fs.readFileSync(
+    path.join(repoRoot, "src", "app", "(docs)", "docs", "index.tsx"),
+    "utf8",
+  );
+
+  for (const route of [
+    "/docs/skills",
+    "/docs/skills/rules",
+    "/docs/skills/workflow",
+    "/docs/skills/create-story",
+    "/docs/skills/dev-story",
+    "/docs/skills/proto-review",
+    "/docs/skills/impl-review",
+  ]) {
+    assert.match(navIndex, new RegExp(route.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  }
+});
+
 test("zhCN docs nav includes the expected changelog, kola, and milestone routes", () => {
   const zhNavIndex = fs.readFileSync(
     path.join(repoRoot, "src", "app", "(docs)", "zhCN-docs", "index.tsx"),
@@ -199,6 +218,25 @@ test("zhCN docs nav includes the expected changelog, kola, and milestone routes"
     "/zhCN-docs/changelog/detail/SDK_0.8.6_cn",
     "/zhCN-docs/kola/006_configurations",
     "/zhCN-docs/milestone/milestone-1.0.0-RELEASE",
+  ]) {
+    assert.match(zhNavIndex, new RegExp(route.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  }
+});
+
+test("zhCN docs nav exposes the curated skills and rules section", () => {
+  const zhNavIndex = fs.readFileSync(
+    path.join(repoRoot, "src", "app", "(docs)", "zhCN-docs", "index.tsx"),
+    "utf8",
+  );
+
+  for (const route of [
+    "/zhCN-docs/skills",
+    "/zhCN-docs/skills/rules",
+    "/zhCN-docs/skills/workflow",
+    "/zhCN-docs/skills/create-story",
+    "/zhCN-docs/skills/dev-story",
+    "/zhCN-docs/skills/proto-review",
+    "/zhCN-docs/skills/impl-review",
   ]) {
     assert.match(zhNavIndex, new RegExp(route.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   }
@@ -263,6 +301,84 @@ test("protobuf extension docs stay aligned with the current it-proto-extend surf
   assert.match(navIndex, /\/docs\/spec\/version/);
 });
 
+test("swagger docs cover the current ApiHug swagger extension surface", () => {
+  const protoOas = fs.readFileSync(path.join(docsRoot, "protobuf", "proto-oas.mdx"), "utf8");
+  const swaggerSpec = fs.readFileSync(path.join(docsRoot, "spec", "swagger.mdx"), "utf8");
+
+  assert.match(protoOas, /pageable/);
+  assert.match(protoOas, /input_repeated/);
+  assert.match(protoOas, /output_repeated/);
+  assert.match(protoOas, /parameters/);
+  assert.match(protoOas, /response_media_type/);
+  assert.match(protoOas, /multipart/);
+  assert.match(protoOas, /request_schema/);
+  assert.match(protoOas, /response_schema/);
+  assert.match(protoOas, /body_empty/);
+  assert.match(protoOas, /internal/);
+  assert.match(protoOas, /hide/);
+
+  assert.match(swaggerSpec, /hope\.swagger\.svc/);
+  assert.match(swaggerSpec, /response_media_type/);
+  assert.match(swaggerSpec, /input_repeated/);
+  assert.match(swaggerSpec, /output_repeated/);
+  assert.match(swaggerSpec, /request_schema/);
+  assert.match(swaggerSpec, /response_schema/);
+  assert.match(swaggerSpec, /body_empty/);
+  assert.match(swaggerSpec, /group/);
+  assert.match(swaggerSpec, /questions/);
+  assert.match(swaggerSpec, /multiple/);
+});
+
+test("skills docs cover the curated ApiHug rules and workflow surface", () => {
+  const overview = fs.readFileSync(path.join(docsRoot, "skills", "index.mdx"), "utf8");
+  const rules = fs.readFileSync(path.join(docsRoot, "skills", "rules.mdx"), "utf8");
+  const workflow = fs.readFileSync(path.join(docsRoot, "skills", "workflow.mdx"), "utf8");
+  const createStory = fs.readFileSync(path.join(docsRoot, "skills", "create-story.mdx"), "utf8");
+  const devStory = fs.readFileSync(path.join(docsRoot, "skills", "dev-story.mdx"), "utf8");
+  const protoReview = fs.readFileSync(path.join(docsRoot, "skills", "proto-review.mdx"), "utf8");
+  const implReview = fs.readFileSync(path.join(docsRoot, "skills", "impl-review.mdx"), "utf8");
+
+  assert.match(overview, /ApiHug Skills/i);
+  assert.match(overview, /BMAD/i);
+  assert.match(rules, /apihug-proto-api-extension-guide/i);
+  assert.match(rules, /apihug-impl-golden-rule/i);
+  assert.match(workflow, /contract-first/i);
+  assert.match(workflow, /apihug-create-story/i);
+  assert.match(createStory, /apihug-create-story/i);
+  assert.match(devStory, /apihug-dev-story/i);
+  assert.match(protoReview, /apihug-proto-review/i);
+  assert.match(implReview, /apihug-impl-review/i);
+});
+
+test("what-is-apihug introduces the architecture diagram near the top of the page", () => {
+  const whatIsApiHug = fs.readFileSync(path.join(docsRoot, "start", "what-is-apihug.mdx"), "utf8");
+
+  assert.match(whatIsApiHug, /src="\/arch\.svg"/);
+  assert.match(whatIsApiHug, /alt="ApiHug architecture overview"/);
+  assert.match(whatIsApiHug, /ApiHug architecture overview/);
+});
+
+test("zhCN skills docs localize the curated ApiHug rules and workflow surface", () => {
+  const overview = fs.readFileSync(path.join(zhDocsRoot, "skills", "index.mdx"), "utf8");
+  const rules = fs.readFileSync(path.join(zhDocsRoot, "skills", "rules.mdx"), "utf8");
+  const workflow = fs.readFileSync(path.join(zhDocsRoot, "skills", "workflow.mdx"), "utf8");
+  const createStory = fs.readFileSync(path.join(zhDocsRoot, "skills", "create-story.mdx"), "utf8");
+  const devStory = fs.readFileSync(path.join(zhDocsRoot, "skills", "dev-story.mdx"), "utf8");
+  const protoReview = fs.readFileSync(path.join(zhDocsRoot, "skills", "proto-review.mdx"), "utf8");
+  const implReview = fs.readFileSync(path.join(zhDocsRoot, "skills", "impl-review.mdx"), "utf8");
+
+  assert.match(overview, /ApiHug Skills/i);
+  assert.match(overview, /BMAD/i);
+  assert.match(rules, /apihug-proto-api-extension-guide/i);
+  assert.match(rules, /apihug-impl-golden-rule/i);
+  assert.match(workflow, /contract-first/i);
+  assert.match(createStory, /apihug-create-story/i);
+  assert.match(devStory, /apihug-dev-story/i);
+  assert.match(protoReview, /apihug-proto-review/i);
+  assert.match(implReview, /apihug-impl-review/i);
+  assert.match(overview, /技能|规则|工作流/);
+});
+
 test("app docs header exposes english and zhCN docs entry points", () => {
   const appHeader = fs.readFileSync(path.join(repoRoot, "src", "components", "header.tsx"), "utf8");
 
@@ -282,13 +398,32 @@ test("app docs header locale panel avoids a hover gap under the docs trigger", (
   assert.match(appHeader, /className="absolute left-0 top-full z-20 pt-3"/);
 });
 
-test("home hero title uses an ApiHug eyebrow and tighter title spacing", () => {
+test("desktop logo adds a subtitle lockup without changing mobile behavior", () => {
+  const logo = fs.readFileSync(path.join(repoRoot, "src", "components", "logo.tsx"), "utf8");
+
+  assert.match(logo, /API as Architecture/);
+  assert.match(logo, /hidden[\s\S]*md:flex/);
+  assert.match(logo, /md:hidden/);
+  assert.match(logo, /font-mono/);
+});
+
+test("root layout restores the old Google Analytics snippet", () => {
+  const rootLayout = fs.readFileSync(path.join(repoRoot, "src", "app", "layout.tsx"), "utf8");
+
+  assert.match(rootLayout, /https:\/\/www\.googletagmanager\.com\/gtag\/js\?id=G-PXR19X43CS/);
+  assert.match(rootLayout, /window\.dataLayer = window\.dataLayer \|\| \[\];/);
+  assert.match(rootLayout, /gtag\('config', 'G-PXR19X43CS'\);/);
+});
+
+test("home hero title keeps the ApiHug eyebrow without oversized headline styling", () => {
   const hero = fs.readFileSync(path.join(repoRoot, "src", "components", "home", "hero.tsx"), "utf8");
 
   assert.match(hero, /API as Architecture/);
   assert.match(hero, /pt-8 sm:pt-10/);
   assert.match(hero, /font-mono text-sm\/6 font-medium tracking-widest text-gray-500 uppercase/);
-  assert.match(hero, /<h1 className="mt-2 px-2 text-4xl tracking-tighter text-balance/);
+  assert.match(hero, /<h1 className="mt-2 px-2 text-4xl\/11 font-medium tracking-tight text-balance/);
+  assert.doesNotMatch(hero, /xl:text-8xl/);
+  assert.doesNotMatch(hero, /max-lg:font-medium/);
 });
 
 test("docs index route redirects to what-is-apihug", () => {
@@ -330,6 +465,16 @@ test("docs sidebar switches to zhCN nav for zhCN routes", () => {
   assert.match(docsSidebar, /let navIndex = pathname\.startsWith\("\/zhCN-docs"\) \? zhIndex : index/);
 });
 
+test("docs sidebar only highlights the exact current doc link", () => {
+  const docsSidebarLink = fs.readFileSync(
+    path.join(repoRoot, "src", "components", "docs-sidebar-link.tsx"),
+    "utf8",
+  );
+
+  assert.match(docsSidebarLink, /aria-current=\{pathname === path \? "page" : undefined\}/);
+  assert.doesNotMatch(docsSidebarLink, /startsWith\(`\$\{path\}\/`\)/);
+});
+
 test("zhCN docs index route redirects to what-is-apihug", () => {
   const zhDocsIndexPage = fs.readFileSync(
     path.join(repoRoot, "src", "app", "(docs)", "zhCN-docs", "page.tsx"),
@@ -338,4 +483,19 @@ test("zhCN docs index route redirects to what-is-apihug", () => {
 
   assert.match(zhDocsIndexPage, /permanentRedirect/);
   assert.match(zhDocsIndexPage, /\/zhCN-docs\/start\/what-is-apihug/);
+});
+
+test("home link button lets page-level variants override the default light theme colors", () => {
+  const linkButton = fs.readFileSync(
+    path.join(repoRoot, "src", "components", "home", "link-button.tsx"),
+    "utf8",
+  );
+  const enterpriseSection = fs.readFileSync(
+    path.join(repoRoot, "src", "components", "home", "enterprise-factory-section.tsx"),
+    "utf8",
+  );
+
+  assert.match(linkButton, /clsx\(\s*"inline-block rounded-4xl bg-black px-4 py-2 text-sm\/6 font-semibold text-white hover:bg-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600",\s*className,\s*\)/);
+  assert.match(enterpriseSection, /Learn more/);
+  assert.match(enterpriseSection, /className="inline-block rounded-4xl !bg-white px-4 py-2 text-sm\/6 font-semibold !text-gray-950 inset-ring inset-ring-gray-950\/8 hover:!bg-gray-50 dark:!bg-gray-950 dark:!text-white dark:inset-ring-white\/15 dark:hover:!bg-gray-900"/);
 });
