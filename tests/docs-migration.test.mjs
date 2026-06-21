@@ -46,6 +46,10 @@ test("docs MDX pipeline supports GFM tables and constrained code blocks", () => 
   );
 
   assert.match(nextConfig, /remarkPlugins:\s*\[\s*\[\s*"remark-gfm"/);
+  assert.match(nextConfig, /"\*\.mdx":\s*\{/);
+  assert.match(nextConfig, /loader:\s*require\.resolve\("@next\/mdx\/mdx-js-loader"\)/);
+  assert.match(nextConfig, /providerImportSource:\s*"next-mdx-import-source-file"/);
+  assert.match(nextConfig, /as:\s*"\*\.tsx"/);
   assert.match(typographyStyles, /pre:where[\s\S]*overflow-x:\s*auto;/);
   assert.match(snippetGroup, /React\.Children\.toArray/);
   assert.match(snippetGroup, /CodeCopyButton/);

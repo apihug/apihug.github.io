@@ -1,5 +1,8 @@
 import type { NextConfig } from "next";
 import createMdx from "@next/mdx";
+import { createRequire } from "node:module";
+
+const require = createRequire(import.meta.url);
 
 const nextConfig: NextConfig = {
   serverExternalPackages: ["@tailwindcss/node"],
@@ -21,6 +24,18 @@ const nextConfig: NextConfig = {
 
   turbopack: {
     rules: {
+      "*.mdx": {
+        loaders: [
+          {
+            loader: require.resolve("@next/mdx/mdx-js-loader"),
+            options: {
+              providerImportSource: "next-mdx-import-source-file",
+              remarkPlugins: [["remark-gfm"]],
+            },
+          },
+        ],
+        as: "*.tsx",
+      },
       "*.react.svg": {
         loaders: ["@svgr/webpack"],
         as: "*.js",
