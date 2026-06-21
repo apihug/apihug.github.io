@@ -1,6 +1,6 @@
 export const title = "ApiHug Vue 框架";
 export const description =
-  "在 Vue 应用里使用 ApiHug UI 工具链的推荐组织方式。";
+  "在 Vue 应用中使用 ApiHug UI 工具链的推荐组织方式。";
 
 ## 适用场景
 
@@ -8,7 +8,7 @@ export const description =
 
 ## 操作步骤
 
-1. 先把 UI 模块分成“可复用部分”和“应用入口部分”。
+1. 先把 UI 模块拆成“可复用部分”和“应用入口部分”。
    常见拆分方式是：
    - 共享包：`util`、`hook`、组件包装层
    - 应用入口：`src`
@@ -20,7 +20,11 @@ export const description =
    - `service` 存放接口模型与服务层
    - `stores`、`types`、`utils` 负责运行时支撑
 3. 让页面文件提供路由元数据，再交给工具链生成路由，而不是手工维护第二套路由树。
-4. 将 Vue 侧结构和 [应用配置](/zhCN-docs/ui/003_app) 以及 [工具链](/zhCN-docs/ui/004_tool_chain) 保持一致。
+   推荐流程是：
+   - 页面文件声明路由元数据
+   - 工具链生成路由记录
+   - 同一份元数据继续驱动菜单和 i18n key
+4. 让 Vue 侧结构与 [应用配置](/zhCN-docs/ui/003_app) 以及 [工具链](/zhCN-docs/ui/004_tool_chain) 保持一致。
 
 ## 你应该得到什么
 

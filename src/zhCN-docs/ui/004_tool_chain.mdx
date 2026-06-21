@@ -1,45 +1,56 @@
-export const title = "ApiHug UI工具链";
+export const title = "ApiHug UI 工具链";
 export const description =
-  "如何无缝集成gradle 和 vite,一站式体验";
+  "说明 Gradle、pnpm 与 Vite 如何在 ApiHug UI 工作流中协同。";
 
-
-由于 ApiHug 专门为企业级 Java 开发而设计，整个工具链是基于 Gradle, 而前端解决方案是基于 Vue, 所以必然涉及到 vite，pnpm 等前端
+ApiHug 面向企业级 Java 开发，因此整体工具链以 Gradle 为主；而前端侧通常基于 Vue，因此会同时涉及 pnpm、Vite 与 Node 生态。
 
 ## Gradle
 
-引入了插件 [com.github.node-gradle.node](https://github.com/node-gradle/gradle-node-plugin) 作为 node 和 gradle 工具栈之间的桥接；
+常见做法是引入插件 [com.github.node-gradle.node](https://github.com/node-gradle/gradle-node-plugin)，把 Node.js 工具链接入 Gradle 工作流。
 
-Task：
+常见任务关系如下：
 
-| Name            | Comment                                                  |
-|-----------------|----------------------------------------------------------|
-| `clean`         | 清理 build 结果                                              |
-| `build`         | `clean` > `check` > `buildPackages` > `build` > `output` |
-| `buildPackages` | `pnpm install` > `build:packages`                        |
-| `test`          | `lint` > `typecheck` > `buildPackages` > `test:unit`     |
-| `lint`          | `buildPackages` > `lint`                                 |
-| `typecheck`     | `buildPackages` > `type-check`                           |
-| `check`         | `lint` > `typecheck` > `test`                            |
-| `dev`           | `buildPackages` > `dev`                                  |
-
+| Name | Comment |
+| --- | --- |
+| `clean` | 清理 build 输出 |
+| `build` | `clean` > `check` > `buildPackages` > `build` > `output` |
+| `buildPackages` | `pnpm install` > `build:packages` |
+| `test` | `lint` > `typecheck` > `buildPackages` > `test:unit` |
+| `lint` | `buildPackages` > `lint` |
+| `typecheck` | `buildPackages` > `type-check` |
+| `check` | `lint` > `typecheck` > `test` |
+| `dev` | `buildPackages` > `dev` |
 
 ## Vite
 
-标准的 vite 项目编译流程:
+前端侧通常使用标准 Vite 流程来承接生成产物与页面代码。
 
-### Plugin
+### 常见插件
 
-1. vue
-2. vueJsx
-3. VueDevtools
-4. unplugin-auto-import/vite
-5. unplugin-vue-components/vite
-6. unplugin-icons/resolver
-7. unplugin-icons/vite
-8. unplugin-icons/loaders
-9. progress (vite-plugin-progress)
+1. `vue`
+2. `vueJsx`
+3. `VueDevtools`
+4. `unplugin-auto-import/vite`
+5. `unplugin-vue-components/vite`
+6. `unplugin-icons/resolver`
+7. `unplugin-icons/vite`
+8. `unplugin-icons/loaders`
+9. `vite-plugin-progress`
 
-### Other
-1. proxy
-2. tailwindcss
+### 常见配套能力
 
+1. `proxy`
+2. `tailwindcss`
+
+## 如何协同
+
+在典型的 ApiHug UI 项目里：
+
+1. Gradle 负责后端模块和整体构建编排
+2. pnpm 负责前端依赖安装与前端脚本执行
+3. Vite 负责本地开发体验和前端产物构建
+4. ApiHug 负责把契约输出转换成服务层、模型、i18n 与页面辅助代码
+
+## 结果
+
+最终你会得到一套前后端协同但职责清晰的工具链：后端仍由 Gradle 主导，前端仍保留现代 Vue/Vite 体验，而 ApiHug 负责把两边连接成一条连续工作流。

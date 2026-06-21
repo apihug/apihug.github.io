@@ -782,12 +782,12 @@ test("product usage docs use task-oriented structure in both locales", () => {
   assert.match(zhIdeaEditor, /## 适用场景/);
   assert.match(zhIdeaEditor, /## 结果/);
 
-  assert.match(zhUiIndex, /## 适用场景/);
-  assert.match(zhUiIndex, /## 推荐阅读顺序/);
-  assert.match(zhUiVue, /## 适用场景/);
-  assert.match(zhUiVue, /## 操作步骤/);
-  assert.match(zhUiApp, /## 适用场景/);
-  assert.match(zhUiApp, /## 运行时说明/);
+  assert.ok(zhUiIndex.includes("## \u9002\u7528\u573a\u666f"));
+  assert.ok(zhUiIndex.includes("## \u63a8\u8350\u9605\u8bfb\u987a\u5e8f"));
+  assert.ok(zhUiVue.includes("## \u9002\u7528\u573a\u666f"));
+  assert.ok(zhUiVue.includes("## \u64cd\u4f5c\u6b65\u9aa4"));
+  assert.ok(zhUiApp.includes("## \u9002\u7528\u573a\u666f"));
+  assert.ok(zhUiApp.includes("## \u8fd0\u884c\u65f6\u8bf4\u660e"));
   assert.match(zhUiApp, /enableFrontVue = true/);
 
   assert.match(zhUploadHow, /multipart: true;/);

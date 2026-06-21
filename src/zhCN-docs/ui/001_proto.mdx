@@ -1,9 +1,27 @@
-export const title = "ApiHug UI 协议";
+export const title = "ApiHug UI 协议层";
 export const description =
-  "Proto 协议扩展和说明";
+  "说明 UI 侧仍然建立在同一套 Proto 契约与扩展规范之上。";
 
+## 它是什么
 
-## 协议
+UI 层并没有引入另一套独立 DSL。它仍然基于 ApiHug 使用的 ProtoBuffer 契约与扩展规则，只是在前端侧消费这些元数据。
 
-协议，也就是 ProtoBuffer DSL, 这次没有任何修改，依然是以前的 [Proto DSL](/zhCN-docs/protobuf)
+## 适用场景
 
+当你想确认“前端到底依赖哪一套规范”时，就应该看这一页。
+
+## 关键结论
+
+1. ApiHug UI 不会绕开 Proto 契约。
+2. 前端生成依赖的模型、路由、表单和接口描述，都来自同一份协议定义。
+3. 这意味着前后端仍然共享同一个 source of truth。
+
+## 继续阅读
+
+UI 侧的协议基础仍然是前面的 [Proto DSL](/zhCN-docs/protobuf)。
+
+如果你已经理解协议层，可以继续看：
+
+1. [Vue 框架](/zhCN-docs/ui/002_vue)
+2. [应用配置](/zhCN-docs/ui/003_app)
+3. [工具链](/zhCN-docs/ui/004_tool_chain)
