@@ -318,6 +318,15 @@ test("app router entrypoints still point at the active runtime", () => {
   assert.match(docsLayout, /@\/components\/docs-sidebar/);
 });
 
+test("root layout keeps the Algolia domain verification meta tag", () => {
+  const rootLayout = read("src", "app", "layout.tsx");
+
+  assert.match(
+    rootLayout,
+    /<meta name="algolia-site-verification" content="6319A3AB38F3E3AC" \/>/,
+  );
+});
+
 test("tooling no longer carries pages-legacy default paths", () => {
   const convertMdxScript = read("scripts", "convert-mdx.mjs");
 

@@ -78,6 +78,7 @@ export default async function RootLayout({
         <link rel="icon" type="image/png" sizes="16x16" href={v("/favicons/favicon-16x16.png")} />
         <link rel="manifest" href={v("/favicons/site.webmanifest")} />
         <link rel="shortcut icon" href={v("/favicons/favicon.ico")} />
+        <meta name="algolia-site-verification" content="6319A3AB38F3E3AC" />
         <meta name="msapplication-TileColor" content="#38bdf8" />
         <meta name="msapplication-config" content={v("/favicons/browserconfig.xml")} />
         <meta name="theme-color" content="white" />
