@@ -2,6 +2,7 @@ import type { TOCEntry } from "@/components/table-of-contents";
 import fs from "node:fs/promises";
 import path from "node:path";
 import React from "react";
+import { zhCNDocPageModules } from "../../../zhCN-docs/manifest";
 import index from "./index";
 
 /**
@@ -9,22 +10,14 @@ import index from "./index";
  */
 export async function getZhCNDocPageBySlug(
   slug: string,
-): Promise<null | { Component: React.FC; title: string; description: string }> {
+): Promise<null | { Component: React.ComponentType; title: string; description: string }> {
   try {
-    let filePath = path.join(process.cwd(), "./src/zhCN-docs", `${slug}.mdx`);
-    if (!(await fs.stat(filePath).catch(() => false))) {
-      let indexPath = path.join(process.cwd(), "./src/zhCN-docs", slug, "index.mdx");
-      if (await fs.stat(indexPath).catch(() => false)) {
-        filePath = indexPath;
-      } else {
-        return null;
-      }
+    const loadModule = zhCNDocPageModules[slug];
+    if (!loadModule) {
+      return null;
     }
 
-    let module = await import(`../../../zhCN-docs/${slug}.mdx`).catch(() => null);
-    if (!module && filePath !== path.join(process.cwd(), "./src/zhCN-docs", `${slug}.mdx`)) {
-      module = await import(`../../../zhCN-docs/${slug}/index.mdx`).catch(() => null);
-    }
+    const module = await loadModule().catch(() => null);
     if (!module || !module.default) {
       return null;
     }
@@ -34,8 +27,8 @@ export async function getZhCNDocPageBySlug(
       title: module.title ?? "",
       description: module.description ?? "",
     };
-  } catch (e) {
-    console.error(`Error loading zhCN doc page: ${slug}`, e);
+  } catch (error) {
+    console.error(`Error loading zhCN doc page: ${slug}`, error);
     return null;
   }
 }
@@ -44,33 +37,7 @@ export async function getZhCNDocPageBySlug(
  * Get all zhCN doc page slugs for static generation
  */
 export async function getZhCNDocPageSlugs(): Promise<string[][]> {
-  let docsDir = path.join(process.cwd(), "./src/zhCN-docs");
-  if (!(await fs.stat(docsDir).catch(() => false))) {
-    return [];
-  }
-
-  let slugs: string[][] = [];
-  await collectMdxSlugs(docsDir, docsDir, slugs);
-  return slugs;
-}
-
-async function collectMdxSlugs(dir: string, baseDir: string, result: string[][]) {
-  let entries = await fs.readdir(dir, { withFileTypes: true });
-  for (let entry of entries) {
-    let fullPath = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      await collectMdxSlugs(fullPath, baseDir, result);
-    } else if (entry.name.endsWith(".mdx")) {
-      let relativePath = path.relative(baseDir, fullPath);
-      let slugParts = relativePath.replace(/\.mdx$/, "").split(path.sep);
-      if (slugParts[slugParts.length - 1] === "index") {
-        slugParts.pop();
-      }
-      if (slugParts.length > 0) {
-        result.push(slugParts);
-      }
-    }
-  }
+  return Object.keys(zhCNDocPageModules).map((slug) => slug.split("/"));
 }
 
 /**

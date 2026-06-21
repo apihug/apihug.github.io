@@ -179,6 +179,48 @@ test("migrated docs use static public image paths instead of require image impor
   assert.deepEqual(requireImageFiles, []);
 });
 
+test("docs runtime loads MDX through generated manifests instead of variable-path imports", () => {
+  const packageJson = JSON.parse(fs.readFileSync(path.join(repoRoot, "package.json"), "utf8"));
+  const docsApi = fs.readFileSync(
+    path.join(repoRoot, "src", "app", "(docs)", "docs", "api.ts"),
+    "utf8",
+  );
+  const zhDocsApi = fs.readFileSync(
+    path.join(repoRoot, "src", "app", "(docs)", "zhCN-docs", "api.ts"),
+    "utf8",
+  );
+  const docsManifest = fs.readFileSync(path.join(docsRoot, "manifest.ts"), "utf8");
+  const zhDocsManifest = fs.readFileSync(path.join(zhDocsRoot, "manifest.ts"), "utf8");
+
+  assert.match(packageJson.scripts.build, /generate-doc-manifests\.mjs/);
+  assert.match(packageJson.scripts.dev, /generate-doc-manifests\.mjs/);
+
+  assert.match(docsApi, /docPageModules/);
+  assert.match(zhDocsApi, /zhCNDocPageModules/);
+  assert.doesNotMatch(docsApi, /import\(`\.\.\/\.\.\/\.\.\/docs\/\$\{slug\}/);
+  assert.doesNotMatch(zhDocsApi, /import\(`\.\.\/\.\.\/\.\.\/zhCN-docs\/\$\{slug\}/);
+
+  for (const route of [
+    "changelog/detail/SDK_0.7.8",
+    "changelog/detail/SDK_0.8.6",
+    "changelog",
+    "changelog/plugin",
+    "changelog/sdk",
+  ]) {
+    assert.match(docsManifest, new RegExp(JSON.stringify(route).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  }
+
+  for (const route of [
+    "ui",
+    "ui/001_proto",
+    "ui/002_vue",
+    "ui/003_app",
+    "ui/004_tool_chain",
+  ]) {
+    assert.match(zhDocsManifest, new RegExp(JSON.stringify(route).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  }
+});
+
 test("docs nav includes the remaining milestone and changelog detail pages", () => {
   const navIndex = fs.readFileSync(
     path.join(repoRoot, "src", "app", "(docs)", "docs", "index.tsx"),
