@@ -6,10 +6,10 @@ import { DocsCodeBlock } from '@/components/DocsCodeBlock'
 import { DocsJetBrainsMarketplaceCard, DocsMavenCentralBadge } from '@/components/DocsStartResources'
 import { SnippetGroup } from '@/components/SnippetGroup'
 
-这一页带你从空目录走到一个可运行的 ApiHug 演示项目。路径很直接：先准备环境，再生成项目，接着跑通 `wire`、`stub` 和应用启动，最后检查生成出的 OAS 接口文档。
+这一页带你从空目录走到一个可运行的 ApiHug 演示项目。路径很直接：先准备环境，再生成项目，接着跑通 `wire`、`stub` 和应用启动，最后检查生成出来的 OAS 接口文档。
 
 <TipGood>
-  ApiHug 3.x 面向 Spring Boot 4.0 及以上版本。升级老项目前，建议先阅读 Spring Boot 4.0 迁移指南。
+  ApiHug 3.x 面向 Spring Boot 4.0 及以上版本。升级老项目之前，建议先阅读 Spring Boot 4.0 迁移指南。
 </TipGood>
 
 ## 你会完成什么
@@ -17,12 +17,57 @@ import { SnippetGroup } from '@/components/SnippetGroup'
 第一次体验通常会完成以下几件事：
 
 1. 初始化一个 ApiHug 工作目录
-2. 用 IntelliJ 向导生成一个演示项目
+2. 通过 IntelliJ 向导生成一个演示项目
 3. 理解 `-proto` 模块与应用模块的分工
 4. 依次执行 `wire`、`stub` 和应用启动
 5. 打开生成出来的 OAS 文档
 
 ## 开始之前
+
+### 初始化工作目录
+
+ApiHug 为常见 shell 提供了启动脚本。
+
+<SnippetGroup>
+
+<div
+  filename="PowerShell"
+  code={`iex (irm 'https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.ps1')`}
+>
+  <DocsCodeBlock
+    compact
+    className="language-powershell"
+    code={`iex (irm 'https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.ps1')`}
+  />
+</div>
+
+<div
+  filename="Command"
+  code={`powershell -c "irm https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.ps1 | iex"`}
+>
+  <DocsCodeBlock
+    compact
+    className="language-shell"
+    code={`powershell -c "irm https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.ps1 | iex"`}
+  />
+</div>
+
+<div
+  filename="macOS / Linux"
+  code={`curl -fsSL https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.sh | bash`}
+>
+  <DocsCodeBlock
+    compact
+    className="language-bash"
+    code={`curl -fsSL https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.sh | bash`}
+  />
+</div>
+
+</SnippetGroup>
+
+如果你是在现有 Spring 项目上升级，请先阅读 [Spring Boot 4.0 Migration Guide](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.0-Migration-Guide)，再推进 ApiHug SDK 升级。
+
+### 准备开发环境
 
 先准备好基础环境：
 
@@ -50,30 +95,6 @@ import { SnippetGroup } from '@/components/SnippetGroup'
 4. 重启 IntelliJ
 
 <img src="/img/editor/001_install_plugin.gif" alt="安装 ApiHug 插件" width={2316} height={1768} className="rounded-lg" />
-
-## 初始化工作目录
-
-ApiHug 为常见 shell 提供了启动脚本。
-
-### Windows PowerShell
-
-```powershell
-iex (irm 'https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.ps1')
-```
-
-### Windows Command Prompt
-
-```shell
-powershell -c "irm https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.ps1 | iex"
-```
-
-### Bash
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.sh | bash
-```
-
-如果你是在现有 Spring 项目上升级，请先阅读 [Spring Boot 4.0 Migration Guide](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.0-Migration-Guide)，再推进 ApiHug SDK 升级。
 
 ## 生成项目
 

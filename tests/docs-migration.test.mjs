@@ -37,6 +37,7 @@ test("docs MDX pipeline supports GFM tables and constrained code blocks", () => 
   const nextConfig = fs.readFileSync(path.join(repoRoot, "next.config.ts"), "utf8");
   const typographyStyles = fs.readFileSync(path.join(repoRoot, "src", "app", "typography.css"), "utf8");
   const startDoc = fs.readFileSync(path.join(docsRoot, "start", "index.mdx"), "utf8");
+  const zhStartDoc = fs.readFileSync(path.join(zhDocsRoot, "start", "index.mdx"), "utf8");
   const snippetGroup = fs.readFileSync(path.join(repoRoot, "src", "components", "SnippetGroup.js"), "utf8");
   const docsCodeBlock = fs.readFileSync(path.join(repoRoot, "src", "components", "DocsCodeBlock.tsx"), "utf8");
   const copyButton = fs.readFileSync(path.join(repoRoot, "src", "components", "CodeCopyButton.tsx"), "utf8");
@@ -63,6 +64,16 @@ test("docs MDX pipeline supports GFM tables and constrained code blocks", () => 
   assert.doesNotMatch(copyButton, /\bborder\b/);
   assert.doesNotMatch(startDoc, /\{\{\s*filename\s*:/);
   assert.match(startDoc, /<div[\s\S]*filename="libs\.versions\.toml"[\s\S]*code=\{/);
+  assert.match(startDoc, /## Before You Start[\s\S]*### Initialize a Workspace[\s\S]*<SnippetGroup>/);
+  assert.match(startDoc, /filename="PowerShell"/);
+  assert.match(startDoc, /filename="Command"/);
+  assert.match(startDoc, /filename="macOS \/ Linux"/);
+  assert.doesNotMatch(startDoc, /## Initialize a Workspace[\s\S]*### Windows PowerShell/);
+  assert.match(zhStartDoc, /## 开始之前[\s\S]*### 初始化工作目录[\s\S]*<SnippetGroup>/);
+  assert.match(zhStartDoc, /filename="PowerShell"/);
+  assert.match(zhStartDoc, /filename="Command"/);
+  assert.match(zhStartDoc, /filename="macOS \/ Linux"/);
+  assert.doesNotMatch(zhStartDoc, /## 初始化工作目录[\s\S]*### Windows PowerShell/);
   assert.match(startDoc, /DocsMavenCentralBadge/);
   assert.match(startDoc, /DocsJetBrainsMarketplaceCard/);
   assert.match(docsStartResources, /DEFAULT_MAVEN_CENTRAL_HREF = "https:\/\/search\.maven\.org\/artifact\/com\.apihug\/it-bom"/);

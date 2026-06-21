@@ -24,6 +24,51 @@ In a typical first run, you will:
 
 ## Before You Start
 
+### Initialize a Workspace
+
+ApiHug provides bootstrap scripts for common shells.
+
+<SnippetGroup>
+
+<div
+  filename="PowerShell"
+  code={`iex (irm 'https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.ps1')`}
+>
+  <DocsCodeBlock
+    compact
+    className="language-powershell"
+    code={`iex (irm 'https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.ps1')`}
+  />
+</div>
+
+<div
+  filename="Command"
+  code={`powershell -c "irm https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.ps1 | iex"`}
+>
+  <DocsCodeBlock
+    compact
+    className="language-shell"
+    code={`powershell -c "irm https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.ps1 | iex"`}
+  />
+</div>
+
+<div
+  filename="macOS / Linux"
+  code={`curl -fsSL https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.sh | bash`}
+>
+  <DocsCodeBlock
+    compact
+    className="language-bash"
+    code={`curl -fsSL https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.sh | bash`}
+  />
+</div>
+
+</SnippetGroup>
+
+If you are upgrading an existing Spring project, review the [Spring Boot 4.0 Migration Guide](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.0-Migration-Guide) before moving the ApiHug SDK forward.
+
+### Prepare the Development Stack
+
 Prepare the standard development stack first:
 
 1. JDK 17 or newer
@@ -50,30 +95,6 @@ If you prefer a terminal-first workflow later, ApiHug REPL is a good companion. 
 4. Restart IntelliJ
 
 <img src="/img/editor/001_install_plugin.gif" alt="Install ApiHug Plugin" width={2316} height={1768} className="rounded-lg" />
-
-## Initialize a Workspace
-
-ApiHug provides bootstrap scripts for common shells.
-
-### Windows PowerShell
-
-```powershell
-iex (irm 'https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.ps1')
-```
-
-### Windows Command Prompt
-
-```shell
-powershell -c "irm https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.ps1 | iex"
-```
-
-### Bash
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.sh | bash
-```
-
-If you are upgrading an existing Spring project, review the [Spring Boot 4.0 Migration Guide](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.0-Migration-Guide) before moving the ApiHug SDK forward.
 
 ## Generate a Project
 
