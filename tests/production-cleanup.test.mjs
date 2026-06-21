@@ -386,6 +386,8 @@ test("github pages workflow matches the current pnpm static export pipeline", ()
   assert.match(packageJson.packageManager, /^pnpm@/);
   assert.ok(setupPnpmStep, "expected a Setup pnpm step in the GitHub workflow");
   assert.doesNotMatch(setupPnpmStep, /\bversion:\s*[^\n]+/);
+  assert.doesNotMatch(workflow, /actions\/configure-pages@v\d+/);
+  assert.doesNotMatch(workflow, /static_site_generator:\s*next/);
   assert.doesNotMatch(workflow, /Detect package manager/);
   assert.doesNotMatch(workflow, /manager=npm/);
   assert.doesNotMatch(workflow, /npm ci/);
