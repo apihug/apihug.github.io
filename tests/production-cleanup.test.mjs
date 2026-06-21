@@ -372,12 +372,20 @@ test("active internal links resolve to real routes or static assets", () => {
 
 test("github pages workflow matches the current pnpm static export pipeline", () => {
   const workflow = read(".github", "workflows", "nextjs.yml");
+  const packageJson = JSON.parse(read("package.json"));
+  const setupPnpmStep = workflow.match(
+    /- name:\s*Setup pnpm[\s\S]*?(?=\n\s*-\s+name:|\n\s*[A-Za-z#])/,
+  )?.[0];
 
   assert.match(workflow, /uses:\s*pnpm\/action-setup@v4/);
   assert.match(workflow, /cache:\s*pnpm/);
   assert.match(workflow, /hashFiles\('\*\*\/pnpm-lock\.yaml'\)/);
   assert.match(workflow, /run:\s*pnpm install --frozen-lockfile/);
   assert.match(workflow, /run:\s*pnpm build/);
+  assert.match(workflow, /node-version:\s*"24"/);
+  assert.match(packageJson.packageManager, /^pnpm@/);
+  assert.ok(setupPnpmStep, "expected a Setup pnpm step in the GitHub workflow");
+  assert.doesNotMatch(setupPnpmStep, /\bversion:\s*[^\n]+/);
   assert.doesNotMatch(workflow, /Detect package manager/);
   assert.doesNotMatch(workflow, /manager=npm/);
   assert.doesNotMatch(workflow, /npm ci/);
