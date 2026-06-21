@@ -98,7 +98,7 @@ test("milestone and changelog docs use the cleaned release-history wording", () 
   assert.doesNotMatch(zhSdk078Detail, /You need to backup your `@Derived` method before run/);
   assert.doesNotMatch(zhSdk078Detail, /Take an exist `repository`/);
   assert.match(zhSdk078Detail, /影响通常会比较有限/);
-  assert.match(zhSdk078Detail, /`0\.7\.8-RELEASE` 主要引入了：/);
-  assert.match(zhSdk078Detail, /可以用模块 `book-app` 中现有的 repository .* 作为示例/);
+  assert.match(zhSdk078Detail, /`0\.7\.8-RELEASE` 主要引入了两个 repository 相关变化：/);
+  assert.match(zhSdk078Detail, /下面以模块 `book-app` 中已有的 repository .* 为例/);
   assert.match(zhSdk078Detail, /这条迁移路径需要更多手工操作/);
 });

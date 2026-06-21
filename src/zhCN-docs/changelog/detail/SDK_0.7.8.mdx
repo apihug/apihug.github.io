@@ -4,27 +4,27 @@ export const description =
 
 [English](/docs/changelog/detail/SDK_0.7.8) | [简体中文](/zhCN-docs/changelog/detail/SDK_0.7.8)
 
-💁 如果你的项目没有使用 `ApiHug` 的领域实体管理能力，这次迁移对你的影响通常会比较有限。
+**提示：** 如果你的项目没有使用 ApiHug 的领域实体管理能力，这次迁移对你的影响通常会比较有限。
 
 Latest: [Maven Central](https://search.maven.org/artifact/com.apihug/it-bom)
 
-`0.7.8-RELEASE` 主要引入了：
+`0.7.8-RELEASE` 主要引入了两个 repository 相关变化：
 
-- 把 Repository `@Derived` 的维护位置拆分到独立的 `trait` 目录
+- 将 Repository `@Derived` 的维护位置拆分到独立的 `trait` 目录
 - 让 `lite` 成为 stub 侧的默认模型
 
 <img src={require('@/img/framework/domain.jpg').default.src} alt="domain design" width={1326} height={577} className="rounded-lg" />
 
 ## Repository 迁移
 
-目标：
+迁移目标：
 
-1. 让生成出来的 repository 保持干净、可预测
-2. 把派生 repository 逻辑移动到更容易维护的位置
+1. 让生成出来的 repository 保持干净、可预测。
+2. 把派生 repository 逻辑迁移到更容易维护的位置。
 
-可以用模块 `book-app` 中现有的 repository `com.novel.book.wire.domain.book.repository.BookAuthorRepository` 作为示例。
+下面以模块 `book-app` 中已有的 repository `com.novel.book.wire.domain.book.repository.BookAuthorRepository` 为例。
 
-**当前位置**：`book-app\src\main\stub\com\novel\book\wire\domain\book\repository\BookAuthorRepository`
+**当前位置：** `book-app\src\main\stub\com\novel\book\wire\domain\book\repository\BookAuthorRepository`
 
 ```java
 @Repository
@@ -39,13 +39,13 @@ public interface BookAuthorRepository
   @Query
   Optional<BookAuthor> findByName(final String name);
 
-  //Other method
+  // Other methods
 }
 ```
 
-⚠️ 在执行 `stub` 命令前，请先备份你的 `@Derived` 方法。
+**重要：** 在执行 `stub` 命令前，请先备份你的 `@Derived` 方法。
 
-这次调整之后，`stub` 目录会被视为纯生成代码，因此下一轮 `stub` 运行时可以被整体覆盖。
+这次调整之后，`stub` 目录会被视为纯生成代码，因此下一次执行 `stub` 时可能会被整体覆盖。
 
 ### 第一步
 
@@ -57,25 +57,26 @@ public interface BookAuthorRepository
 apihug = "0.7.8-RELEASE"
 ```
 
-然后执行模块对应的 `stub` 命令。具体命令一般可以在项目的 `README.md` 里找到：
+然后执行模块对应的 `stub` 命令。具体命令通常可以在项目的 `README.md` 中找到：
 
 ```shell
 ./gradlew.bat book-app:clean stub build -x test -x stubTest
 ```
 
-命令执行成功后，你会看到一个新的 `sourceSet`：`book-app\src\main\trait`。
+命令执行成功后，你会看到一个新的 source set：`book-app\src\main\trait`。
 
-💡 你可能需要在 `Gradle` 工具窗口中执行 `Reload Gradle Project`，否则 `book-app\src\main\trait` 可能不会被识别为 `sourceSet`。
+**提示：** 你可能需要在 Gradle 工具窗口中执行 `Reload Gradle Project`。否则，`book-app\src\main\trait` 可能不会被识别为 source set。
 
 ### 第二步
 
-1. 把备份下来的 `@Derived` 方法移动到 `trait` 目录里的 `_BookAuthorRepository`，并在首次迁移阶段临时保持旧 repository 仍然可编译。
-2. 再次执行 `stub` 命令。
+1. 把备份下来的 `@Derived` 方法移动到 `trait` 目录中的 `_BookAuthorRepository`。
+2. 在首次迁移阶段，暂时保持旧 repository 仍然可以通过编译。
+3. 再次执行 `stub` 命令。
 
 之后，所有 `@Derived` repository 方法都会维护在 `book-app\src\main\trait` 下。
 
 1. `stub` 任务会把这些方法重新合并回运行时的 `BookAuthorRepository`。
-2. 生成模板代码和自定义派生逻辑被分开后，`BookAuthorRepository` 会更干净。
+2. 生成模板代码和自定义派生逻辑分离后，`BookAuthorRepository` 会更干净。
 3. 以 SQL 为主的 trait 逻辑也更容易长期维护。
 
 ---
@@ -91,7 +92,7 @@ apihug = "0.7.8-RELEASE"
 5. 把 `BookAuthorRepository` 中的 `@Derived` 方法复制到 `_BookAuthorRepository`
 6. 运行 `stub` 命令
 
-如果 repository 数量可控，例如少于 30 个，这种方式仍然是可接受的。
+如果 repository 数量可控，例如少于 30 个，这种方式仍然是可以接受的。
 
 **项目目录结构**
 
@@ -132,7 +133,7 @@ apihug = "0.7.8-RELEASE"
 
 ## 后续改进
 
-从 SDK `0.8.5-RELEASE` 开始，后续版本对这一模式做了更容易维护的改进。
+从 SDK `0.8.5-RELEASE` 开始，后续版本对这套模式做了更容易维护的改进。
 
 当你在 `proto` 中定义实体并运行 `stub` 后，也会得到一个空的 trait repository：
 
@@ -158,14 +159,14 @@ interface _JobEntityRepository extends JobEntityRepository {
 
 ```java
 @Overwrite
-default void myDaoApi(){
-    
+default void myDaoApi() {
+
 }
 ```
 
 记得给这个方法加上 `@Overwrite`。随后 IDEA 会提示你执行 `Pull method 'myDaoApi' to 'JobEntityRepository'`。
 
-按照 IDEA 的建议操作后，方法会被提升到父接口里，从而减少一次额外的 `stub` 运行。
+按 IDEA 的建议操作后，方法会被提升到父接口里，从而减少一次额外的 `stub` 运行。
 
 下一次执行 `stub` 后，这套逻辑仍然会被保留下来。
 
@@ -175,7 +176,7 @@ default void myDaoApi(){
 
 ApiHug 工具链会帮你处理这套合并流程。
 
-也可以参考 Scala 中的 [Companion objects](https://zhCN-docs.scala-lang.org/scala3/book/domain-modeling-tools.html#companion-objects)。
+也可以参考 Scala 中的 [Companion objects](https://docs.scala-lang.org/scala3/book/domain-modeling-tools.html#companion-objects)。
 
 如果升级过程中遇到问题，请联系 ApiHug 团队：
 

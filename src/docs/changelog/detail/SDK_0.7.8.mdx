@@ -4,27 +4,27 @@ export const description =
 
 [English](/docs/changelog/detail/SDK_0.7.8)
 
-💁 If your project does not use ApiHug domain entity management, this migration will likely have limited impact on your project.
+**Note:** If your project does not use ApiHug domain entity management, this migration will likely have limited impact on your project.
 
 Latest: [Maven Central](https://search.maven.org/artifact/com.apihug/it-bom)
 
 `0.7.8-RELEASE` introduced:
 
-- Repository `@Derived` maintenance moved into a separate `trait` location.
-- `lite` became the default model for the stub side.
+- Repository `@Derived` maintenance moved into a dedicated `trait` source set.
+- `lite` became the default model on the stub side.
 
 <img src={require('@/img/framework/domain.jpg').default.src} alt="domain design" width={1326} height={577} className="rounded-lg" />
 
 ## Repository Migration
 
-Goal:
+Goals:
 
-1. keep generated repositories clean and predictable
-2. move derived repository logic into a location that is easier to maintain
+1. Keep generated repositories clean and predictable.
+2. Move derived repository logic into a location that is easier to maintain.
 
 Use an existing repository such as `com.novel.book.wire.domain.book.repository.BookAuthorRepository` in module `book-app` as the example below.
 
-**Current location**: `book-app\src\main\stub\com\novel\book\wire\domain\book\repository\BookAuthorRepository`
+**Current location:** `book-app\src\main\stub\com\novel\book\wire\domain\book\repository\BookAuthorRepository`
 
 ```java
 @Repository
@@ -39,13 +39,13 @@ public interface BookAuthorRepository
   @Query
   Optional<BookAuthor> findByName(final String name);
 
-  //Other method
+  // Other methods
 }
 ```
 
-⚠️ Back up your `@Derived` methods before running the `stub` command.
+**Important:** Back up your `@Derived` methods before running the `stub` command.
 
-The `stub` directory is fully generated after this change, which means it can be overwritten on the next `stub` run.
+After this change, the `stub` directory is treated as generated output and can be overwritten by the next `stub` run.
 
 ### Step 1
 
@@ -63,18 +63,19 @@ Then run the module `stub` command. The exact command is usually documented in y
 ./gradlew.bat book-app:clean stub build -x test -x stubTest
 ```
 
-After the command succeeds, you will see a new `sourceSet`: `book-app\src\main\trait`.
+After the command succeeds, you will see a new source set: `book-app\src\main\trait`.
 
-💡 You may need to run `Reload Gradle Project` from the Gradle tool window. Otherwise, `book-app\src\main\trait` may not be recognized as a `sourceSet`.
+**Tip:** You may need to run `Reload Gradle Project` from the Gradle tool window. Otherwise, `book-app\src\main\trait` may not be recognized as a source set.
 
 ### Step 2
 
-1. Move the backed-up `@Derived` methods into `_BookAuthorRepository` under the `trait` directory and temporarily keep the old repository compilable during the first migration.
-2. Run the `stub` command again.
+1. Move the backed-up `@Derived` methods into `_BookAuthorRepository` under the `trait` directory.
+2. Keep the old repository temporarily compilable during the first migration.
+3. Run the `stub` command again.
 
 After that, all `@Derived` repository methods are maintained under `book-app\src\main\trait`.
 
-1. The `stub` job merges those methods back into the runtime `BookAuthorRepository`.
+1. The `stub` task merges those methods back into the runtime `BookAuthorRepository`.
 2. `BookAuthorRepository` stays cleaner because generated template code and custom derived logic are separated.
 3. SQL-oriented trait logic becomes easier to maintain over time.
 
@@ -158,8 +159,8 @@ Then you can add a customized DAO API:
 
 ```java
 @Overwrite
-default void myDaoApi(){
-    
+default void myDaoApi() {
+
 }
 ```
 
