@@ -70,7 +70,7 @@ All Modules: [project ':sample-proto',':sample-app']
 
 ApiHug Plugin 依赖于 IDE 自带的 **Proto Editor** 插件进行 AST 语法树解析，因此必须启用 `JetBrains s.r.o.` ✅ Proto 插件：
 
-<img src={require('@/img/plugin/protobuf_plugin.png').default.src} alt="ApiHug plugin" width={986} height={712} className="rounded-lg" />
+<img src="/img/plugin/protobuf_plugin.png" alt="ApiHug plugin" width={986} height={712} className="rounded-lg" />
 
 ### Proto 文件无法导入，无法识别 proto import
 
@@ -78,17 +78,17 @@ ApiHug SDK proto 导入 `import "swagger/annotations.proto";` 时报错：
 
 ApiHug SDK proto import `import "swagger/annotations.proto";` 失败：
 
-<img src={require('@/img/plugin/import_error.png').default.src} alt="ApiHug plugin SDK import error" width={880} height={361} className="rounded-lg" />
+<img src="/img/plugin/import_error.png" alt="ApiHug plugin SDK import error" width={880} height={361} className="rounded-lg" />
 
 **01: 编译项目, compile the project** (通过 markdown 或 gradle 任务)
 
-<img src={require('@/img/plugin/2ways_build.png').default.src} alt="ApiHug 2 ways build project" width={1113} height={568} className="rounded-lg" />
+<img src="/img/plugin/2ways_build.png" alt="ApiHug 2 ways build project" width={1113} height={568} className="rounded-lg" />
 
 **02: 编译完成后，查看 proto 项目的 build 缓存**，after compile success, check the project proto build cache:
 
 `{PROJECT}/{PROTO-MODULE}/build/extracted-include-protos`:
 
-<img src={require('@/img/plugin/2ways_build_success.png').default.src} alt="ApiHug success build" width={1202} height={535} className="rounded-lg" />
+<img src="/img/plugin/2ways_build_success.png" alt="ApiHug success build" width={1202} height={535} className="rounded-lg" />
 
 **03：如果仍未成功导入**，手动配置 proto import；if still not import then please add path manually：
 
@@ -99,7 +99,7 @@ ApiHug SDK proto import `import "swagger/annotations.proto";` 失败：
 
 从 [Plugin](/zhCN-docs/changelog/plugin) 0.7.6 版本起，插件已内置这些预定义的 proto 文件。
 
-<img src={require('@/img/plugin/2ways_finally.png').default.src} alt="ApiHug import finally" width={1928} height={1041} className="rounded-lg" />
+<img src="/img/plugin/2ways_finally.png" alt="ApiHug import finally" width={1928} height={1041} className="rounded-lg" />
 
 最终所有 `import` 语句都应变为绿色，Eventually all the `import` should turn green!
 
@@ -115,7 +115,7 @@ IDE 应弹出 **Load Gradle Project** 提示，若通知被关闭，请打开 **
 
 IDE should pop up a notification: **Load Gradle Project**，if notification pop up was forbidden, then please open the **Notification** panel to load it manually!
 
-<img src={require('@/img/plugin/gradle_loader.png').default.src} alt="ApiHug Load gradle project" width={740} height={428} className="rounded-lg" />
+<img src="/img/plugin/gradle_loader.png" alt="ApiHug Load gradle project" width={740} height={428} className="rounded-lg" />
 
 ### Gradle 编译失败
 
@@ -127,7 +127,7 @@ IDE should pop up a notification: **Load Gradle Project**，if notification pop 
 1. 刷新树
 2. 重建树（耗时操作），重新编译后再刷新
 
-<img src={require('@/img/plugin/api-tree-rebuild.png').default.src} alt="ApiHug Rebuild" width={678} height={518} className="rounded-lg" />
+<img src="/img/plugin/api-tree-rebuild.png" alt="ApiHug Rebuild" width={678} height={518} className="rounded-lg" />
 
 若错误仍然存在，则 [report issue](https://github.com/apihug/apihug-ide-plugin/issues/new/choose)！
 
@@ -137,7 +137,7 @@ IDE should pop up a notification: **Load Gradle Project**，if notification pop 
 
 顶部菜单：`ApiHug` -> `About`：
 
-<img src={require('@/img/plugin/version_checker.png').default.src} alt="ApiHug version check" width={1248} height={545} className="rounded-lg" />
+<img src="/img/plugin/version_checker.png" alt="ApiHug version check" width={1248} height={545} className="rounded-lg" />
 
 ## Plugin 0.2+ 问题
 

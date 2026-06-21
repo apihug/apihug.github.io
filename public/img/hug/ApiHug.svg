@@ -1,0 +1,27 @@
+<svg class="svg-canvas" viewBox="0 0 800 600" width="1600" height="1200" preserveAspectRatio="none" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <!--滤镜-->
+        <defs><filter id="filter_shadow_shape_P1i1rJC8Tr" width="100%" height="100%" x="0%" y="0%">
+              <feDropShadow dx="0" dy="0" stdDeviation="0" flood-color="#000000" flood-opacity="0.4"></feDropShadow>
+            </filter></defs>
+
+        <!-- 背景 -->
+        <g id="background">
+            <rect x="0" y="0" fill="#ffffff" width="800" height="600"></rect>
+
+          </g>
+
+        <!--元素-->
+
+                <g id="shape_P1i1rJC8Tr" ref="shape_P1i1rJC8Tr" key="shape_P1i1rJC8Tr" transform="translate(31.302267899172804,227.51604181203425) rotate(0,72.3034242379328,72.3050449047856) scale(1,1)" style="opacity: 1;" filter="url(#filter_shadow_shape_P1i1rJC8Tr)">
+                  <!--普通元素-->
+                  <svg version="1.1" id="图层_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" style="enable-background:new 0 0 283.465 283.465;" xml:space="preserve" viewBox="51.875 51.87200164794922 179.71697998046875 179.72100830078125" width="144.6068484758656" height="144.6100898095712" class="style-removed" preserveAspectRatio="none" data-parent="shape_P1i1rJC8Tr">
+<path d="M51.875,231.593h33.455c0-31.149,25.252-56.398,56.398-56.398c31.158,0,56.404,25.249,56.404,56.398
+	h33.46V51.872C132.332,51.872,51.875,132.335,51.875,231.593z M141.727,169.126c-15.127,0-27.39-12.264-27.39-27.394
+	s12.264-27.393,27.39-27.393c15.133,0,27.402,12.263,27.402,27.393S156.859,169.126,141.727,169.126z" fill="#6726ff" stroke-width="0"></path>
+</svg>
+                </g>
+                <g id="shape_KrZgG5isga" ref="shape_KrZgG5isga" key="shape_KrZgG5isga" transform="translate(-311.75262535328,-260.48395818796575) rotate(0,818.6486972147361,560) scale(1,1)" style="opacity: 1;" filter="">
+                  <!--普通元素-->
+                  <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="1637.2973944294722" height="1120" viewBox="0 0 1023.3108715184201 700" data-parent="shape_KrZgG5isga"><g data-role="text" data-width="340.40000000000003" data-height="100" transform="translate(341.45543575921, 300)"><path d="M16.90 0L0.30 0L27.90-66.70L44.20-66.70L71.80 0L55.20 0L48.70-15.40L23.40-15.40L16.90 0ZM45.60-27.30L36.10-50.60L26.60-27.30L45.60-27.30Z" transform="translate(0 85) " fill="rgb(15, 8, 62)" stroke="rgb(15, 8, 62)" stroke-width="0.167" data-glyph-w="73.2" data-glyph-h="100" data-glyph-ascender="85.9" data-glyph-descender="-14.100000000000001"></path><path d="M6.50 18.30L6.50-48.70L29.90-48.70Q36.70-48.70 40.20-47.85Q43.70-47 46.90-44.50L46.90-44.50Q55.60-37.70 55.60-23.60L55.60-23.60Q55.60-12.90 49.20-6.30L49.20-6.30Q46-3 41.85-1.50Q37.70 0 31.70 0L31.70 0L19.90 0L19.90 18.30L6.50 18.30ZM29-38.30L19.90-38.30L19.90-10.40L28.10-10.40Q34.60-10.40 37.60-13.20L37.60-13.20Q41.80-16.90 41.80-24.60L41.80-24.60Q41.80-31.20 38.50-34.75Q35.20-38.30 29-38.30L29-38.30Z" transform="translate(73.2 85) " fill="rgb(15, 8, 62)" stroke="rgb(15, 8, 62)" stroke-width="0.167" data-glyph-w="59.900000000000006" data-glyph-h="100" data-glyph-ascender="85.9" data-glyph-descender="-14.100000000000001"></path><path d="M6.50 0L6.50-48.70L19.90-48.70L19.90 0L6.50 0ZM19.90-53.70L6.50-53.70L6.50-66.70L19.90-66.70L19.90-53.70Z" transform="translate(133.10000000000002 85) " fill="rgb(15, 8, 62)" stroke="rgb(15, 8, 62)" stroke-width="0.167" data-glyph-w="27.6" data-glyph-h="100" data-glyph-ascender="85.9" data-glyph-descender="-14.100000000000001"></path><path d="M6.50-66.70L19.90-66.70L19.90-48.70L33.60-48.70Q39.70-48.70 43.15-47.75Q46.60-46.80 49-44.40L49-44.40Q53.60-40.20 53.60-30.30L53.60-30.30L53.60 0L40.20 0L40.20-27.70Q40.20-31.60 39.85-33.25Q39.50-34.90 38.40-36.10L38.40-36.10Q36.40-38.20 30.80-38.30L30.80-38.30L19.90-38.30L19.90 0L6.50 0L6.50-66.70Z" transform="translate(160.70000000000002 85) " fill="rgb(15, 8, 62)" stroke="rgb(15, 8, 62)" stroke-width="0.167" data-glyph-w="60.6" data-glyph-h="100" data-glyph-ascender="85.9" data-glyph-descender="-14.100000000000001"></path><path d="M25.70-10.40L38.30-10.40L38.30-48.70L51.70-48.70L51.70 0L25.30 0Q19.60 0 16.50-0.85Q13.40-1.70 11-3.90L11-3.90Q5.90-8.50 5.90-18.80L5.90-18.80L5.90-48.70L19.20-48.70L19.20-17.40Q19.20-14.10 20.95-12.25Q22.70-10.40 25.70-10.40L25.70-10.40Z" transform="translate(221.3 85) " fill="rgb(15, 8, 62)" stroke="rgb(15, 8, 62)" stroke-width="0.167" data-glyph-w="59.300000000000004" data-glyph-h="100" data-glyph-ascender="85.9" data-glyph-descender="-14.100000000000001"></path><path d="M28.20-48.70L53.20-48.70L53.20-0.30Q53.20 3.80 52.25 7Q51.30 10.20 49.50 12.40L49.50 12.40Q47.20 15.20 43.95 16.25Q40.70 17.30 34.50 17.30L34.50 17.30L7.80 17.30L7.80 6.90L32.70 6.90Q37.10 6.90 38.45 5.55Q39.80 4.20 39.80 0L39.80 0L27.50 0Q21.60 0 17.75-1.25Q13.90-2.50 10.80-5.40L10.80-5.40Q3.50-12.30 3.50-24.40L3.50-24.40Q3.50-38.20 12.40-44.50L12.40-44.50Q15.60-46.80 19.15-47.75Q22.70-48.70 28.20-48.70L28.20-48.70ZM39.80-10.40L39.80-38.30L28.70-38.30Q17.10-38.30 17.10-24.30L17.10-24.30Q17.10-17.50 20.25-13.95Q23.40-10.40 29.40-10.40L29.40-10.40L39.80-10.40Z" transform="translate(280.6 85) " fill="rgb(15, 8, 62)" stroke="rgb(15, 8, 62)" stroke-width="0.167" data-glyph-w="60.800000000000004" data-glyph-h="100" data-glyph-ascender="85.9" data-glyph-descender="-14.100000000000001"></path></g></svg>
+                </g>
+      </svg>

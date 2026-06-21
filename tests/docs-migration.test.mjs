@@ -171,6 +171,14 @@ test("migrated zhCN docs no longer contain legacy badge and iframe embeds", () =
   assert.deepEqual(legacyHtmlFiles, []);
 });
 
+test("migrated docs use static public image paths instead of require image imports", () => {
+  const requireImageFiles = [...walkMdxFiles(docsRoot), ...walkMdxFiles(zhDocsRoot)]
+    .filter((filePath) => fs.readFileSync(filePath, "utf8").includes("require('@/img/"))
+    .map((filePath) => path.relative(repoRoot, filePath));
+
+  assert.deepEqual(requireImageFiles, []);
+});
+
 test("docs nav includes the remaining milestone and changelog detail pages", () => {
   const navIndex = fs.readFileSync(
     path.join(repoRoot, "src", "app", "(docs)", "docs", "index.tsx"),

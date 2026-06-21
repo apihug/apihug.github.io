@@ -69,7 +69,7 @@ These two plugins conflict with each other and only one can be enabled at a time
 
 The ApiHug Plugin relies on the IDE's built-in **Proto Editor** plugin for AST parsing, so the `JetBrains s.r.o.` ✅ Proto plugin must be enabled:
 
-<img src={require('@/img/plugin/protobuf_plugin.png').default.src} alt="ApiHug plugin" width={986} height={712} className="rounded-lg" />
+<img src="/img/plugin/protobuf_plugin.png" alt="ApiHug plugin" width={986} height={712} className="rounded-lg" />
 
 ### Proto file import fails, cannot recognize the proto import
 
@@ -77,17 +77,17 @@ ApiHug SDK proto import `import "swagger/annotations.proto";` fails with an erro
 
 ApiHug SDK proto import `import "swagger/annotations.proto";` fails:
 
-<img src={require('@/img/plugin/import_error.png').default.src} alt="ApiHug plugin SDK import error" width={880} height={361} className="rounded-lg" />
+<img src="/img/plugin/import_error.png" alt="ApiHug plugin SDK import error" width={880} height={361} className="rounded-lg" />
 
 **01: Compile the project** (via markdown or gradle task)
 
-<img src={require('@/img/plugin/2ways_build.png').default.src} alt="ApiHug 2 ways build project" width={1113} height={568} className="rounded-lg" />
+<img src="/img/plugin/2ways_build.png" alt="ApiHug 2 ways build project" width={1113} height={568} className="rounded-lg" />
 
 **02: After successful compilation, check the build cache of the proto project**:
 
 `{PROJECT}/{PROTO-MODULE}/build/extracted-include-protos`:
 
-<img src={require('@/img/plugin/2ways_build_success.png').default.src} alt="ApiHug success build" width={1202} height={535} className="rounded-lg" />
+<img src="/img/plugin/2ways_build_success.png" alt="ApiHug success build" width={1202} height={535} className="rounded-lg" />
 
 **03: If the import still fails**, manually configure the proto import path; if imports are still not recognized, please add the path manually:
 
@@ -98,7 +98,7 @@ ApiHug SDK proto import `import "swagger/annotations.proto";` fails:
 
 Since [Plugin](/docs/changelog/plugin) version 0.7.6, these predefined protos are included by the plugin.
 
-<img src={require('@/img/plugin/2ways_finally.png').default.src} alt="ApiHug import finally" width={1928} height={1041} className="rounded-lg" />
+<img src="/img/plugin/2ways_finally.png" alt="ApiHug import finally" width={1928} height={1041} className="rounded-lg" />
 
 Eventually, all `import` statements should turn green!
 
@@ -114,7 +114,7 @@ The IDE should display a **Load Gradle Project** notification. If notifications 
 
 IDE should pop up a notification: **Load Gradle Project**; if the notification was disabled, please open the **Notification** panel to load it manually!
 
-<img src={require('@/img/plugin/gradle_loader.png').default.src} alt="ApiHug Load gradle project" width={740} height={428} className="rounded-lg" />
+<img src="/img/plugin/gradle_loader.png" alt="ApiHug Load gradle project" width={740} height={428} className="rounded-lg" />
 
 ### Gradle compile failure
 
@@ -126,7 +126,7 @@ IDE should pop up a notification: **Load Gradle Project**; if the notification w
 1. Refresh the tree
 2. Rebuild the tree (heavy operation): recompile and then refresh
 
-<img src={require('@/img/plugin/api-tree-rebuild.png').default.src} alt="ApiHug Rebuild" width={678} height={518} className="rounded-lg" />
+<img src="/img/plugin/api-tree-rebuild.png" alt="ApiHug Rebuild" width={678} height={518} className="rounded-lg" />
 
 If the error persists, please [report issue](https://github.com/apihug/apihug-ide-plugin/issues/new/choose)!
 
@@ -136,7 +136,7 @@ Check the installed version of the ApiHug IDE plugin:
 
 Top Menu: `ApiHug` -> `About`:
 
-<img src={require('@/img/plugin/version_checker.png').default.src} alt="ApiHug version check" width={1248} height={545} className="rounded-lg" />
+<img src="/img/plugin/version_checker.png" alt="ApiHug version check" width={1248} height={545} className="rounded-lg" />
 
 ## Plugin 0.2+ issue
 
