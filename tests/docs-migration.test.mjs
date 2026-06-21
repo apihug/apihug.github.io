@@ -579,6 +579,33 @@ test("root layout restores the old Google Analytics snippet", () => {
   assert.match(rootLayout, /gtag\('config', 'G-PXR19X43CS'\);/);
 });
 
+test("search uses the current Algolia app credentials with env overrides", () => {
+  const search = fs.readFileSync(path.join(repoRoot, "src", "components", "search.tsx"), "utf8");
+  const globalStyles = fs.readFileSync(path.join(repoRoot, "src", "app", "globals.css"), "utf8");
+
+  assert.match(search, /NEXT_PUBLIC_ALGOLIA_INDEX_NAME \?\? "apihug_github_io_k5tocsg7lu_pages"/);
+  assert.match(search, /NEXT_PUBLIC_ALGOLIA_API_KEY \?\? "325ded393996e354815124ed7d764f23"/);
+  assert.match(search, /NEXT_PUBLIC_ALGOLIA_APP_ID \?\? "K5TOCSG7LU"/);
+  assert.match(search, /@headlessui\/react/);
+  assert.match(search, /https:\/\/\$\{APP_ID\}-dsn\.algolia\.net\/1\/indexes\/\$\{INDEX_NAME\}\/query/);
+  assert.match(search, /X-Algolia-Application-Id/);
+  assert.match(search, /X-Algolia-API-Key/);
+  assert.match(search, /Search documentation/);
+  assert.match(search, /Start typing to search the docs/);
+  assert.match(search, /Search results/);
+  assert.match(search, /Search by/);
+  assert.match(search, /https:\/\/www\.algolia\.com\/ref\/docsearch\/\?utm_source=\$\{window\.location\.hostname\}/);
+  assert.match(search, /function AlgoliaLogo/);
+  assert.match(search, /aria-label="Algolia"/);
+  assert.match(search, /viewBox="0 0 2196\.2 500"/);
+  assert.match(search, /role="listbox"/);
+  assert.doesNotMatch(search, /DocSearchModal/);
+  assert.doesNotMatch(search, /@docsearch\/react/);
+  assert.doesNotMatch(globalStyles, /docsearch\.css/);
+  assert.doesNotMatch(search, /KNPXZI5B0M/);
+  assert.doesNotMatch(search, /5fc87cef58bb80203d2207578309fab6/);
+});
+
 test("home hero title keeps the ApiHug eyebrow without oversized headline styling", () => {
   const hero = fs.readFileSync(path.join(repoRoot, "src", "components", "home", "hero.tsx"), "utf8");
 
