@@ -1,0 +1,76 @@
+export const title = "Mock 指令规范";
+export const description =
+  "ApiHug mock 扩展使用手册";
+
+`apihug/protobuf/mock/mock.proto` 用来为字段或简单响应生成契约驱动的 mock 数据，适合联调、前端开发、示例环境与自动化测试。
+
+## 使用位置
+
+### 字段级 mock
+
+```proto
+string phone = 1 [(hope.swagger.field) = {
+  mock: {
+    nature: CN_PHONE;
+  };
+}];
+```
+
+### operation 级 mock
+
+```proto
+option (hope.swagger.operation) = {
+  post: "/ping";
+  mock: {
+    nature: GUID;
+  };
+};
+```
+
+## 常见规则
+
+| 类型 | 说明 |
+| --- | --- |
+| `nature` | 语义型生成器，如 `EMAIL`、`GUID`、`CN_PHONE` |
+| `string_rule` | 字符串长度、字符池、候选值 |
+| `number_rule` | 数值范围与小数位控制 |
+| `date_rule` | 生日、过去/未来时间 |
+| `chinese_rule` | 中文段落、句子、标题 |
+| `chinese_name_rule` | 中文姓名 |
+| `china_address_rule` | 中国地址 |
+| `map_rule` | Map 结构生成 |
+
+## 快速示例
+
+```proto
+string email = 1 [(hope.swagger.field) = {
+  mock: { nature: EMAIL };
+}];
+
+string status = 2 [(hope.swagger.field) = {
+  mock: {
+    string_rule: {
+      candidates: ["PENDING", "APPROVED", "REJECTED"];
+    };
+  };
+}];
+
+double price = 3 [(hope.swagger.field) = {
+  mock: {
+    number_rule: {
+      min: 1;
+      max: 9999;
+      max_fraction: 2;
+    };
+  };
+}];
+```
+
+## 建议
+
+- 语义明显的字段优先使用 `nature`
+- 枚举风格字段优先使用 `string_rule.candidates`
+- 数值精度要求明确时使用 `number_rule`
+- 让 mock 规则服务于契约表达，不要把页面示例数据硬编码到业务逻辑里
+
+如需完整字段说明，可再对照英文版 [Mock Data Specification](/docs/spec/mock)。

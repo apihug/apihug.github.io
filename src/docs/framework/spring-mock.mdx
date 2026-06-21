@@ -1,10 +1,145 @@
 export const title = "ApiHug Spring Mock Extension";
 export const description =
-  "ApiHug SDK spring mock 扩展";
+  "Contract-driven WireMock support for ApiHug Spring integration tests.";
 
-## Mock
+## What It Is
 
-1. faker
-2. runtime
+`it-common-spring-mock` turns generated ApiHug contract metadata into a WireMock-based upstream mock server for tests. Instead of hand-writing large stub suites, it reads the generated `Module` metadata, registers HTTP stubs automatically, and produces mock payloads from the proto contract.
 
-<TipInfo>To be done 🏗️</TipInfo>
+<TipInfo>Use this module in test scope. It is for integration testing and local verification, not for production runtime.</TipInfo>
+
+## Core Pieces
+
+### `@AutoConfigureWireMock`
+
+Use `@AutoConfigureWireMock` on a Spring test class to start and manage the WireMock server.
+
+```java
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureWireMock(port = 0)
+class UserServiceTest {
+}
+```
+
+`port = 0` is the safest default because it avoids port conflicts in CI and local runs.
+
+### `wiremock.server.*`
+
+The extension is configured through the `wiremock` prefix.
+
+| Property | Default | Meaning |
+| --- | --- | --- |
+| `wiremock.server.port` | `8080` | HTTP port |
+| `wiremock.server.https-port` | `-1` | HTTPS port, disabled when negative |
+| `wiremock.server.port-dynamic` | `false` | Use a random HTTP port |
+| `wiremock.server.https-port-dynamic` | `false` | Use a random HTTPS port |
+| `wiremock.server.stubs` | `[]` | Extra stub directories |
+| `wiremock.server.files` | `[]` | Response body file directories |
+| `wiremock.reset-mappings-after-each-test` | `false` | Reset mappings after each test |
+| `wiremock.rest-template-ssl-enabled` | `false` | Enable SSL support for `RestTemplate` |
+
+For most ApiHug tests, `@AutoConfigureWireMock(port = 0)` plus `${wiremock.server.port}` is enough.
+
+### `HopeContractConfiguration`
+
+`HopeContractConfiguration` is the contract bridge. Extend it and return the generated upstream `Module`. The framework will walk its services and methods and register WireMock stubs from the proto-derived HTTP metadata.
+
+```java
+@Configuration
+public class UpstreamServiceMockConfig extends HopeContractConfiguration {
+
+  @Override
+  protected Module module() {
+    return UpstreamApiModule.INSTANCE;
+  }
+
+  @Override
+  protected RuntimeContext runtimeContext() {
+    RuntimeContext context = super.runtimeContext();
+    context.setResultPlain(true);
+    return context;
+  }
+}
+```
+
+That gives you:
+
+- path matching based on generated HTTP routes
+- method-aware stub registration
+- mock payload generation from the response contract
+- one place to tune runtime output style for tests
+
+### `WireMockStubCustomizer`
+
+Use `WireMockStubCustomizer` when a specific scenario must override or extend the contract-generated defaults.
+
+```java
+@Component
+public class ErrorScenarioStub implements WireMockStubCustomizer {
+
+  @Override
+  public String name() {
+    return "error-scenario";
+  }
+
+  @Override
+  public void stub(WireMockServer server) {
+    server.stubFor(
+      get(urlPathEqualTo("/api/users/999"))
+        .willReturn(aResponse().withStatus(404))
+    );
+  }
+}
+```
+
+This is the right extension point for edge cases such as 404, 500, throttling, or domain-specific negative flows.
+
+### `WireMockConfigurationCustomizer`
+
+If you need lower-level WireMock server tuning, use `WireMockConfigurationCustomizer`.
+
+```java
+@Bean
+public WireMockConfigurationCustomizer myConfigCustomizer() {
+  return config -> config.timeout(5000);
+}
+```
+
+## Typical Test Flow
+
+1. Add `it-common-spring-mock` in test scope.
+2. Enable `@AutoConfigureWireMock`.
+3. Import one or more `HopeContractConfiguration` classes for the upstream services you need to fake.
+4. Inject `${wiremock.server.port}` into downstream client configuration.
+5. Add `WireMockStubCustomizer` only when the contract-generated stub is not enough.
+
+```java
+@SpringBootTest
+@AutoConfigureWireMock(port = 0)
+@Import(UpstreamServiceMockConfig.class)
+class OrderServiceIntegrationTest {
+
+  @Autowired
+  private OrderService orderService;
+
+  @Test
+  void shouldCreateOrder() {
+    OrderDTO order = orderService.create(new CreateOrderRequest().setUserId(1L));
+    assertThat(order).isNotNull();
+  }
+}
+```
+
+## Best Practices
+
+- Prefer contract-generated stubs first. Add manual stubs only for exceptional behavior.
+- Keep mock configuration close to the test module that owns the downstream client behavior.
+- Use random ports in CI.
+- Reset mappings between tests only when your suite mutates stub state heavily.
+
+## References
+
+- `it-common-spring-plus/it-common-spring-mock/README.md`
+- `hope.common.mock.server.wiremock.AutoConfigureWireMock`
+- `hope.common.mock.server.wiremock.HopeContractConfiguration`
+- `hope.common.mock.server.wiremock.WireMockStubCustomizer`

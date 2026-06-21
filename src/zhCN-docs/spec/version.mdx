@@ -1,0 +1,99 @@
+export const title = "版本变更规范";
+export const description =
+  "来自 version.proto 的历史版本注解定义，主要用于兼容旧项目和做迁移审计。";
+
+`apihug/protobuf/extend/version.proto` 在当前源码中仍然存在，但它已经被标记为 **deprecated**。新项目更应该通过里程碑和更新日志记录发布说明；只有旧 proto 合同还在使用这些注解时，才需要继续读取它们。
+
+- **扩展文件**：`apihug/protobuf/extend/version.proto`
+- **作用范围**：File / Service / Method / Message / Enum / Field
+- **状态**：历史兼容层
+
+---
+
+## 1. 导入与注册
+
+```proto
+import "apihug/protobuf/extend/version.proto";
+```
+
+已注册的扩展点：
+
+| Descriptor | 扩展点 | 字段号 | 值类型 |
+|---|---|---:|---|
+| `FileOptions` | `(hope.version.file)` | 31142 | `repeated Version` |
+| `MethodOptions` | `(hope.version.method)` | 31142 | `repeated Version` |
+| `MessageOptions` | `(hope.version.msg)` | 31143 | `repeated Version` |
+| `ServiceOptions` | `(hope.version.svc)` | 31143 | `repeated Version` |
+| `EnumOptions` | `(hope.version.enm)` | 31143 | `repeated Version` |
+| `FieldOptions` | `(hope.version.field)` | 31143 | `repeated Version` |
+
+`31142` 会同时用于 file 和 method，`31143` 会同时用于 message、service、enum 和 field。因为它们挂在不同的 protobuf descriptor 类型上，所以这种复用是合法的。
+
+---
+
+## 2. VersionTypeEnum
+
+```proto
+enum VersionTypeEnum {
+  NA = 0;
+  ADD = 1;
+  MODIFY = 2;
+  REMOVE = 3;
+}
+```
+
+| 枚举值 | 含义 |
+|---|---|
+| `NA` | 未声明明确变更类型 |
+| `ADD` | 在该版本新增 |
+| `MODIFY` | 在该版本修改 |
+| `REMOVE` | 在该版本移除 |
+
+---
+
+## 3. Version 消息
+
+```proto
+message Version {
+  string version = 1;
+  string timestamp = 2;
+  VersionTypeEnum type = 10;
+  string message = 11;
+  string track = 12;
+  string updated_by = 20;
+}
+```
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| `version` | string | 版本号，例如 `2.0.0-RELEASE` |
+| `timestamp` | string | 变更发生时间 |
+| `type` | `VersionTypeEnum` | 新增 / 修改 / 删除标记 |
+| `message` | string | 面向人的变更说明 |
+| `track` | string | 外部任务或工单编号 |
+| `updated_by` | string | 维护者名称 |
+
+---
+
+## 4. 示例
+
+```proto
+import "apihug/protobuf/extend/version.proto";
+
+service UserApi {
+  option (hope.version.svc) = [{
+    version: "2.0.0-RELEASE";
+    timestamp: "2025-05-15";
+    type: MODIFY;
+    message: "将旧的 proto/app 拆分结构合并回统一 app 模块";
+    track: "MILESTONE-2.0.0";
+    updated_by: "Aaron";
+  }];
+}
+```
+
+## 5. 实际建议
+
+- 在审计旧 proto 文件时，继续读取这些注解。
+- 如果不是为了兼容历史合同，不建议继续新增 `hope.version.*` 的使用。
+- 当前项目的发布记录优先查看 [里程碑](/zhCN-docs/milestone) 和 [更新日志](/zhCN-docs/changelog)。

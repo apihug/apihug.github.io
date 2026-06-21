@@ -19,8 +19,8 @@ message AccountEntity {
   string name = 1 [(hope.persistence.column) = {
     name: "NAME",
     description: "name of the account",
-    nullable: FALSE,
-    updatable: FALSE,
+    nullable: false,
+    updatable: false,
     length: {
       value: 32
     },
@@ -30,7 +30,7 @@ message AccountEntity {
   string email = 2 [(hope.persistence.column) = {
     name: "EMAIL",
     description: "email of the account",
-    updatable: FALSE,
+    updatable: false,
     unique: TRUE,
     length: {
       value: 64

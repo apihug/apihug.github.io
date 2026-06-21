@@ -1,29 +1,83 @@
-export const title = "Tool Chain Used in Kola";
+export const title = "Kola 工具链";
 export const description =
-  "Kola 工具链， Gradle Kola 集成， IDEA 集成 Kola.";
+  "理解 ApiHug 中 Kola 的 SDK、IDEA 插件、Gradle 任务与 DSL 文件如何协同工作。";
 
+## 本页说明
 
-## Latest
+这一页讲的是 Kola 背后的工具链，而不只是 DSL 语法本身。
 
-⚠️请及时更新 SDK + IDEA插件保持先进⚠️
+当你需要理解 Kola 能否稳定运行依赖哪些环节时，请先看这一页。
 
-**SDK Version**
+## 核心组成
 
-[Maven Central](https://search.maven.org/artifact/com.apihug/it-bom)
+Kola 依赖四层能力共同配合：
 
-**Plugin Version**
+1. **Proto 契约**：定义 API 与生成元数据
+2. **ApiHug SDK**：提供运行时与测试支持
+3. **IntelliJ 插件**：提高 Kola 与 proto 的编辑效率
+4. **Gradle 任务**：负责生成、编译与执行契约感知测试
 
-[Maven Central](https://search.maven.org/artifact/com.apihug/it-bom)
+只要其中任何一层版本严重失配，Kola 工作流通常就会很快变得不稳定。
 
+## 推荐做法
 
-[JetBrains Marketplace](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
+请尽量保持以下版本同步：
 
-## Wire
+- 项目使用的 ApiHug SDK / BOM 版本
+- 团队使用的 IntelliJ 插件版本
+- proto 模块中的 Kola 相关 Gradle 配置
 
-## IDEA
+当前常用入口：
 
-### File Template
+- [Maven Central](https://search.maven.org/artifact/com.apihug/it-bom)
+- [JetBrains Marketplace](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
 
-### Add Edit Widget
+## 工作流如何串起来
 
-⚠️TBD⚠️
+### 1. 从 proto 契约开始
+
+服务、请求、响应、实体以及相关元数据都从 proto 驱动模块开始。
+
+### 2. Kola 场景跟契约放在一起
+
+Kola 最适合与拥有 API 契约的模块一起演进，而不是独立散落在另一个无上下文的测试目录里。
+
+### 3. 通过 Gradle 执行契约感知测试
+
+常见执行入口：
+
+```shell
+./gradlew.bat {proto_module}:kolaTest --stacktrace
+```
+
+这也是为什么 Kola 应该被视为一条完整工具链，而不只是一个单独 DSL 特性。
+
+## IntelliJ 插件负责什么
+
+插件主要负责：
+
+- 加快 proto / Kola 相关文件的创建与编辑
+- 减少重复模板输入
+- 把常见编辑动作留在 IDE 内完成
+
+插件不是执行引擎。它解决的是“写得更快”，而不是“跑得起来”。
+
+## Gradle 负责什么
+
+Gradle 负责：
+
+- 把生成与测试执行接入模块生命周期
+- 解析 Kola 运行所需的依赖
+- 给团队提供可重复执行的契约测试入口
+
+如果构建层没有正确暴露 Kola 任务，单独写好 DSL 文件仍然无法形成稳定流程。
+
+## 结果
+
+当 SDK、插件、proto 模块与 Gradle 任务保持一致时，Kola 才会真正成为团队可复用、可持续维护的契约测试工作流，而不是某个人本地临时可跑的一套脚本。
+
+## 相关页面
+
+1. [Kola 首页](/zhCN-docs/kola)
+2. [Kola 是什么](/zhCN-docs/kola/001_what_is_kola)
+3. [Kola DSL](/zhCN-docs/kola/003_dsl_contract)

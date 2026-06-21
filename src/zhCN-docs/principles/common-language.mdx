@@ -1,35 +1,58 @@
-export const title = "Why Common Language is important";
+export const title = "共同语言";
 export const description =
-  "Common language is the language context used";
+  "为什么 ApiHug 需要一套共享的契约语言，用来降低跨角色和跨工具的理解损耗。";
 
+## 它是什么
 
-<TipInfo>To be done 🏗️</TipInfo>
+共同语言，指的是团队拥有一套共享的表达方式，来描述领域、API 结构以及预期行为。
 
+如果没有共同语言，同一个意图会在不同角色之间被不断重新翻译：
 
-> The critical complexity of most software projects is in understanding the domain itself.
-> By Eric Evans in Domain-Driven Design
+- 产品描述业务含义
+- 架构师描述结构
+- 开发描述实现
+- 测试描述场景
 
-Being easy to understand should be the gold standard of good and maintainable software.
+每多一次翻译，就多一层损耗。
 
-> A domain-specific language (DSL) is a computer language specialized to a particular application domain.
+## 为什么重要
 
-Domain Specific Language(Common Language) closes the gap between:
+软件真正困难的地方，往往不是语法，而是对领域理解是否一致。
 
-- Domain Experts
-- Technical Experts
-- Working Software & Tests
+因此，在 API 工作里，共同语言尤其关键。只要命名、结构和语义表达不一致，项目就会持续为以下问题付出代价：
 
-ApiHug aims to bridge the gap between various stakeholders involved in API development, including Business Analysts, Project Managers, Architects, UI designers, and Testers.
-It achieves this by providing a common language for defining APIs that transcends specific formats like Swagger's JSON/YAML or programming languages like Java and Python.
+- 误解
+- 评审反复
+- 返工
+- 文档漂移
+- 集成错误
 
-ApiHug's goal is to facilitate effective communication and collaboration among diverse team members, ensuring a shared understanding and streamlined development process.
+## 为什么需要领域化语言
 
+面向领域的语言，可以缩短以下几类对象之间的距离：
 
+- 领域专家
+- 技术专家
+- 可执行系统与测试
 
+重点不是构建一套抽象理论，而是给团队一套可以讨论、版本化、评审并转化成真实产物的表达载体。
 
+## ApiHug 如何应用它
 
-## Refer
+ApiHug 通过共享契约语言，避免 API 定义被困在：
 
-1. [Domain-specific language-wikipedia](https://en.wikipedia.org/wiki/Domain-specific_language)
-2. [Domain-Specific Languages Guide -  Martin Fowler](https://martinfowler.com/dsl.html)
-3. [Domain-Specific Languages - Jetbrains](https://www.jetbrains.com/mps/concepts/domain-specific-languages/)
+- 某一种编程语言里
+- 某一种文档格式里
+- 某一个角色的私人理解里
+
+这份共享语言，正是产品含义、技术结构和生成结果能够持续保持一致的基础。
+
+## 结果
+
+共同语言会让 API 协作不那么脆弱。它减少翻译损耗，提升评审质量，也为契约优先设计提供了更稳定的基础。
+
+## 参考
+
+1. [Domain-specific language](https://en.wikipedia.org/wiki/Domain-specific_language)
+2. [Martin Fowler on DSLs](https://martinfowler.com/dsl.html)
+3. [JetBrains overview of domain-specific languages](https://www.jetbrains.com/mps/concepts/domain-specific-languages/)

@@ -2,23 +2,70 @@ export const title = "ApiHug Spring API Extension";
 export const description =
   "ApiHug SDK spring API 扩展";
 
+## 它暴露什么
 
-## Api
+`it-common-spring-api` 负责把 proto 编译产物中的 API 文档和元数据通过 HTTP 暴露出来。它不是靠运行时扫描 Controller 反射生成文档，而是直接读取契约生成的资源文件。
 
-API资源信息暴露：
+主要端点包括：
 
-1.  swagger 文档 `/v3/api-docs`
-2.  api meta 信息 `/hope/meta/errors|dictionaries|authorities`
+- OpenAPI 文档：`/v3/api-docs`
+- 指定版本文档：`/v3/api-docs/{version}`、`/v3/api-docs/{version}.yaml`
+- 元数据端点：
+  - `/hope/meta/errors`
+  - `/hope/meta/dictionaries`
+  - `/hope/meta/authorities`
+  - `/hope/meta/versions`
 
-API 环境配置：
+<TipInfo>`/v3/api-docs` 是 OpenAPI 3 文档，不是 Swagger 2.0。</TipInfo>
 
-1. `hope.open.api.path` 配置文档目录， 默认 `/v3/api-docs`
-2.  `hope.open.api.enable` 是否暴露 swagger 文档信息， 建议在生产环境关闭
-3.  `hope.open.api.showMeta` 是否暴露 API meta 信息， 建议在生产环境关闭
+## 配置项
 
-项目启动后，查看命令行，可得到类似信息：
+配置前缀是 `hope.api`，不是旧文档里的 `hope.open.api`。
 
+| 配置项 | 默认值 | 说明 |
+| --- | --- | --- |
+| `hope.api.enable` | `true` | 是否启用 OpenAPI 文档端点 |
+| `hope.api.path` | `/v3/api-docs` | 文档主路径 |
+| `hope.api.showMeta` | `true` | 是否暴露元数据端点 |
+| `hope.api.showActuator` | `false` | 是否把 actuator 暴露进 API 视图 |
+| `hope.api.project.name` | - | 关联的 proto 项目名 |
+| `hope.api.project.latest` | `true` | 是否默认返回最新版本 |
+| `hope.api.mcp.mcpServer` | `openapi-server` | MCP Server 名称 |
+| `hope.api.mcp.toolPrefixName` | `""` | MCP 工具名前缀 |
+| `hope.api.mcp.serverUrl` | - | 运行时服务地址 |
+
+示例：
+
+```yaml
+hope:
+  api:
+    enable: true
+    path: /v3/api-docs
+    show-meta: true
+    project:
+      name: my-api-proto
 ```
+
+## 运行时特点
+
+这些资源都来自 proto 编译生成物，而不是运行时反射扫描：
+
+- OpenAPI JSON / YAML
+- 错误码列表
+- 字典列表
+- 权限列表
+- 版本列表
+
+这意味着：
+
+- 启动更快
+- 输出更稳定
+- 文档与契约始终来自同一份生成结果
+- 如果要修改接口元数据，应该修改 proto 并重新生成，而不是在运行时临时补注解
+
+## 常见访问地址
+
+```text
 Application 'demo-app' is running! Access URLs:
 
 Local                             http://localhost:18089/
@@ -28,23 +75,32 @@ Actuator                          http://192.168.0.115:18089/management
 Api-Errors                        http://192.168.0.115:18089/hope/meta/errors
 Api-Dictionaries                  http://192.168.0.115:18089/hope/meta/dictionaries
 Api-Authorities                   http://192.168.0.115:18089/hope/meta/authorities
+Api-Versions                      http://192.168.0.115:18089/hope/meta/versions
 Profile(s)                        dev
 ```
 
+## 端点说明
 
-所有这些 **资源** 元信息都是由 `wire` 模块生成，非运行时代码反射扫描所得；
+| 路径 | 说明 |
+| --- | --- |
+| `/v3/api-docs` | 最新 OpenAPI JSON |
+| `/v3/api-docs.yaml` | 最新 OpenAPI YAML |
+| `/v3/api-docs/{version}` | 指定版本 OpenAPI JSON |
+| `/v3/api-docs/{version}.yaml` | 指定版本 OpenAPI YAML |
+| `/hope/meta/errors` | 错误码清单 |
+| `/hope/meta/dictionaries` | 字典与常量清单 |
+| `/hope/meta/authorities` | 权限清单 |
+| `/hope/meta/versions` | 已发布版本列表 |
 
-API和API元信息均在设计阶段已经固定，运行时不能修改！
+## 生产环境建议
 
-如需要修改，需要重新 **编译&发布** 你的 `wire` 模块，也就是API定义模块！
+- 对外不需要文档时，关闭 `hope.api.enable`
+- 对外不需要元数据时，关闭 `hope.api.showMeta`
+- 保持文档和契约一起构建与发布，不要手工维护第二份接口说明
 
-<TipInfo>建议在生产环境关闭此类信息接口的暴露</TipInfo>
+## 参考
 
-## 详细信息
-
-| 资源                      | 说明                  | 
-|-------------------------|---------------------|
-| /v3/api-docs            | 标准OAS(Swagger2.0)文档 |
-| /hope/meta/errors       | 错误码列表               |
-| /hope/meta/dictionaries | 字典(常量)列表            |
-| /hope/meta/authorities  | 权限列表                |
+- `it-common-spring-plus/it-common-spring-api/README.md`
+- `hope.common.spring.api.HopeApiProperties`
+- `hope.common.spring.api.resource.ApiMetaWebMvcResource`
+- `hope.common.spring.api.resource.ApiMetaWebFluxResource`

@@ -44,3 +44,4 @@ classes/
 out/
 temp/
 .worktrees/
+.codegraph/

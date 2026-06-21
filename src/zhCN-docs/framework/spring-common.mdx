@@ -7,6 +7,11 @@ export const description =
 
 Spring 扩展包， 包含基本共享类和函数，为更快更安全的开发：[Maven Central](https://search.maven.org/artifact/com.apihug/it-common-spring)
 
+本页对应的权威来源：
+
+- `github.com/apihug/skills`
+- `skills/spring-extension`
+
 ## 功能
 
 不一一枚举，基本都非常直观和简单；使用中可以直接参考源码。
@@ -107,9 +112,9 @@ ResponseEntity builder 包含:
 
 #### **checker**
 
-**checker** 包，包含 Authority & Role 组合 校验 DSL 定义；仅作为 java annotation 标致，运行时不会读取；
+**checker** 包定义了表达 Authority 与 Role 组合的 DSL，并不只是“编译期标记”。运行时会加载生成的权限元数据，将其映射到 `SecurityContext`，再由 `HopeSecurityManager` 在当前 service 方法上解析并执行校验。
 
-<TipInfo>运行时通过 wire `proto` 内 RBAC 定义实现！</TipInfo>
+<TipInfo>checker DSL 会和生成的 wire 元数据一起生效。先在 proto 中定义 authorization，再由 Spring 运行时通过 `SecurityContext` 和 `HopeSecurityManager` 解析并执行。</TipInfo>
 
 #### **internal**
 

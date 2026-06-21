@@ -2,80 +2,114 @@ export const title = "ApiHug Spring Security Extension";
 export const description =
   "ApiHug SDK spring security extension";
 
+## 它是什么
 
-安全框架是一个提供身份验证（authentication）、授权（authorization）和防止常见攻击的框架。
+`it-common-spring-security` 是 ApiHug 的 JWT 安全扩展。它建立在 Spring Security OAuth2 JOSE 之上，负责 Token 编解码、请求过滤、`Customer` 上下文注入，以及与 ApiHug `SecurityContext` 的运行时授权校验整合。
 
-<TipInfo>️️⚠️ Apihug Security 与 Spring Security 在运行时不兼容，不建议在运行时共存。</TipInfo>
+<TipInfo>ApiHug Security 不是替代 Spring Security，而是在 Spring Security 之上做了 ApiHug 风格的契约驱动安全封装。</TipInfo>
 
-**ApiHug** 提供了一个极简又凑效的解决方案，有别于传统 Apache Shiro, 或者 Spring Security。
+## 运行时模型
 
-底层依然是基于资源(Resource 也就是API)权限管理；如集合角色，就是一个极简RBAC架构,开箱即用。
+请求进入应用后，大致流程如下：
 
-## 协议
+1. 过滤器提取 JWT
+2. `JwtDecoder` 解析 Token
+3. `JwtCustomizer` 将 Claims 转为业务 `Customer`
+4. `HopeContextHolder` 保存当前安全上下文
+5. `SecurityAspect` 在进入 API 业务方法前执行权限检查
+6. `HopeSecurityManager` 从 `SecurityContext` 解析当前方法对应的授权规则
+7. 根据角色、权限、内部资源限制等规则决定是否放行
 
-Proto 层如何定义协议 [极简 Authentication & Authorization](/zhCN-docs/framework/widget/authority)
+这也是为什么 ApiHug 的 proto 授权定义会在运行时真正生效，而不仅仅是文档或注解提示。
 
-## 实现
+## 核心组件
 
-1. SecurityAspect  切面 Aspect
-2. SecurityContext: 运行时候 security context, 包括资源 到 CheckerAuthorization 映射
-3. HopeSecurityManager 运行时 security 参数组装
-4. JWTFilter jwt filter 过滤
+### `JwtCustomizer`
 
-目前**Aspect** SecurityAspect 切面只支持 **BEFORE** 也就是进入资源(API)业务逻辑前校验。
+业务侧实现 `JwtCustomizer`，负责：
 
-### 配置
+- 生成 JWT
+- 解析 JWT
+- 将 Claims 填充为具体 `Customer`
+- 定义匿名用户对象
 
-配置路径 `hope.security`； 配置对象 `HopeSecurityProperties`。
+### `HopeSecurityManager`
 
-| 配置                                        | 备注                       |
-|-------------------------------------------|--------------------------|
-| `enabled`                                 | 是否启用 ApiHug Security.    |
-| `jwt`                                     | JWT 配置.                  |
-| `jwt.base64Secret`                        | Base64 secret.           |
-| `jwt.secret`                              | secret.                  |
-| `jwt.tokenValidityInSecondsForRememberMe` | Remember me 时候有效期，默认30天. |
-| `jwt.tokenValidityInSeconds`              | 默认有效时间，7天.               |
+`HopeSecurityManager` 是运行时授权入口。它会从 `SecurityContext` 读取当前 API 方法的授权配置，并结合 `Customer`、请求上下文、内部资源访问规则完成校验。
 
+### `SecurityAspect`
 
-## 禁用 Spring Security
+`SecurityAspect` 是进入业务方法前的切面检查点。ApiHug 的权限校验默认在这里发生。
 
-<TipInfo>⚠️ Apihug Security 与 Spring Security 在运行时不兼容。</TipInfo>
+### `InternalResourceAccessChecker`
 
-禁用 Spring Security 最简单的方法是从项目中移除其 **依赖项**。
+内部资源检查器根据请求来源头（默认 `x-hope-source`）区分外部请求与内部调用，防止外部流量访问被标记为 internal 的接口。
 
-通过移除以下依赖，可以清除项目中所有由 Spring Security 提供的安全配置和默认设置：
+### `SpringSecurityExceptionHandler`
 
-```xml
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-security</artifactId>
-    <version>...</version>
-</dependency>
+框架内置了 `SpringSecurityExceptionHandler`，将常见 Spring Security 异常映射为统一的 ApiHug 错误响应，例如：
+
+- `AccessDeniedException`
+- `AuthenticationCredentialsNotFoundException`
+- `BadCredentialsException`
+- `UsernameNotFoundException`
+
+## 配置
+
+配置前缀是 `hope.security`。
+
+| 配置项 | 默认值 | 说明 |
+| --- | --- | --- |
+| `hope.security.enable` | `true` | 是否启用安全模块 |
+| `hope.security.default-access-style` | `DENY` | 未配置资源时的默认访问策略 |
+| `hope.security.request-origin-header` | `x-hope-source` | 请求来源头 |
+| `hope.security.external-origin-value` | `external` | 外部请求标记值 |
+| `hope.security.bypass-origin-check` | `false` | 是否跳过来源检查 |
+| `hope.security.jwt.secret` | 内置默认值 | JWT 密钥，生产环境必须替换 |
+| `hope.security.jwt.base64-secret` | - | Base64 密钥，优先级高于 `secret` |
+| `hope.security.jwt.token-validity-in-seconds` | `604800` | 普通 Token 有效期 |
+| `hope.security.jwt.token-validity-in-seconds-for-remember-me` | `2592000` | remember-me Token 有效期 |
+
+示例：
+
+```yaml
+hope:
+  security:
+    enable: true
+    default-access-style: DENY
+    bypass-origin-check: false
+    jwt:
+      base64-secret: "your-base64-secret"
+      token-validity-in-seconds: 86400
 ```
 
-移除该依赖后，应用程序中将不再包含任何 Spring Security 的功能。
+## 与 Spring Security 的关系
 
-但如果您仍希望使用部分 Spring Security 的组件，我们建议您手动禁用其自动配置功能：
+ApiHug Security 会直接注册 `JwtDecoder`、`JwtEncoder`、安全过滤器以及异常处理能力，因此它本身就是基于 Spring Security 生态的扩展方案。
 
-**排除 Spring Security 自动配置**
+因此这里的正确建议是：
 
-当项目类路径中包含 `spring-boot-starter-security` 时，Spring Boot 会自动启用安全配置。若要禁用该自动配置，可在 `application.properties` 文件中添加如下配置：
+- 不要把 ApiHug Security 描述成“与 Spring Security 不兼容”
+- 不要把“删除 `spring-boot-starter-security`”当成默认做法
+- 只有在你明确知道自己不需要 Spring Security 相关能力时，才讨论自定义裁剪
 
-```properties
-spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
-```
+对绝大多数 ApiHug 项目，正确方向是让 ApiHug 的安全扩展与 Spring Security 一起工作，而不是强行把 Spring Security 从项目里拆掉。
 
-如果您希望完全禁用 Spring Security，建议仅通过 `spring.autoconfigure.exclude` 配置实现，而不要创建 `SecurityConfiguration` 类。
+## 你通常需要做什么
 
-请注意：手动定义 Spring Security 配置类会覆盖 `application.properties` 中的配置，因此当两者同时存在时，`application.properties` 中的排除配置将失效。
+1. 在 proto 中定义授权规则
+2. 生成 wire / runtime 元数据
+3. 实现自己的 `JwtCustomizer`
+4. 在业务侧补充 `Customer`、角色、权限映射
+5. 根据项目需要扩展 `SecurityCustomizer` 或上下文初始化逻辑
 
+如果你还没有定义 proto 授权，请先阅读：
 
-<TipInfo>To be done 🏗️</TipInfo>
+- [极简 Authentication & Authorization](/zhCN-docs/framework/widget/authority)
 
-## Refer
+## 参考
 
-1. [极简 Authentication & Authorization](/zhCN-docs/framework/widget/authority)
-2. [Spring Security](https://docs.spring.io/spring-security/reference/index.html)
-3. [Apache Shiro](https://shiro.apache.org/)
-4. [RBAC - Role-based access control](https://en.wikipedia.org/wiki/Role-based_access_control)
+- `it-common-spring-plus/it-common-spring-security/README.md`
+- `hope.common.spring.security.AbstractSecurityConfiguration`
+- `hope.common.spring.security.HopeSecurityManager`
+- `hope.common.spring.problem.handler.SpringSecurityExceptionHandler`

@@ -1,25 +1,25 @@
-export const title = "SDK 0.8.6-RELEASE Easy merger";
+export const title = "SDK 0.8.6-RELEASE 稳定生成结果差异";
 export const description =
-  "0.8.6-RELEASE, Code generate more sortable, relief from code merger effort";
+  "说明 0.8.6-RELEASE 如何让生成代码的 diff 更稳定、更容易合并。";
 
+[English](/docs/changelog/detail/SDK_0.8.6) | [简体中文](/zhCN-docs/changelog/detail/SDK_0.8.6)
 
-[English](/zhCN-docs/changelog/detail/SDK_0.8.6) | [简体中文](/zhCN-docs/changelog/detail/SDK_0.8.6_cn)
+## 问题
 
-## Issue
+ApiHug 一直希望生成代码能够稳定到可以直接放进版本库里。
 
-**ApiHug** spend a lot of effort to make automatically generate best-practice template code.
+在 `0.8.6-RELEASE` 之前，`stub` 与 `wire` 的部分生成流程仍然依赖 `HashMap` 的遍历顺序。即使 schema 或模型只发生了很小的变化，也可能让生成结果出现很多无意义的 diff。
 
-But as the `stub` & `wire` store those AST mapping in the HashMap, some time the auto generated code may very different between versions even a tiny changes happen.
+## 这次改动解决了什么
 
-This really make the code merger guy crazy!
+从 `0.8.6-RELEASE` 开始，生成文件会以更稳定的顺序输出，因此升级后的 diff 更容易阅读，也更容易合并。
 
-so since this version of SDK **0.8.6-RELEASE**, we make you really relief from this boring crazy stuff. include [0.7.8](/zhCN-docs/changelog/detail/SDK_0.7.8) re-design the repository maintain way;
+这一版也延续了 [SDK 0.7.8](/zhCN-docs/changelog/detail/SDK_0.7.8) 中对 repository 维护方式的重构。
 
 Latest: [Maven Central](https://search.maven.org/artifact/com.apihug/it-bom)
 
 ---
 
-but we still keep track the last `compile/build` time in the meta file(json).
+元数据文件仍然会保留最近一次 `compile/build` 的时间戳：
 
 <img src={require('@/img/framework/version_meta_diff.png').default.src} alt="meta diff" width={1411} height={374} className="rounded-lg" />
-

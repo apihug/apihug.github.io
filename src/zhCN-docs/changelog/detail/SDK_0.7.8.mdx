@@ -1,32 +1,30 @@
-export const title = "SDK 0.7.8-RELEASE Big change";
+export const title = "SDK 0.7.8-RELEASE Repository 迁移";
 export const description =
-  "0.7.8-RELEASE big change and migration steps";
+  "说明 0.7.8-RELEASE 引入的 repository 与 trait 拆分迁移步骤。";
 
+[English](/docs/changelog/detail/SDK_0.7.8) | [简体中文](/zhCN-docs/changelog/detail/SDK_0.7.8)
 
-[English](/zhCN-docs/changelog/detail/SDK_0.7.8) | [简体中文](/zhCN-docs/changelog/detail/SDK_0.7.8_cn)
-
-💁 If you never touch the `ApiHug` domain entity management, then this migration will never bother you. but better keep rolling release with us! :-)
+💁 如果你的项目没有使用 `ApiHug` 的领域实体管理能力，这次迁移对你的影响通常会比较有限。
 
 Latest: [Maven Central](https://search.maven.org/artifact/com.apihug/it-bom)
 
+`0.7.8-RELEASE` 主要引入了：
 
-`0.7.8-RELEASE` Add features:
-
-- Move the `Repository` `@Derived` maintain way to `Trait` separated location, make code clean;
-- `lite` as default model for the stub side, make it more swift;
+- 把 Repository `@Derived` 的维护位置拆分到独立的 `trait` 目录
+- 让 `lite` 成为 stub 侧的默认模型
 
 <img src={require('@/img/framework/domain.jpg').default.src} alt="domain design" width={1326} height={577} className="rounded-lg" />
 
-## Repository migration
+## Repository 迁移
 
-Target:
+目标：
 
-1. make generated repository pure and straightforward.
-2. make repository derived api easy to maintain
+1. 让生成出来的 repository 保持干净、可预测
+2. 把派生 repository 逻辑移动到更容易维护的位置
 
-Take an exist `repository`: `com.novel.book.wire.domain.book.repository.BookAuthorRepository` in your module `book-app` as example:
+可以用模块 `book-app` 中现有的 repository `com.novel.book.wire.domain.book.repository.BookAuthorRepository` 作为示例。
 
-**Exist logic**: in `book-app\src\main\stub\com\novel\book\wire\domain\book\repository\BookAuthorRepository`:
+**当前位置**：`book-app\src\main\stub\com\novel\book\wire\domain\book\repository\BookAuthorRepository`
 
 ```java
 @Repository
@@ -45,13 +43,13 @@ public interface BookAuthorRepository
 }
 ```
 
-⚠️⚠️⚠️ You need to backup your `@Derived` method before run the `stub` command;
+⚠️ 在执行 `stub` 命令前，请先备份你的 `@Derived` 方法。
 
-As now the `stub` dir code is pure `generated`, that meaning it can be totally removed in next round `stub` command.
+这次调整之后，`stub` 目录会被视为纯生成代码，因此下一轮 `stub` 运行时可以被整体覆盖。
 
-### Step1
+### 第一步
 
-Run the `stub` command of your module after upgrade the SDK version in the `gradle\libs.versions.toml`:
+先在 `gradle\libs.versions.toml` 中升级 SDK 版本：
 
 ```toml
 [versions]
@@ -59,43 +57,43 @@ Run the `stub` command of your module after upgrade the SDK version in the `grad
 apihug = "0.7.8-RELEASE"
 ```
 
-Command line, check your project's `README.md`:
+然后执行模块对应的 `stub` 命令。具体命令一般可以在项目的 `README.md` 里找到：
 
 ```shell
 ./gradlew.bat book-app:clean stub build -x test -x stubTest
 ```
 
-After run successfully you will got a new `sourceSet`: `book-app\src\main\trait`;
+命令执行成功后，你会看到一个新的 `sourceSet`：`book-app\src\main\trait`。
 
-💁‍♀️ you may need `Reload Gradle Project` from `Gradle` tool window, otherwise the `book-app\src\main\trait` may not be recognized as `sourceSet`
+💡 你可能需要在 `Gradle` 工具窗口中执行 `Reload Gradle Project`，否则 `book-app\src\main\trait` 可能不会被识别为 `sourceSet`。
 
-### Step2
+### 第二步
 
-1. Manually put the backup `@Derived` to the `_BookAuthorRepository`(trait dir) & `BookAuthorRepository`(stub dir)(only first time migration need this, to keep the old class compilable);
-2. Kick off the `stub` command again.
+1. 把备份下来的 `@Derived` 方法移动到 `trait` 目录里的 `_BookAuthorRepository`，并在首次迁移阶段临时保持旧 repository 仍然可编译。
+2. 再次执行 `stub` 命令。
 
-Since now all the `@Derived` Repository methods, will be maintained separated at `book-app\src\main\trait`
+之后，所有 `@Derived` repository 方法都会维护在 `book-app\src\main\trait` 下。
 
-1. `stub` job will merger them back to the runtime `BookAuthorRepository` class
-2. Avoid any conflict in `BookAuthorRepository` during development(template code vs derived code), keep it pure and straightforward.
-3. Much easier way to derived our repository API, the `trait` for SQL logic;
+1. `stub` 任务会把这些方法重新合并回运行时的 `BookAuthorRepository`。
+2. 生成模板代码和自定义派生逻辑被分开后，`BookAuthorRepository` 会更干净。
+3. 以 SQL 为主的 trait 逻辑也更容易长期维护。
 
 ---
 
-### StepX
+### 手工迁移路径
 
-This way migration need more manually job, but much clearly;
+这条迁移路径需要更多手工操作，但对 repository 数量不多的项目仍然可行。
 
-1. create directory `book-app\src\main\trait`
-2. create package `t.com.novel.book.wire.domain.book.repository` that is prefix with `t.` of original `com.novel.book.wire.domain.book.repository`
-3. add trait `interface` class `_BookAuthorRepository` that is  prefix with  `_` of original  `BookAuthorRepository`
-4. make it `extends BookAuthorRepository`
-5. copy the `@Derived` method of `BookAuthorRepository` to `_BookAuthorRepository`
-6. run `stub` command
+1. 创建目录 `book-app\src\main\trait`
+2. 创建包 `t.com.novel.book.wire.domain.book.repository`，即在原包名前加 `t.`
+3. 创建 trait 接口 `_BookAuthorRepository`，即在原 `BookAuthorRepository` 前加 `_`
+4. 让它 `extends BookAuthorRepository`
+5. 把 `BookAuthorRepository` 中的 `@Derived` 方法复制到 `_BookAuthorRepository`
+6. 运行 `stub` 命令
 
-This is a easier way for countable `repository` like less than 30 etc;
+如果 repository 数量可控，例如少于 30 个，这种方式仍然是可接受的。
 
-**Real** Project dir structure:
+**项目目录结构**
 
 ```shell
 +---java
@@ -132,11 +130,11 @@ This is a easier way for countable `repository` like less than 30 etc;
                                 \---repository
 ```
 
-## PS
+## 后续改进
 
-since SDK `0.8.5-RELEASE`, introduce more way to handle those easier;
+从 SDK `0.8.5-RELEASE` 开始，后续版本对这一模式做了更容易维护的改进。
 
-so after define a Entity in your `proto` and run `stub` command you will got a `trait` empty **Repository**:
+当你在 `proto` 中定义实体并运行 `stub` 后，也会得到一个空的 trait repository：
 
 ```java
 /**
@@ -156,7 +154,7 @@ interface _JobEntityRepository extends JobEntityRepository {
 }
 ```
 
-Then you can write a customized DAO api:
+然后你可以继续补充自定义 DAO API：
 
 ```java
 @Overwrite
@@ -165,20 +163,20 @@ default void myDaoApi(){
 }
 ```
 
-remember to add `@Overwrite` to this method， then the IDEA will remind you to `Pull method 'myDaoApi' to 'JobEntityRepository'`
+记得给这个方法加上 `@Overwrite`。随后 IDEA 会提示你执行 `Pull method 'myDaoApi' to 'JobEntityRepository'`。
 
-Do as the IDEA suggest you, then this method will be pull to parent interface, this will avoid one round of `stub` command;
+按照 IDEA 的建议操作后，方法会被提升到父接口里，从而减少一次额外的 `stub` 运行。
 
-next time after kick off the `stub` command, you still get the exactly same code/logic.
+下一次执行 `stub` 后，这套逻辑仍然会被保留下来。
 
-## Best Tips
+## 最佳提示
 
-You can consider the `_BookAuthorRepository` as Companion class of the `BookAuthorRepository`;
+可以把 `_BookAuthorRepository` 理解为 `BookAuthorRepository` 的 companion interface。
 
-Only the `ApiHug` tool chain handle all those complexities for you!
+ApiHug 工具链会帮你处理这套合并流程。
 
-Image the [Companion objects](https://zhCN-docs.scala-lang.org/scala3/book/domain-modeling-tools.html#companion-objects) in Scala;
+也可以参考 Scala 中的 [Companion objects](https://zhCN-docs.scala-lang.org/scala3/book/domain-modeling-tools.html#companion-objects)。
 
-IF YOU meet any problem during upgrade, please contact us:
+如果升级过程中遇到问题，请联系 ApiHug 团队：
 
 <img src={require('@/img/hug/apihug-contact.gif').default.src} alt="Apihug Contact QR Code" width={750} height={750} className="rounded-lg" />

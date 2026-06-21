@@ -1,55 +1,75 @@
-export const title = "How we design Kola";
+export const title = "Kola 的设计思路";
 export const description =
-  "Kola 背景, Kola 设计初衷, Kola设计参考.";
+  "理解 Kola 为什么采用 DSL、为什么依赖这套工具链，以及它如何服务契约优先测试。";
 
+## 本页说明
 
-## BDD
+这一页解释的是 Kola 为什么这样设计，而不仅仅是怎么执行。
 
-行为驱动开发(`BDD`)是一种软件团队工作方式,可以缩小业务人员和技术人员之间的差距:
+如果你想理解 Kola 在 DSL、运行时依赖和契约优先测试流程上的取舍，请先看这一页。
 
-1. 鼓励跨角色协作,建立对需要解决的问题的共同理解
-2. 采用快速、小规模的迭代,增加反馈和价值流转
-3. 生成自动检查系统行为的系统文档
+## Kola 要解决什么问题
 
-我们通过将协作工作集中在具体的、贴近实际的示例上来实现这一点,这些示例阐述了我们希望系统的行为方式。
+传统 API 测试很容易滑向两个方向：
 
-我们使用这些示例作为指引,从概念到实现,进行持续的协作。
+1. 场景写得容易读，但和真实契约脱节
+2. 场景可以执行，但只有实现者自己能看懂
 
-## Groovy
+Kola 的设计目标，就是把场景意图、契约结构和团队协作流程重新拉近。
 
-1. DSL
-2. Dynamic language
-3. Straightforward
+## 为什么采用 BDD 风格
 
+Kola 采用 BDD 风格，不是为了追随某个特定框架，而是因为 API 场景用下面这种结构更容易沟通：
 
-## Dependencies
+- 一个贴近业务的问题场景
+- 一次明确的请求
+- 一组清晰的结果断言
 
-Kola 依托一系列成熟、优秀的第三方库和框架,构建起了强大的基础设施,从而提供了一套完整的测试解决方案。
+这种表达方式更适合产品、前端、后端和测试一起讨论。
 
-| 框架                                      | 引入      | 备注                                                     |
-|-----------------------------------------|---------|--------------------------------------------------------|
-| `org.springframework:spring-core`       | API依赖引入 | Spring核心                                               |
-| `org.springframework:spring-context`    | API依赖引入 | Spring核心                                               |
-| `org.springframework:spring-test`       | API依赖引入 | Spring核心                                               |
-| `org.junit.jupiter:junit-jupiter-api`   | API依赖引入 | junit5                                                 |
-| `org.junit.jupiter:junit-jupiter`       | API依赖引入 | junit5                                                 |
-| `org.assertj:assertj-core`              | API依赖引入 | 流式调用                                                   |
-| `org.mockito:mockito-core`              | API依赖引入 | mock                                                   |
-| `com.jayway.jsonpath:json-path`         | API依赖引入 | Xpath JSON                                             |
-| `org.skyscreamer:jsonassert`            | API依赖引入 | Assertion JSON                                         |
-| `org.hamcrest:hamcrest`                 | API依赖引入 | 匹配帮助                                                   |
-| `org.awaitility:awaitility`             | API依赖引入 | 异步测试                                                   |
-| `org.xmlunit:xmlunit-core`              | API依赖引入 | [XMLUnit](https://github.com/xmlunit/xmlunit) for Java |
-| `jakarta.xml.bind:jakarta.xml.bind-api` | API依赖引入 | Jakarta XML Binding API                                |
-| `io.rest-assured:rest-assured`          | API依赖引入 | -                                                      |
-| `org.junit.jupiter:junit-jupiter-api`   | 未依赖     | -                                                      |
+## 为什么采用 Groovy DSL
 
-## ApiHug
+Kola 使用 Groovy 风格 DSL，是因为它在三个方面比较平衡：
 
-Kola 专为ApiHug 测试而设定，如果您的测试范围都在 ApiHug 风格API 那么测试将会非常简单直接;
+1. 场景表达足够灵活
+2. 编写成本比手写 Java Fixture 更低
+3. 与 JVM / Gradle 工程集成自然
 
-但是如果你使用任何已存在或者三方的API， Kola 也能测试， 只是失去了部分灵活和便捷， 比如无法自动帮你mock 一个请求体;
+目标不是发明一门新的语言，而是让测试场景既轻量、又能很好地融入现有工程。
 
-当然这些附加的好处，手动做起来也毫不费力！
+## 依赖策略
 
-至于生成的测试代码， 那个完全是 java 写的 Junit5 代码， 使用的三方辅助包，都是耳熟能详的，你应该没有任何的学习和理解成本。
+Kola 不打算重造整套测试运行栈，而是建立在熟悉的 JVM 测试基础设施之上。
+
+常见依赖包括：
+
+- Spring 测试能力
+- JUnit 5
+- AssertJ
+- Mockito
+- Rest Assured
+- JSON / XML 断言辅助库
+
+这样做的好处是：团队不需要为了引入 Kola，再额外学习一整套完全陌生的底层工具链。
+
+## 为什么它特别适合 ApiHug
+
+Kola 首先是为 proto 驱动的 ApiHug 项目设计的。
+
+这种前提带来三点优势：
+
+- 测试场景能和契约模型保持更近距离
+- 生成结果与测试可以同步演进
+- 团队能获得统一的契约测试入口，而不是散落的脚本
+
+Kola 也能覆盖非 ApiHug 的 API，但项目越接近 ApiHug 的契约模型，收益通常越大。
+
+## 结果
+
+Kola 的设计目标非常务实：让场景更易读、执行更贴近契约、工具链又足够熟悉，团队可以在不重建整套测试体系的前提下采用它。
+
+## 相关页面
+
+1. [Kola 是什么](/zhCN-docs/kola/001_what_is_kola)
+2. [Kola 原则](/zhCN-docs/kola/004_principle)
+3. [Kola 工具链](/zhCN-docs/kola/005_tool_chain)

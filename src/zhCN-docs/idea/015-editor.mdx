@@ -1,69 +1,115 @@
-export const title = "015 Editor Assistant";
+export const title = "使用编辑器助手";
 export const description =
-  "Menu context to help edit easier.";
+  "在 IntelliJ IDEA 中使用 ApiHug 编辑器上下文菜单，更快地创建和编辑 proto 文件。";
 
+## 本页说明
 
-How to use the edit context menu to code smarter and quicker by ApiHug Api design Copilot
+这一页介绍 ApiHug IntelliJ 插件提供的编辑器上下文操作。
 
-Also refer to the [Shortcuts](/zhCN-docs/idea/000-shortcut)
+当你希望直接在 IDE 中完成 proto 文档创建、结构补全和常见编辑动作，而不是手写所有模板代码时，请使用这些能力。
 
-## Add File
+另请参考：[快捷键速查](/zhCN-docs/idea/000-shortcut)
 
-1. Select `proto` module's `src>main>proto`
-2. Right click
-3. Select `Add Proto File`
-4. Select right type proto file
+## 适用场景
 
-<img src={require('@/img/plugin/115_menu_add_file.gif').default.src} alt="ApiHug Add file" width={2334} height={1768} className="rounded-lg" />
+当你需要：
 
-## Edit Message
+- 快速创建新的 proto 文件
+- 为消息、字段、服务、枚举、错误码、实体添加标准结构
+- 在 IDE 内持续完成契约设计，不反复切换到外部模板或脚本
 
-1. Select `option (hope.domain.kind) = BEAN;` kind proto file
-2. right click(shortcut), show up `ApiHug` menu context
-3. `Add Message`: Add a new Message
-4. `Add Field`: Add a primitive type field
-5. `Add Field(Reference)`: Add field reference to another proto object(Message/Enum)
+就应该使用编辑器助手。
 
-<img src={require('@/img/plugin/116_menu_add_message.gif').default.src} alt="ApiHug Add Message" width={2334} height={1768} className="rounded-lg" />
+## 新建 Proto 文件
 
-## Edit Service
+1. 打开 `proto` 模块中的 `src/main/proto`
+2. 右键目标目录
+3. 选择 `Add Proto File`
+4. 选择正确的 proto 文件类型
 
-1. Select `option (hope.domain.kind) = IDL;` kind proto file
-2. right click(shortcut), show up `ApiHug` menu context
-3. `Add Service`: Add a new Service
-4. `Add Method`: Add a new method to Service
+<img src={require('@/img/plugin/115_menu_add_file.gif').default.src} alt="ApiHug 编辑器助手新增文件" width={2334} height={1768} className="rounded-lg" />
 
-<img src={require('@/img/plugin/117_menu_add_service.gif').default.src} alt="ApiHug Add Service" width={2334} height={1768} className="rounded-lg" />
+## 编辑 Message 文件
 
-## Edit Enum
+适用于声明了如下类型的文件：
 
-1. Select `option (hope.domain.kind) = ENUM;` kind proto file
-2. right click(shortcut), show up `ApiHug` menu context
-3. `Add Enum`: Add a new Enum
-4. `Add Enum Item`: Add a Enum Item
+```proto
+option (hope.domain.kind) = BEAN;
+```
 
-<img src={require('@/img/plugin/118_menu_add_enum.gif').default.src} alt="ApiHug Add Enum" width={2334} height={1768} className="rounded-lg" />
+常见操作包括：
 
-## Edit Error
+- `Add Message`
+- `Add Field`
+- `Add Field(Reference)`
 
-1. Select `option (hope.domain.kind) = ERROR;` kind proto file
-2. right click(shortcut), show up `ApiHug` menu context
-3. `Add Error`: Add a new Error
-4. `Add Error Item`: Add a Error Item
+<img src={require('@/img/plugin/116_menu_add_message.gif').default.src} alt="ApiHug 编辑器助手新增 message" width={2334} height={1768} className="rounded-lg" />
 
-<img src={require('@/img/plugin/119_menu_add_error.gif').default.src} alt="ApiHug Add Error" width={2334} height={1768} className="rounded-lg" />
+## 编辑 Service 文件
 
-## Edit Entity
+适用于声明了如下类型的文件：
 
-1. Select `option (hope.domain.kind) = ENTITY;` kind proto file
-2. right click(shortcut), show up `ApiHug` menu context
-3. `Add Entity`: Add a new Entity
-4. `Add Column`: Add a new Column
+```proto
+option (hope.domain.kind) = IDL;
+```
 
-<img src={require('@/img/plugin/120_menu_add_entity.gif').default.src} alt="ApiHug Add Entity" width={2334} height={1768} className="rounded-lg" />
+常见操作包括：
 
+- `Add Service`
+- `Add Method`
 
-## Reference
+<img src={require('@/img/plugin/117_menu_add_service.gif').default.src} alt="ApiHug 编辑器助手新增 service" width={2334} height={1768} className="rounded-lg" />
+
+## 编辑 Enum 文件
+
+适用于声明了如下类型的文件：
+
+```proto
+option (hope.domain.kind) = ENUM;
+```
+
+常见操作包括：
+
+- `Add Enum`
+- `Add Enum Item`
+
+<img src={require('@/img/plugin/118_menu_add_enum.gif').default.src} alt="ApiHug 编辑器助手新增 enum" width={2334} height={1768} className="rounded-lg" />
+
+## 编辑 Error 文件
+
+适用于声明了如下类型的文件：
+
+```proto
+option (hope.domain.kind) = ERROR;
+```
+
+常见操作包括：
+
+- `Add Error`
+- `Add Error Item`
+
+<img src={require('@/img/plugin/119_menu_add_error.gif').default.src} alt="ApiHug 编辑器助手新增 error" width={2334} height={1768} className="rounded-lg" />
+
+## 编辑 Entity 文件
+
+适用于声明了如下类型的文件：
+
+```proto
+option (hope.domain.kind) = ENTITY;
+```
+
+常见操作包括：
+
+- `Add Entity`
+- `Add Column`
+
+<img src={require('@/img/plugin/120_menu_add_entity.gif').default.src} alt="ApiHug 编辑器助手新增 entity" width={2334} height={1768} className="rounded-lg" />
+
+## 结果
+
+编辑器助手可以显著减少重复性的 proto 结构输入工作，并帮助团队在契约设计过程中保持更一致的文件形态。
+
+## 参考
 
 1. [ApiHug101-Bilibili](https://space.bilibili.com/666522636)
-2. [ApiHug101-Youtube](https://youtube.com/@ApiHug?si=C1yw0poHA01zbmyj)
+2. [ApiHug101-YouTube](https://youtube.com/@ApiHug?si=C1yw0poHA01zbmyj)

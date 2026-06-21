@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import localFont from "next/font/local";
 import { SearchProvider } from "@/components/search";
-import { ThemeProvider } from "@/components/theme-toggle";
 
 const inter = localFont({
   src: [
@@ -44,48 +43,13 @@ const ubuntuMono = localFont({
 });
 
 const js = String.raw;
-let darkModeScript = js`
-  if (!('_updateTheme' in window)) {
-    window._updateTheme = function updateTheme(theme) {
-      let classList = document.documentElement.classList;
-
-      classList.remove("light", "dark", "system");
-      document.querySelectorAll('meta[name="theme-color"]').forEach(el => el.remove())
-      if (theme === 'dark') {
-        classList.add('dark')
-
-        let meta = document.createElement('meta')
-        meta.name = 'theme-color'
-        meta.content = 'oklch(.13 .028 261.692)'
-        document.head.appendChild(meta)
-      } else if (theme === 'light') {
-        classList.add('light')
-
-        let meta = document.createElement('meta')
-        meta.name = 'theme-color'
-        meta.content = 'white'
-        document.head.appendChild(meta)
-      } else {
-        classList.add('system')
-
-        let meta1 = document.createElement('meta')
-        meta1.name = 'theme-color'
-        meta1.content = 'oklch(.13 .028 261.692)'
-        meta1.media = '(prefers-color-scheme: dark)'
-        document.head.appendChild(meta1)
-
-        let meta2 = document.createElement('meta')
-        meta2.name = 'theme-color'
-        meta2.content = 'white'
-        meta2.media = '(prefers-color-scheme: light)'
-        document.head.appendChild(meta2)
-      }
-    }
-
-    try {
-      _updateTheme(localStorage.currentTheme)
-    } catch (_) {}
-  }
+let googleAnalyticsScript = js`
+  try {
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-PXR19X43CS');
+  } catch (_) {}
 `;
 
 export const metadata: Metadata = {
@@ -106,8 +70,7 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${plexMono.variable} ${ubuntuMono.variable} antialiased dark:bg-gray-950`}
-      suppressHydrationWarning
+      className={`${inter.variable} ${plexMono.variable} ${ubuntuMono.variable} antialiased`}
     >
       <head>
         <link rel="apple-touch-icon" sizes="180x180" href={v("/favicons/apple-touch-icon.png")} />
@@ -117,13 +80,13 @@ export default async function RootLayout({
         <link rel="shortcut icon" href={v("/favicons/favicon.ico")} />
         <meta name="msapplication-TileColor" content="#38bdf8" />
         <meta name="msapplication-config" content={v("/favicons/browserconfig.xml")} />
-        <script type="text/javascript" dangerouslySetInnerHTML={{ __html: darkModeScript }}></script>
+        <meta name="theme-color" content="white" />
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-PXR19X43CS"></script>
+        <script dangerouslySetInnerHTML={{ __html: googleAnalyticsScript }}></script>
       </head>
       <body>
         <SearchProvider>
-          <ThemeProvider>
-            <div className="isolate">{children}</div>
-          </ThemeProvider>
+          <div className="isolate">{children}</div>
         </SearchProvider>
       </body>
     </html>

@@ -29,7 +29,7 @@ const TABS: Record<TabKey, { label: string; description: string }> = {
   },
   entity: {
     label: "Movie.java",
-    description: "JPA entities with annotations, relationships, and audit fields — generated from your proto.",
+    description: "Domain entities with annotations, relationships, and audit fields — generated from your proto.",
   },
 };
 

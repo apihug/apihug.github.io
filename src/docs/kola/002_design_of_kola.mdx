@@ -1,47 +1,75 @@
-export const title = "How we design Kola";
+export const title = "How Kola Is Designed";
 export const description =
-  "Kola background, Kola a consumer driver tester framework";
+  "Understand the design motivations behind Kola's DSL, toolchain choices, and contract-first testing model.";
 
-How we design the Kola
+## What This Page Covers
 
-⚠️TBD⚠️
+This page explains why Kola is designed the way it is, not just how to execute it.
 
-## BDD
+Read it when you want to understand the tradeoffs behind Kola's DSL, runtime dependencies, and contract-first testing workflow.
 
-BDD is a way for software teams to work that closes the gap between business people and technical people by:
+## The Problem Kola Tries To Solve
 
-1. Encouraging collaboration across roles to build shared understanding of the problem to be solved
-2. Working in rapid, small iterations to increase feedback and the flow of value
-3. Producing system documentation that is automatically checked against the system’s behaviour
+Traditional API tests often drift into one of two bad states:
 
-We do this by focusing collaborative work around concrete, real-world examples that illustrate how we want the system to behave. 
+1. the scenario is readable, but disconnected from the real contract
+2. the scenario is executable, but unreadable to anyone outside the implementation team
 
-We use those examples to guide us from concept through to implementation, in a process of continuous collaboration.
+Kola is designed to reduce that split by keeping scenario intent, contract structure, and team workflow closer together.
 
-## Groovy
+## Why Kola Uses a BDD-Style Shape
 
-1. DSL
-2. Dynamic language
-3. Straightforward 
+Kola adopts a BDD-oriented structure because API scenarios are easier to discuss when they are expressed as:
 
-## Dependencies
+- a business-relevant situation
+- one concrete request
+- a small set of expected results
 
-Kola leverages a robust foundation of established, best-in-class third-party libraries and frameworks to deliver a comprehensive testing solution.
+This makes the test easier to read across product, frontend, backend, and QA roles, even though Kola is not trying to become a generic Cucumber replacement.
 
-| Library                                 | Scope           | Comment                                                |
-|-----------------------------------------|-----------------|--------------------------------------------------------|
-| `org.springframework:spring-core`       | API Transparent | Spring Core                                            |
-| `org.springframework:spring-context`    | API Transparent | Spring Core                                            |
-| `org.springframework:spring-test`       | API Transparent | Spring Core                                            |
-| `org.junit.jupiter:junit-jupiter-api`   | API Transparent | junit5 Core                                            |
-| `org.junit.jupiter:junit-jupiter`       | API Transparent | junit5                                                 |
-| `org.assertj:assertj-core`              | API Transparent | Fluent assertions                                      |
-| `org.mockito:mockito-core`              | API Transparent | mock                                                   |
-| `com.jayway.jsonpath:json-path`         | API Transparent | Xpath JSON                                             |
-| `org.skyscreamer:jsonassert`            | API Transparent | Assertion JSON                                         |
-| `org.hamcrest:hamcrest`                 | API Transparent | declarative assertions                                 |
-| `org.awaitility:awaitility`             | API Transparent | Java DSL for synchronizing asynchronous operations     |
-| `org.xmlunit:xmlunit-core`              | API Transparent | [XMLUnit](https://github.com/xmlunit/xmlunit) for Java |
-| `jakarta.xml.bind:jakarta.xml.bind-api` | API Transparent | Jakarta XML Binding API                                |
-| `io.rest-assured:rest-assured`          | API Transparent | -                                                      |
-| `org.junit.jupiter:junit-jupiter-api`   | Not yet         | -                                                      |
+## Why Kola Uses Groovy DSL Files
+
+Kola uses a Groovy-based DSL because it balances three needs well:
+
+1. expressive scenario syntax
+2. concise test authoring
+3. straightforward integration with JVM-based build workflows
+
+The goal is not to introduce a brand-new language. The goal is to keep scenario authoring lighter than handwritten Java test fixtures while still fitting normal Gradle projects.
+
+## Dependency Strategy
+
+Kola builds on familiar JVM testing infrastructure instead of inventing its own isolated runtime stack.
+
+Typical supporting libraries include:
+
+- Spring testing utilities
+- JUnit 5
+- AssertJ
+- Mockito
+- Rest Assured
+- JSON and XML assertion helpers
+
+That decision keeps Kola easier to integrate into existing teams and reduces the amount of new testing infrastructure people need to learn.
+
+## Why Kola Fits ApiHug Well
+
+Kola is designed for proto-driven ApiHug projects first.
+
+That gives it three advantages:
+
+- scenario structure can stay close to the contract model
+- generated artifacts and tests evolve together
+- the team gets one shared testing entrypoint instead of scattered custom scripts
+
+Kola can still be used around non-ApiHug APIs, but the closer the project is to the ApiHug contract model, the more value Kola can provide.
+
+## Result
+
+Kola's design is intentionally practical: readable scenarios, contract-aware execution, and a JVM toolchain that feels familiar enough to adopt without rebuilding the whole testing stack.
+
+## Related Pages
+
+1. [What Kola Is](/docs/kola/001_what_is_kola)
+2. [Kola Principles](/docs/kola/004_principle)
+3. [Kola Tool Chain](/docs/kola/005_tool_chain)

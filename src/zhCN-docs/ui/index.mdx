@@ -1,29 +1,28 @@
-export const title = "ApiHug UI 解决方案";
+export const title = "ApiHug UI 方案";
 export const description =
-  "前后端语义化设计，节约80%以上时间";
+  "理解 ApiHug 如何把契约设计延伸到前端应用层。";
 
+## 它是什么
 
-## 背景
+UI 章节说明 ApiHug 如何把契约优先设计延伸到前端层，包括 proto 对前端的约束、Vue 应用组织方式，以及生成式 UI 工具链。
 
-现代前端框架日趋SPA(Single Page Application)化，给前后协同都带来了挑战，ApiHug试图减少多人在前后协同带来的理解难度，和同步的滞后性。
-所以采用了：
+## 适用场景
 
-1. 前后项目在同工程中不同子模块
-2. 工具链上融合， `gradle` +  `vite`, 无缝集成，互相可以调用任务
-3. 运行时，java application 静态代理 + vue 端 proxy
+当你希望：
 
-以实现前后端人员协同最大化，上下文切换最低化，开发效率最大化！ 
+- 基于 ApiHug 契约组织前端项目
+- 让路由、服务层、i18n 与生成结果保持一致
+- 减少前后端对齐时的重复手工工作
 
-这中新开发方式不是 ApiHug 首创，很早如[Jhipster](https://www.jhipster.tech/) 已在尝试，当然 ApiHug 也从 Jhipster上获取了很多灵感；
+就应该从这一节开始。
 
-ApiHug 紧紧围绕 Open Api 标准，使用DSL作为不同角色之间通用语言，让这一步推进异常的顺利！
+## 推荐阅读顺序
 
-下面我们从协议层， 到应用层， 再到UI 层一一带你一步步领略如何借助 ApiHug 快速而又优雅进行全栈开发！ 
+1. [协议层](/zhCN-docs/ui/001_proto)
+2. [Vue 框架](/zhCN-docs/ui/002_vue)
+3. [应用配置](/zhCN-docs/ui/003_app)
+4. [工具链](/zhCN-docs/ui/004_tool_chain)
 
+## 结果
 
-## Refer
-
-1. [Jhipster](https://www.jhipster.tech/)
-2. [jmix](https://www.jmix.io/)
-3. [vaadin](https://vaadin.com/)
-
+读完这一节后，你应该能理解 ApiHug UI 不是“独立前端模板”，而是和后端契约、生成数据层、应用配置一起协作的完整前端工作流。

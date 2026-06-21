@@ -14,7 +14,7 @@ const PLATFORMS: Record<PlatformKey, { label: string; command: string }> = {
     command: "iex (irm 'https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.ps1')",
   },
   cmd: {
-    label: "CMD",
+    label: "Command",
     command: 'powershell -c "irm https://raw.githubusercontent.com/apihug/apihug.github.io/main/helper/apihug-install.ps1 | iex"',
   },
   bash: {
@@ -71,13 +71,13 @@ const Hero: React.FC = () => {
         <p className="px-2 font-mono text-sm/6 font-medium tracking-widest text-gray-500 uppercase max-sm:px-4 dark:text-gray-400">
           API as Architecture
         </p>
-        <h1 className="mt-2 px-2 text-4xl tracking-tighter text-balance max-lg:font-medium max-sm:px-4 sm:text-5xl lg:text-6xl xl:text-8xl">
+        <h1 className="mt-2 px-2 text-4xl/11 font-medium tracking-tight text-balance max-sm:px-4 sm:text-5xl/[1.05] lg:text-6xl/[1.02]">
           Embrace AI with every API.
         </h1>
       </GridContainer>
       <GridContainer className="mt-4">
         <p className="max-w-(--breakpoint-md) px-2 text-lg/7 font-medium text-gray-600 max-sm:px-4 dark:text-gray-400">
-          One protobuf contract. Your{" "}
+          One contract. Your{" "}
           <span className="font-mono text-[1.0625rem] text-sky-500 dark:text-sky-400">APIs</span>,{" "}
           <span className="font-mono text-[1.0625rem] text-sky-500 dark:text-sky-400">services</span>,{" "}
           <span className="font-mono text-[1.0625rem] text-sky-500 dark:text-sky-400">databases</span> — a design language that embraces both engineers and{" "}
@@ -197,7 +197,7 @@ const Hero: React.FC = () => {
           <div className="relative flex flex-col border-(--pattern-fg) bg-[image:repeating-linear-gradient(315deg,_var(--pattern-fg)_0,_var(--pattern-fg)_1px,_transparent_0,_transparent_50%)] bg-[size:10px_10px] bg-fixed [--pattern-fg:var(--color-black)]/5 p-2 dark:[--pattern-fg:var(--color-white)]/10">
             <div className="mb-2 px-3 pt-1">
               <div className="font-mono text-xs text-gray-500 dark:text-gray-400">OrderController.java</div>
-              <div className="text-xs text-gray-500 dark:text-gray-500">ApiHug generates your Spring Boot controller</div>
+              <div className="text-xs text-gray-500 dark:text-gray-500">ApiHug generates your API controller</div>
             </div>
             <Editor>
               <div

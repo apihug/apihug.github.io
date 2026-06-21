@@ -1,91 +1,85 @@
-export const title = "Why SSOT is important";
+export const title = "单一可信源";
 export const description =
-  "Single source of truth, more efficient communication and collaboration";
+  "为什么 ApiHug 把契约视为受控的事实来源，用来保持代码、文档与协作的一致性。";
 
+## 它是什么
 
-<TipInfo>To be done 🏗️</TipInfo>
+单一可信源（SSOT，Single Source of Truth）指的是：团队明确约定哪一个受控对象代表“当前真实状态”。
 
-> Single source of truth (SSOT) is used to describe the unique data that everyone in an organization relies on for reference.
+在 API 场景里，问题不只是把信息保存下来，而是当需求变化时，如何让产品意图、接口定义、生成代码、测试和文档持续保持同步。
 
+## 为什么重要
 
-## Concept
+分工一旦变多，漂移就很容易发生：
 
-`SSOT`: Single Source Of Truth, as the name suggests.
+- 产品改了需求
+- 后端改了实现
+- 前端跟着最新接口载荷调整
+- 文档却停留在旧版本
 
-Once upon a time, the computer world was controlled by something called a Mainframe, where code and programs were centralized. However, with the proliferation of various solutions and the distribution and decentralization of computer resources, the environment and architecture have become microservices, which brings benefits as well as challenges.
-The fragmentation of management and collaboration, while providing a high degree of autonomy to different working groups and different roles within the same group, also brings inevitable conflicts in change management. This is not out of malice but due to architectural design flaws that cannot adapt to the change management required in modern distributed systems.
-Fortunately, there is a set of methods, single source of truth (SSOT) + GitOps principles, that can effectively manage the changes in your organizational assets.
+如果每个角色读取的是不同来源，变更管理就会越来越慢，也越来越容易出错。
 
-> Single source of truth (SSOT) is a concept used to ensure that everyone in an organization bases business decisions on the same data.
+## 为什么只有源码还不够
 
-## Why
+源码对“程序如何运行”当然是权威的，但它并不总是理想的协作介质。
 
-Change management, the pursuit of **fast, accurate** delivery to all places, **fast**: all processes are as automated as possible; **accurate**: the need to exclude human intervention, formatted expression: **code**.
-Everything is code (Code), which is both the code in the sense of human-computer interaction and the principle (Law). Code and Law are two closely related concepts, such as the Pirate Code that everyone must follow in the "Pirates of the Caribbean."
+源码本身通常无法同时满足两件事：
 
-<img src={require('@/img/principles/pirates-code.webp').default.src} alt="Pirates" width={3508} height={2480} className="rounded-lg" />
+1. 所有相关角色都能方便地读懂这份事实
+2. 当事实变化时，下游流程可以稳定地感知并响应
 
-Applications (Application), networking (Networking), computing resources (Computing resources), storage (Storage), everything can be codified.
-Unified under code (Code) is easy to handle, which is equivalent to normalizing everything, and the rules of code time are unified.
-Code has its own verification rules: static or dynamic, and code has its own organization, storage, and distribution methods: Repository & Artificat; Nexus Repository in the Java world, npm in the JavaScript world.
+这也是为什么很多纯代码驱动的 API 工作流，即使能反向生成文档，仍然会逐渐失去同步。
 
-> Git repository is the sole source of truth
+## 为什么要强调 Specification First（规范优先）
 
-Based on the Git construction process, it has evolved into GitOps.
-Most modern Git repository platforms have already integrated CI/CD interactions into their list of essential functions.
+受控的规范可以为团队提供一层中立的协作界面。
 
-<img src={require('@/img/principles/git-op1.webp').default.src} alt="Git Ops" width={1080} height={758} className="rounded-lg" />
+它不再把实现、文档、测试当成三套平行世界，而是把它们都收敛到同一份持续演进的契约上。API 生态里常见的形式包括 OpenAPI、gRPC、AsyncAPI、GraphQL 等。
 
+## ApiHug 如何应用这个原则
 
-When all resources are codified, GitOps controls storage, versioning, synchronization, etc.
+ApiHug 把契约视为 API 生命周期中的协作中心。
 
-<img src={require('@/img/principles/git-op2.webp').default.src} alt="Pirates" width={1080} height={702} className="rounded-lg" />
+这份契约应该：
 
+- 存放在 Git 中被版本化管理
+- 可以被多角色评审
+- 能够连接生成、校验与分发流程
 
-Under this principle, architects need to ensure that all artifacts (such as jar packages) have detailed descriptions, displays, and controls of the underlying environmental architecture; deployment scripts need: CI/CD process control; virtual environment configuration files; they should be as detailed and rigorous as the database's ERD, architectural UML, etc.
+这也是 ApiHug 为什么强调契约优先，而不是把文档生成或代码生成当成附属能力。
 
-So, what does this have to do with the entire API lifecycle management? Here's an example:
+## Git 与自动化
 
-## An Example
+Git 很适合作为 SSOT 的承载层，因为它天然提供了：
 
-API implementation + API documentation is as follows. Of course, the API documentation here is independently written, and now it can be generated from the code in reverse. However, most are still disconnected. If you are directly using some API design tools, such as ApiFox, Postman, Stoplight, etc., the two parallel worlds still exist!
+- 版本历史
+- 评审流程
+- 分支控制
+- Webhook 与 CI/CD 集成能力
 
-<img src={require('@/img/principles/api-syn-1.webp').default.src} alt="Pirates" width={1080} height={527} className="rounded-lg" />
+它不会自动解决所有同步问题，但它提供了围绕契约变化建立自动化流程所需要的控制面。
 
-The next day, a new interface '/elephants' was added to the requirements, and something bad happened, the API documentation was not synchronized! Now, after reverse generation of the document, it feeds back to the API sharing platform, whether manually or semi-automatically, but this is not a perfect solution. The defect is that although the source code plays the role of SSOT, it does not take full responsibility; the SSOT role needs:
+<img src={require('@/img/principles/git-op1.webp').default.src} alt="GitOps 作为版本化资产的控制层" width={1080} height={758} className="rounded-lg" />
 
-1. A way for all parties to access
-2. To notify interested parties when the truth changes
+## 一个契约优先的例子
 
-Obviously, the source code does not have the above capabilities! So, what should be used as the only trusted source SSOT?
-At this time, an independent Specification is needed, and this Specification is preferred:
-> All work emanates from an ever-evolving but controlled specification. This includes coding, documenting, and enhancing software
+当一个新接口被加入时，最先变化的应该是契约。随后，这个契约变化再驱动：
 
-**Specification First** is a software development method whose core concept is that all work originates from a continuously evolving but controlled specification. This includes aspects such as coding, document writing, and software enhancement. This is the code, it's the law!
+- 文档更新
+- 代码生成
+- 前后端协作任务
+- 下游交付与校验动作
 
-"Specification First" has many in the API world: OpenAPI, gRPC, AsyncAPI, or GraphQL, etc.
+如果没有这条链路，团队通常就会退回到手工同步，并把“不同步”当成常态。
 
-Specification serves as a neutral SSOT to control the generation of documentation and code. Different roles in software development use the API Specification as a collaborative medium, as follows:
+<img src={require('@/img/principles/api-syn-2.webp').default.src} alt="规范作为中立协作层" width={1080} height={390} className="rounded-lg" />
 
-<img src={require('@/img/principles/api-syn-2.webp').default.src} alt="Pirates" width={1080} height={390} className="rounded-lg" />
+## 结果
 
+SSOT 不只是一个存储概念，它本质上是一套变更管理策略。ApiHug 通过把契约作为这套策略的核心，帮助团队减少理解偏差，更安全地自动化，并让 API 生命周期中的多类产物保持一致。
 
-There is also a defect: How to prevent API developers from entering the source code and changing the API without the knowledge of the documentation personnel, causing the content to become out of sync again? This is where automation comes into play. As shown in the figure below, the `OnSpecChange` event displayed at the bottom indicates that when the API specification is changed, it will trigger an `OnSpecChange` event in some way, and interested parties can respond accordingly.
-
-Current Git repositories generally provide a Web Hook mechanism to obtain the relevant triggers for the next action.
-
-<img src={require('@/img/principles/api-syn-3.webp').default.src} alt="Pirates" width={1080} height={557} className="rounded-lg" />
-
-
-This scheme still has significant limitations. Triggering the next action, automatically updating the code and documentation, especially the code update, still cannot be smoothly achieved under the limitations of language and architecture, and the risk is relatively high.
-
-SSOT is easy to choose, but the path to synchronization is still long. How to truly eliminate the differences in understanding of changes among different roles and links, and maintain strong consistency, is a topic that is always worth exploring.
-
-[Apihug](https://www.apihug.com) not only uses `git` as the first management tool for the single source of truth of the `API` protocol standard, relying on major git service providers (Github, GitLab, Gitee, etc.) to unify the management of `API` protocols and version iterations; at the same time, in the distribution and sharing of `API` protocols, it uses existing distribution tools; modularization, reuse of `API` components, to avoid repetitive work, significantly improving development efficiency.
-
-## Refer
+## 参考
 
 - [Implementing single source of truth in an enterprise architecture](https://www.redhat.com/architect/single-source-truth-architecture)
 - [Single Source of Truth](https://www.talend.com/resources/single-source-truth/)
-- [swaggerhub -The Single Source of Truth for API Development](https://swagger.io/tools/swaggerhub/)
-- [Metadata-as-Code SSOT](https://hackolade.com/metadata-as-code.html)
+- [SwaggerHub and API collaboration](https://swagger.io/tools/swaggerhub/)

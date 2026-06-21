@@ -1,137 +1,65 @@
-export const title = "Milestone of 2024-02-22";
+export const title = "Milestone 2024-02-22";
 export const description =
-  "With SDK [0.6.0-RELEASE] and plugin  [0.2.0]";
-
+  "针对 0.6.0 SDK 与 0.2.0 IntelliJ 插件兼容性断点的早期迁移说明。";
 
 <TipGood>
-  After the SDK and plugin upgrade on February 22, 2024, the migration process was triggered. If you are using ApiHug after that date, you won't encounter any issues, and there is no need to refer to this document.  
+  这份指南只适用于 2024 年 2 月 22 日之前已经存在的旧项目。
 </TipGood>
 
-⚠️ This is an incompatible change, Both the SDK and IDE plugin not compatible with previous version.
+<TipBad>
+  这是一次不兼容升级。旧版 SDK 与 IDE 插件无法继续直接配合新版使用。
+</TipBad>
 
-⚠️ Upgrade the [Spring boot](#spring-version) to `3.2+` and if any incompatible 3rd party libs(Cloud etc.)
+## 发生了什么
 
-😆 Guide：
+这个版本阶段引入了 ApiHug 早期的重要结构调整，后续很多版本都建立在这次迁移之上。
 
-1. [ApiHug101-Bilibili](https://space.bilibili.com/666522636)
-2. [ApiHug101 Youtube](https://youtube.com/@ApiHug?si=C1yw0poHA01zbmyj)
+当时最重要的两项要求是：
 
-[Maven Central](https://search.maven.org/artifact/com.apihug/it-bom)
+1. 升级到新的 SDK / 插件线
+2. 把工程对齐到 Spring Boot `3.2+`
 
-[ApiHug - API design Copilot](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
+## 升级步骤
 
-## ApiHug [0.6.0-RELEASE] -  2024-02-22
+### 项目版本
 
-### SDK Features
+更新 `{PROJECT}/gradle/libs.versions.toml`：
 
-- `google.protobuf.BoolValue` -> `hope.common.BoolType`, less code, more straightforward. [3 kinds Boolean](../../blog/2024Q1/20240222-3-kinds-boolean-issue.md)
-- message field deprecated flag picker logic
-- `authorization_struct`  --> `rbac` make it more human friendly: `RBAC rbac = 2;`
-- support `hope.common.BoolType blank = 49;` for the `String` specific field
-    - `empty` vs `blank`,  blank more for the string field, string field may not empty, but may be blank, as it include no qualify character, like space, tab, etc.
-- bug fix
+```toml
+apihug = "0.6.0-RELEASE"
+```
 
-## ApiHug-IDE [0.2.0] -  2024-02-22
+### IntelliJ 插件
 
-### IDE Features
+安装或升级 ApiHug IntelliJ 插件到 `0.2.0+`。
 
-1. new wire info panel, link to enum
-2. auto refresh after edit
-3. upgrade the AST parser
-4. authority auto complete
-5. bugfix
+### Spring 兼容性
 
-## Steps
+确认项目使用 Spring Boot `3.2+`，并检查第三方依赖是否兼容，尤其是 Spring Cloud 与数据访问相关组件。
 
-**Upgrade SDK+IDE Version**：
+## Proto 语法迁移
 
-## Project
+这个版本阶段涉及两项较早的语法变化：
 
-1. `{PROJECT}/gradle/libs.versions.toml`
-2. `apihug = "OLD_VERSION"` -> `0.6.0-RELEASE`+
+1. `google.protobuf.BoolValue` 逐步迁移到 `hope.common.BoolType`
+2. `authorization_struct` 改名为 `rbac`
 
-## Plugin
-
-1. download: [ApiHug - API design Copilot](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)  `0.2.0`+
-2. upgrade in IDE:
-
-
-<img src={require('@/img/milestone/milstone02.png').default.src} alt="Milestone February 22, 2024" width={1080} height={758} className="rounded-lg" />
-
-
-### Code
-
-**1.`google.protobuf.BoolValue` -> `hope.common.BoolType`**
-
-🏁 find all the broken like:
+布尔字段示例：
 
 ```proto
-    empty: {
-      value: false
-    };
+empty: false;
 ```
 
-**Change TO**:
+授权字段示例：
 
 ```proto
-    empty: FALSE;
+rbac: {
+  authorities: "PLATFORM_MEMBER_OPERATE";
+  combinator: OR;
+  predefined_role_checker: PLATFORM_MANAGER
+}
 ```
 
-**2. `authorization_struct`  --> `rbac`**
+## 结果
 
-🏁 find all the broken like:
-
-```proto
-       authorization_struct: {
-          authorities: "PLATFORM_MEMBER_OPERATE";
-          combinator: OR;
-          predefined_role_checker: PLATFORM_MANAGER
-        }
-      }
-```
-
-**Change TO**:
-
-```proto
-       rbac: {
-          authorities: "PLATFORM_MEMBER_OPERATE";
-          combinator: OR;
-          predefined_role_checker: PLATFORM_MANAGER
-        }
-      }
-```
-
-🥳🥳🥳 all done!
-
-## Spring version
-
-1. check the spring version: `3.2+`
-2. other 3rd party lib: **cloud(2023+)**, **mybatis** etc.
-3. search google for the key words, or contact me!
-
-**factoryBeanObjectType** issue [Invalid value type for attribute 'factoryBeanObjectType': java.lang.String](https://github.com/spring-projects/spring-framework/issues/31247):
-
-```shell
-java.lang.IllegalStateException: Error processing condition on org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration.propertySourcesPlaceholderConfigurer
-	at org.springframework.boot.autoconfigure.condition.SpringBootCondition.matches(SpringBootCondition.java:60)
-Caused by: java.lang.IllegalArgumentException: Invalid value type for attribute 'factoryBeanObjectType': java.lang.String
-	at org.springframework.beans.factory.support.FactoryBeanRegistrySupport.getTypeForFactoryBeanFromAttributes(FactoryBeanRegistrySupport.java:86)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.getTypeForFactoryBean(AbstractAutowireCapableBeanFactory.java:837)
-  ...
-	... 15 common frames omitted
-```
-
-**MappingJdbcConverter** issue;
-
-```shell
-	at hope.common.spring.data.persistence.config.HopeAbstractJdbcConfiguration.jdbcConverter(HopeAbstractJdbcConfiguration.java:133)
-  ...
-Caused by: java.lang.ClassNotFoundException: org.springframework.data.jdbc.core.convert.MappingJdbcConverter
-	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:520)
-
-	... 66 common frames omitted
-```
-
----
-
-<img src={require('@/img/hug/apihug-contact.gif').default.src} alt="Apihug Contact QR Code" width={750} height={750} className="rounded-lg" />
+完成这次迁移后，项目就可以进入新的 SDK / 插件版本线，并继续跟随后续里程碑，而不再停留在 0.6 之前的兼容分支。

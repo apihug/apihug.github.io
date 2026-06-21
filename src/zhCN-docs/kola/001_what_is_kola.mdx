@@ -1,93 +1,41 @@
-export const title = "What's ApiHug Kola, 关于 Kola";
+export const title = "Kola 是什么";
 export const description =
-  "Kola background, why we create kola, about kola";
+  "理解 Kola 为什么存在，以及它在 ApiHug 测试模型中的位置。";
 
+## 它是什么
 
-## Latest
+Kola 是 ApiHug 生态中的测试框架和配套工具链。它使用 DSL 风格表达测试场景，目标是让产品、前端、后端和测试角色围绕同一份场景描述协作。
 
-⚠️请及时更新 SDK + IDEA插件保持先进⚠️
+## 为什么需要它
 
-**SDK Version**
+传统 API 测试常常有两个问题：
 
-[Maven Central](https://search.maven.org/artifact/com.apihug/it-bom)
+- 过于代码化，非测试/非后端角色难以理解
+- 过于松散，时间一长就和真实契约脱节
 
-**Plugin Version**
+Kola 想解决的正是这两个问题：让测试既可读、又能被版本化和持续维护。
 
-[Maven Central](https://search.maven.org/artifact/com.apihug/it-bom)
+## 核心理念
 
+Kola 延续了 ApiHug 的几条核心原则：
 
-[JetBrains Marketplace](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
+1. 用统一语言降低跨角色沟通损耗
+2. 尽量复用现有测试资产和主流技术栈
+3. 降低场景编写门槛
+4. 让测试意图和契约一起成为单一可信源
 
-## Summary
+## 它如何融入 ApiHug
 
-Kola 是一个测试 框架+工具， 主要为Apihug 整个生态服务， 还在持续的开发和丰富中(2024/08).
+Kola 不是独立于 ApiHug 之外的一套测试体系。它最适合放在 proto 驱动的模块旁边，让：
 
-Kola一脉相承 ApiHug 的设计原则：
+- API 契约
+- 生成结果
+- 测试场景
 
-1. 统一语言，DSL，减少分歧
-2. 依托现有技术，最大化利用现有资产
-3. 极低学习成本
-4. 单一信任源，版本化管理
+随着同一轮变更一起演进。
 
-## Why
+## 下一步
 
-### 现有困境
+继续阅读实践入口页：
 
-1. 测试或需要要很专业(编程技能)，或很松散(结构不严谨)
-2. 多工具栈，多角色之间切换上下文缺失
-3. 缺乏设计规划先行
-4. 严谨的版本管理
-5. 团队协同困难(测试和开发， 测试和测试)
-
-
-### 现有概念
-
-1. TDD: Test driven development
-2. BDD: Behaviour-Driven Development
-3. CDC: Consumer Driven Contracts
-
-### So
-
-在现有众多的测试解决方案里， 每种方案都有自己的优缺点， 这也使集成方案，在使用便利性和整体完整性不能兼得。 
-
-当下方案难以满足：让所有人产品，前后端，测试等角色都能统一理解，书写，维护，管理测试。 
-
-Kola 在限定环境 (ApiHug), 提供了可行比较好的方案：
-
-1. 遵循 `BDD` 习惯， Given/When/Then/And，直观又简单
-2. `DSL`, 基于 `groovy` 声明式语法
-3. 强校验：静态检查(groovy) + 编译处理 + 代码生成 
-4. 更多的语法糖, 更好适应用户习惯迁移: junit, junit5，assertj，jsonpath,rest-assured
-5. ApiHug 集成
-6. IDE 支持
-7. 团队协同
-
-最终在 **2024-08-02** 里程碑 **1.0.0-RELEASE**  随着整个ApiHug SDK 发行了Kola 第一个版本; [Kola Index](/zhCN-docs/kola)。
-
-## Ongoing
-
-1. Multipart file support ~DONE~
-2. Customized report
-3. Debug tool
-4. Dependencies import
-5. Event Driven support
-6. Stub side
-7. performance test
-
-
-## 参考
-
-1. spring test [spring-framework/spring-test](https://github.com/spring-projects/spring-framework/tree/main/spring-test)
-2. spring test doc [spring-framework/reference/testing](https://docs.spring.io/spring-framework/reference/testing.html)
-3. spring boot test [spring-boot-test](https://github.com/spring-projects/spring-boot/tree/main/spring-boot-project/spring-boot-test)
-4. spring boot test doc [spring-boot/testing](https://docs.spring.io/spring-boot/reference/testing/index.html)
-5. spring contract [spring-cloud-contract](https://github.com/spring-cloud/spring-cloud-contract)
-6. spring contract doc [spring-cloud-contract reference](https://docs.spring.io/spring-cloud-contract/reference/)
-7. cucumber [Behaviour-Driven Development](https://cucumber.io/docs/bdd/)
-8. Spock: [Spock Framework](https://spockframework.org/)
-9. [karate](https://karatelabs.github.io/karate/) Test Automation Made Simple
-10. [Contract Test](https://martinfowler.com/bliki/ContractTest.html) Martin Fowler
-11. [PactFlow](https://pactflow.io/) SmartBear Consumer Driven
-12. [Contract Testing Vs Integration Testing](https://pactflow.io/blog/contract-testing-vs-integration-testing/) from PactFlow
-13. [Consumer-Driven Contracts: A Service Evolution Pattern](https://martinfowler.com/articles/consumerDrivenContracts.html)
-
+1. [Kola Index](/zhCN-docs/kola)

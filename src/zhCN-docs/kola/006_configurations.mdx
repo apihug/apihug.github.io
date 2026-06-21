@@ -1,15 +1,45 @@
-export const title = "Kola Configuration & Appendix & Others";
+export const title = "Kola 配置与附录";
 export const description =
-  "Kola 配置细节， 术语表";
+  "记录 Kola 使用过程中的配置关注点、IDE 辅助入口和补充说明。";
 
+## 本页说明
 
+这一页不是 Kola 的主入门页，而是把分散的配置注意点集中收拢，方便在落地时快速查阅。
 
-## Wire
+## 构建侧关注点
 
-## IDEA
+使用 Kola 时，最先需要确认的是构建层已经具备稳定入口：
 
-### File Template
+- proto 模块已经启用 Kola 相关任务
+- SDK 版本与插件版本保持兼容
+- 团队知道统一的执行命令，例如 `./gradlew.bat {proto_module}:kolaTest --stacktrace`
 
-### Add Edit Widget
+## IDE 侧关注点
 
-⚠️TBD⚠️
+在 IntelliJ 中，Kola 相关体验通常依赖 ApiHug 插件提供的编辑辅助能力。
+
+常见场景包括：
+
+- 创建 proto / 场景文件
+- 使用上下文菜单补全结构
+- 结合 Gradle 刷新让 IDE 重新识别 DSL 文件
+
+## 文件模板与追加编辑
+
+如果你的项目已经形成固定的 Kola 目录约定，建议团队统一：
+
+- 场景文件放置目录
+- 命名规则
+- 基础模板结构
+
+这样可以减少团队成员之间的文件组织差异。
+
+## 结果
+
+把这些配置关注点提前统一之后，Kola 的落地过程会更顺滑，团队也更容易把它当成稳定工具链，而不是只靠少数人记住的“经验配置”。
+
+## 相关页面
+
+1. [Kola 首页](/zhCN-docs/kola)
+2. [Kola 工具链](/zhCN-docs/kola/005_tool_chain)
+3. [Kola 原则](/zhCN-docs/kola/004_principle)

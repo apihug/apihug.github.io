@@ -1,174 +1,140 @@
 export const title = "极简 Authentication & Authorization";
 export const description =
-  "Hope 实现Authentication & Authorization, JWT, RBAC";
+  "Hope 实现 Authentication、Authorization、JWT 与 RBAC";
 
+## 它解决什么问题
 
-## Authentication
+ApiHug 把权限定义拆成两部分：
 
-### JWT
+1. **契约层定义**：在 proto 中声明资源、权限与授权规则
+2. **运行时实现**：在 Spring 应用里解析 JWT、装配 `Customer`、执行权限检查
 
-## Authorization
+这样做的好处是，接口契约、权限文档、运行时校验都来自同一份定义。
 
-要检查登录账户的权限，您需要三个步骤：
-
-1. 定义资源（API路径）的授权属性
-2. 登录账户安全上下文自定义
-3. 设置账户和权限的映射
-
-### Define resource authorization
-
-检查 [Milestone 20240510](/zhCN-docs/milestone/milestone-20240510#rbac) `rbac `部分:
-
-<img src={require('@/img/framework/authorization.png').default.src} alt="domain design" width={2408} height={886} className="rounded-lg" />
-
-
-#### **1.** 设置权限枚举
+## 第一步：定义权限枚举
 
 ```protobuf
-enum  BookAuthorityEnum {
+enum BookAuthorityEnum {
+  option (hope.swagger.enm) = {
+    description: "Authority used in book project";
+  };
 
-    option (hope.swagger.enm) = {
-        description: "Authority used in book project"
-    };
-
-    BOOK_ADD = 0 [(hope.constant.field) = {code: 1,message: "book:add", message2: "Authority to add book"}];
-    BOOK_DELETE = 1 [(hope.constant.field) = {code: 2,message: "book:remove", message2: "Authority to delete book"}];
-    BOOK_MODIFY = 2 [(hope.constant.field) = {code: 3,message: "book:modify", message2: "Authority to modify book"}];
-
+  BOOK_ADD = 0 [(hope.constant.field) = {
+    code: 1,
+    message: "book:add",
+    message2: "Authority to add book"
+  }];
+  BOOK_DELETE = 1 [(hope.constant.field) = {
+    code: 2,
+    message: "book:delete",
+    message2: "Authority to delete book"
+  }];
+  BOOK_MODIFY = 2 [(hope.constant.field) = {
+    code: 3,
+    message: "book:modify",
+    message2: "Authority to modify book"
+  }];
 }
 ```
 
-#### **2.** 添加枚举到 `hope-wire.json` 配置
+## 第二步：把权限枚举接入 wire 配置
 
 ```json
-  "authority" : {
-    "enumClass" : "com.novel.book.proto.infra.settings.BookAuthorityEnum",
-    "codePrefix" : 10240000
-  }
+"authority": {
+  "enumClass": "com.novel.book.proto.infra.settings.BookAuthorityEnum",
+  "codePrefix": 10240000
+}
 ```
 
-#### **3.** 包含你的资源
+## 第三步：在 API 上声明授权规则
 
 ```protobuf
-
-  rpc ListCategory (com.novel.book.proto.api.admin.request.CategoryListRequest) returns (com.novel.book.proto.api.admin.response.CategoryVoResponse) {
-    option (hope.swagger.operation) = {
-      get: "/list-category";
-      description: "list all the categories support";
-      priority: MIDDLE;
-      out_plural: true;
-      authorization:{
-        rbac:{
-          authorities: "BOOK_DELETE";
-          combinator: OR;
-          predefined_role_checker: PLATFORM_MANAGER
-        }
+rpc ListCategory (CategoryListRequest) returns (CategoryVoResponse) {
+  option (hope.swagger.operation) = {
+    get: "/list-category";
+    description: "List all supported categories";
+    priority: MIDDLE;
+    output_repeated: true;
+    authorization: {
+      rbac: {
+        authorities: ["BOOK_DELETE"];
+        combinator: OR;
+        predefined_role_checker: PLATFORM_MANAGER;
       }
     };
-  }
+  };
+}
 ```
 
-#### **4.** 运行时配置
+这里要注意两点：
 
-这些配置将在您的应用程序模块中进行，而不是在proto模块中：
+- 使用 `output_repeated`，不要继续使用已废弃的 `out_plural`
+- `authorities` 是列表，应该写成 `["BOOK_DELETE"]`，而不是单个字符串
 
-在您的应用程序项目的包中找到自动生成的代码模板：`${PKG}.infra.security`（以`Book`为例，域为`Book`）：
+## 第四步：在应用侧补运行时实现
 
-```shell
-    1. AnonymousBookCustomer.java       
-    2. BookCustomer.java                
-    3. BookJWTPicker.java               
-    4. BookQuickCustomerRoleChecker.java
-    5. BookSecurityCustomerContextCustomizer.java
-    6. BookSecurityCustomizer.java
-```
+生成代码通常会在 `${PKG}.infra.security` 下提供这些入口：
 
-| Class                                   | Usage         | Comment                                                                       |
-|-----------------------------------------|---------------|-------------------------------------------------------------------------------|
-| Anonymous`Book`Customer                 | 匿名顾客定义        | 通常无需更新                                                                        |
-| `Book`Customer                          | 在安全上下文中使用的顾客  | 扩展以便动态加载附加字段，如权限，通常是`Book`SecurityCustomerContextCustomizer的响应，用于初始化并进行包装，需扩展 |
-| `Book`JWTPicker                         | 获取JWT的位置      | 通常从头部获取，但也可以从会话或cookies中获取                                                    |
-| `Book`QuickCustomerRoleChecker          | 快速平台/租户角色检查器  | 通常需要扩展                                                                        |
-| `Book`SecurityCustomerContextCustomizer | 安全上下文顾客初始化的响应 | 从token获取更多详细信息，创建新的顾客，如委托权限/角色获取器                                             |
-| `Book`SecurityCustomizer                | 安全配置定制        | 更改全局安全策略：如默认访问检查，或特定路径的特定规则                                                   |
+- `AnonymousBookCustomer`
+- `BookCustomer`
+- `BookJWTPicker`
+- `BookQuickCustomerRoleChecker`
+- `BookSecurityCustomerContextCustomizer`
+- `BookSecurityCustomizer`
 
+它们的职责通常是：
 
-#### **5.** 最后部分
+| 类型 | 作用 |
+| --- | --- |
+| `*Customer` | 当前登录用户对象 |
+| `*JWTPicker` | 从 Header / Cookie / Session 中提取 Token |
+| `*QuickCustomerRoleChecker` | 平台 / 租户等预定义角色校验 |
+| `*SecurityCustomerContextCustomizer` | 从 Token 或其他来源补充用户上下文 |
+| `*SecurityCustomizer` | 自定义全局安全策略 |
 
-这不是框架所能提供的，因为这依赖于您的业务逻辑：如何设置您与权限列表的账户关系。
+## 第五步：组织你的权限模型
 
-最佳实践是遵循基于角色的访问控制，即 **RBAC**。
+最常见的方式仍然是 RBAC。
 
-因此，您可以利用权限枚举，例如 `BookAuthorityEnum` 的消息模式来组织您的权限层次结构：
+例如：
 
-以这个书籍应用程序为例：
-
-```
-
+```text
 BOOK_ADD: book:add
 BOOK_DELETE: book:delete
 USER_BLOCK: user:block
 USER_EDIT: user:edit
-ORDER_APPROVE:order:approve
-ORDER_DELETE:order:delete
-ORDER_MODIFY:order:modify
-
+ORDER_APPROVE: order:approve
+ORDER_DELETE: order:delete
+ORDER_MODIFY: order:modify
 ```
 
-因此，层次结构可能如下所示：
+这会自然形成稳定的权限层次：
 
-```shell
-
-+---book
-|       add
-|       delete
-|
-+---user
-|       block
-|       edit
-|
-+---order
-|       approve
-|       delete
-|       modify
-
+```text
+book
+  add
+  delete
+user
+  block
+  edit
+order
+  approve
+  delete
+  modify
 ```
 
-㊗️ so enjoy!
+## 与 Spring Security 的关系
 
+这里不建议再写“禁用 Spring Security”的指导。ApiHug Security 本身就是建立在 Spring Security 之上的扩展，正确做法通常是：
 
-## 禁用 Spring Security
+- 让 ApiHug Security 与 Spring Security 一起工作
+- 用 proto + runtime 代码把业务权限接起来
+- 仅在你明确知道自己要裁剪哪些 Spring Security 能力时，再做定制化调整
 
-<TipInfo>⚠️ Apihug Security 与 Spring Security 在运行时不兼容。</TipInfo>
+如果你需要运行时细节，请继续阅读：
 
-禁用 Spring Security 最简单的方法是从项目中移除其 **依赖项**。
+- [ApiHug Spring Security Extension](/zhCN-docs/framework/spring-security)
 
-通过移除以下依赖，可以清除项目中所有由 Spring Security 提供的安全配置和默认设置：
+## 参考
 
-```xml
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-security</artifactId>
-    <version>...</version>
-</dependency>
-```
-
-移除该依赖后，应用程序中将不再包含任何 Spring Security 的功能。
-
-但如果您仍希望使用部分 Spring Security 的组件，我们建议您手动禁用其自动配置功能：
-
-**排除 Spring Security 自动配置**
-
-当项目类路径中包含 `spring-boot-starter-security` 时，Spring Boot 会自动启用安全配置。若要禁用该自动配置，可在 `application.properties` 文件中添加如下配置：
-
-```properties
-spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
-```
-
-如果您希望完全禁用 Spring Security，建议仅通过 `spring.autoconfigure.exclude` 配置实现，而不要创建 `SecurityConfiguration` 类。
-
-请注意：手动定义 Spring Security 配置类会覆盖 `application.properties` 中的配置，因此当两者同时存在时，`application.properties` 中的排除配置将失效。
-
-## Reference
-
-1. [RBAC-Wiki](https://en.wikipedia.org/wiki/Role-based_access_control)
+- [RBAC - Role-based access control](https://en.wikipedia.org/wiki/Role-based_access_control)

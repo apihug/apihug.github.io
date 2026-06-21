@@ -74,13 +74,13 @@ function DocsLocaleMenu() {
                 href="/docs"
                 className="rounded-lg px-3 py-2 text-sm/6 font-medium text-gray-950 hover:bg-gray-950/5 dark:text-white dark:hover:bg-white/10"
               >
-                English Docs
+                English
               </Link>
               <Link
                 href="/zhCN-docs"
                 className="rounded-lg px-3 py-2 text-sm/6 font-medium text-gray-950 hover:bg-gray-950/5 dark:text-white dark:hover:bg-white/10"
               >
-                中文文档
+                中文
               </Link>
             </div>
           </div>
@@ -122,8 +122,8 @@ export function Header(props: React.PropsWithChildren) {
             </kbd>
           </SearchButton>
           <DocsLocaleMenu />
-          <Link href="/blog" className="text-sm/6 text-gray-950 dark:text-white">
-            Blog
+          <Link href="/docs/changelog" className="text-sm/6 text-gray-950 dark:text-white">
+            Changelog
           </Link>
           <Link
             href="https://github.com/apihug"
@@ -169,19 +169,19 @@ export function Header(props: React.PropsWithChildren) {
                   href="/docs"
                   className="rounded-lg px-3 py-2 text-xl/9 font-medium text-gray-950 data-active:bg-gray-950/5 dark:text-white dark:hover:bg-white/10"
                 >
-                  English Docs
+                  English
                 </Link>
                 <Link
                   href="/zhCN-docs"
                   className="rounded-lg px-3 py-2 text-xl/9 font-medium text-gray-950 data-active:bg-gray-950/5 dark:text-white dark:hover:bg-white/10"
                 >
-                  中文文档
+                  中文
                 </Link>
                 <Link
-                  href="/blog"
+                  href="/docs/changelog"
                   className="rounded-lg px-3 py-2 text-xl/9 font-medium text-gray-950 data-active:bg-gray-950/5 dark:text-white dark:hover:bg-white/10"
                 >
-                  Blog
+                  Changelog
                 </Link>
                 <Link
                   href="https://github.com/apihug"

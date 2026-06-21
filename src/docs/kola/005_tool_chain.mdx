@@ -1,11 +1,83 @@
-export const title = "How we design Kola";
+export const title = "Kola Tool Chain";
 export const description =
-  "Kola background, Kola a consumer driver tester framework";
+  "Understand how SDK, IntelliJ, Gradle, and Kola DSL files work together in the ApiHug testing flow.";
 
-Kola, the apihug testing framework, enhances your capabilities by automating repetitive tasks and standardizing testing procedures. This frees up your time and resources, allowing you to focus on more strategic and high-impact activities.
+## What This Page Covers
 
-The framework's comprehensive testing capabilities and integration with other tools optimize your workflow, enabling you to work more efficiently and make informed decisions.
+This page explains the operational toolchain behind Kola, not just the DSL syntax.
 
-By leveraging Kola, you can elevate your testing capacity and redirect your efforts towards more valuable tasks that drive innovation and business growth.
+Use it when you need to understand which moving parts must stay aligned before Kola scenarios can run reliably.
 
-⚠️TBD⚠️
+## Core Components
+
+Kola depends on four cooperating layers:
+
+1. **Proto contracts** define the API surface and generated metadata.
+2. **ApiHug SDK** provides the runtime and testing support used by generated projects.
+3. **IntelliJ plugin** helps create and edit Kola files and related proto structures.
+4. **Gradle tasks** compile, generate, and execute contract-aware tests.
+
+If one of these layers is outdated, the testing flow usually degrades quickly.
+
+## Recommended Setup
+
+Keep the following versions aligned:
+
+- the project SDK version from your ApiHug BOM or platform dependencies
+- the IntelliJ plugin version used by the team
+- the Kola-related Gradle setup in the proto-driven module
+
+For current artifacts:
+
+- [Maven Central](https://search.maven.org/artifact/com.apihug/it-bom)
+- [JetBrains Marketplace](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
+
+## How the Flow Works
+
+### 1. Contract design starts in proto
+
+Service, request, response, entity, and supporting metadata are defined in the proto-driven module.
+
+### 2. Kola scenarios live beside the contract
+
+Kola works best when the scenario DSL files evolve together with the same module that owns the API contract.
+
+### 3. Gradle executes the contract-aware test task
+
+The typical entry command is:
+
+```shell
+./gradlew.bat {proto_module}:kolaTest --stacktrace
+```
+
+This is why Kola is best treated as a toolchain concern, not just a standalone DSL feature.
+
+## IntelliJ Responsibilities
+
+The IntelliJ plugin helps with:
+
+- creating proto and Kola-related files faster
+- reducing boilerplate when editing contract structures
+- keeping common editing tasks inside the IDE
+
+The plugin is not the execution engine. It improves authoring speed, while Gradle and the SDK still own generation and runtime execution.
+
+## Gradle Responsibilities
+
+Gradle is responsible for:
+
+- wiring generation and test execution into the module lifecycle
+- resolving the SDK/runtime dependencies needed by Kola
+- exposing a reproducible team entrypoint for contract-aware tests
+
+If your build does not expose the Kola task correctly, the DSL files alone are not enough.
+
+## Result
+
+When the SDK, plugin, proto module, and Gradle task stay aligned, Kola becomes a repeatable team workflow for contract-aware testing instead of a one-off local experiment.
+
+## Related Pages
+
+1. [Kola Index](/docs/kola)
+2. [What Kola Is](/docs/kola/001_what_is_kola)
+3. [Kola DSL](/docs/kola/003_dsl_contract)

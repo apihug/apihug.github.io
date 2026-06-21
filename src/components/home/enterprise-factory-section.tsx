@@ -101,7 +101,7 @@ export default function EnterpriseFactorySection() {
           <LinkButton href="/docs/start">Get started</LinkButton>
           <LinkButton
             href="/docs/framework"
-            className="inline-block rounded-4xl bg-white px-4 py-2 text-sm/6 font-semibold text-gray-950 inset-ring inset-ring-gray-950/8 hover:bg-gray-50 dark:bg-gray-950 dark:text-white dark:inset-ring-white/15 dark:hover:bg-gray-900"
+            className="inline-block rounded-4xl !bg-white px-4 py-2 text-sm/6 font-semibold !text-gray-950 inset-ring inset-ring-gray-950/8 hover:!bg-gray-50 dark:!bg-gray-950 dark:!text-white dark:inset-ring-white/15 dark:hover:!bg-gray-900"
           >
             Learn more
           </LinkButton>

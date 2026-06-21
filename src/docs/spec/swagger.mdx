@@ -272,8 +272,26 @@ Mark request/response as list.
 #### `raw` (optional bool)
 Do not wrap response (return raw type directly).
 
+#### `session` (optional bool)
+Pass `HttpSession` through to the generated Java controller when the endpoint needs servlet-session access.
+
+#### `request_schema` / `response_schema`
+Use these to attach swagger-specific JSON-schema metadata directly at the operation level when request or response payload documentation needs to be more explicit than the raw message type alone.
+
+```proto
+option (hope.swagger.operation) = {
+  post: "/register";
+  request_schema: {
+    title: "RegisterPayload";
+    description: "Validated registration body";
+  };
+};
+```
+
 #### `body_empty` (bool)
 Allow response body to be empty.
+
+`body_empty`, `response_schema`, and operation-level `mock` are mutually exclusive response customization paths in the source `oneof ResponseCustomized`.
 
 ### 4.3 Media Types
 
@@ -291,7 +309,7 @@ Content-Type accepted/returned by the interface.
 | `TEXT_HTML` | text/html | HTML page |
 | `APPLICATION_PDF` | application/pdf | PDF file |
 | `APPLICATION_ZIP` | application/zip | Zip archive |
-| `APPLICATION_XLSX` | application/vnd.openxmlformats-officedocument.spreadsheetml.sheet | Excel |
+| `APPLICATION_VND_OPEN_XML_FORMATS_XLSX` | application/vnd.openxmlformats-officedocument.spreadsheetml.sheet | Excel |
 | `IMAGE_PNG` | image/png | PNG image |
 | `MULTIPART_FORM_DATA` | multipart/form-data | File upload |
 | `APPLICATION_OCTET_STREAM` | application/octet-stream | Binary download |
@@ -318,6 +336,8 @@ The source enum is broader than this quick table and also includes office format
 | `is_repeated` | bool | Mark the parameter as an array/list |
 
 `plural` still exists in source as a deprecated compatibility field. Prefer `is_repeated`.
+
+For Java controller generation, `session: true` is a separate operation-level flag. It indicates servlet-session access and should not be confused with declaring a `SESSION` parameter in the OpenAPI parameter list.
 
 **IN Enum Values**:
 
@@ -406,6 +426,13 @@ authorization: {
 
 #### `internal` / `hide` / `deprecated` (bool)
 Mark as internal, hidden from docs, or deprecated.
+
+#### `multipart` / `multiple`
+
+- `multipart`: current flag for multipart request handling
+- `multiple`: deprecated compatibility alias retained in the source proto
+
+Prefer `multipart`.
 
 ### 4.7 AI-friendly Fields
 
@@ -533,6 +560,18 @@ enum: ["PENDING", "APPROVED", "REJECTED"];
 | `EMAIL`     | string | Email |
 | `PASSWORD`  | string | Password |
 | `BINARY`    | bytes | Binary data |
+
+#### `field_configuration.path_param_name`
+
+Use `field_configuration.path_param_name` when a field is used in a path template and the generated placeholder name should be overridden explicitly.
+
+```proto
+string owner_id = 1 [(hope.swagger.field) = {
+  field_configuration: {
+    path_param_name: "owner-id";
+  };
+}];
+```
 
 ### 6.7 Date and Time Constraints
 

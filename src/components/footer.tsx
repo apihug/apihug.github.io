@@ -1,6 +1,5 @@
 import clsx from "clsx";
 import Link from "next/link";
-import ThemeToggle from "./theme-toggle";
 
 export function FooterSitemap({ className }: { className?: string }) {
   return (
@@ -51,11 +50,10 @@ export function FooterMeta({ className }: { className?: string }) {
     <div className="px-2 pt-10 pb-24">
       <div
         className={clsx(
-          "mx-auto flex w-full flex-col items-start gap-6 sm:flex-row sm:items-center sm:justify-between sm:gap-8",
+          "mx-auto flex w-full flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-8",
           className,
         )}
       >
-        <ThemeToggle />
         <div className="flex flex-col gap-4 text-sm/6 text-gray-700 sm:flex-row sm:gap-2 sm:pr-4 dark:text-gray-400">
           <span>Copyright &copy;&nbsp;{new Date().getFullYear()}&nbsp;ApiHug</span>
           <span className="max-sm:hidden">&middot;</span>
@@ -172,8 +170,8 @@ function Community() {
           </Link>
         </li>
         <li>
-          <Link href="/blog" className="hover:underline">
-            Blog
+          <Link href="/docs/changelog" className="hover:underline">
+            Changelog
           </Link>
         </li>
         <li>

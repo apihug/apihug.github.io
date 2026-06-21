@@ -110,6 +110,149 @@ function getReachableProductionFiles() {
   return reachable;
 }
 
+function listMdxFiles(dirPath) {
+  return listFiles(dirPath).filter((filePath) => filePath.endsWith(".mdx"));
+}
+
+function routeFromAppPage(filePath) {
+  const relPath = normalizeRelative(filePath);
+  if (relPath === "src/app/page.tsx") {
+    return "/";
+  }
+
+  const relDir = relPath.replace(/^src\/app\//, "").replace(/\/page\.tsx$/, "");
+  const segments = relDir
+    .split("/")
+    .filter(Boolean)
+    .filter((segment) => !segment.startsWith("(") && !segment.startsWith("@"));
+
+  if (segments.some((segment) => segment.includes("["))) {
+    return null;
+  }
+
+  return segments.length === 0 ? "/" : `/${segments.join("/")}`;
+}
+
+function routeFromDocsFile(filePath, prefix) {
+  const relativePath = path.relative(path.join(repoRoot, "src", prefix === "/docs" ? "docs" : "zhCN-docs"), filePath);
+  const routeSegments = relativePath
+    .replace(/\.mdx$/, "")
+    .split(path.sep)
+    .filter(Boolean);
+
+  if (routeSegments[routeSegments.length - 1] === "index") {
+    routeSegments.pop();
+  }
+
+  return routeSegments.length === 0 ? prefix : `${prefix}/${routeSegments.join("/")}`;
+}
+
+function getValidInternalTargets() {
+  const validRoutes = new Set(
+    listFiles(path.join(repoRoot, "src", "app"))
+      .filter((filePath) => filePath.endsWith("page.tsx"))
+      .map(routeFromAppPage)
+      .filter(Boolean),
+  );
+
+  for (const filePath of listMdxFiles(path.join(repoRoot, "src", "docs"))) {
+    validRoutes.add(routeFromDocsFile(filePath, "/docs"));
+  }
+
+  for (const filePath of listMdxFiles(path.join(repoRoot, "src", "zhCN-docs"))) {
+    validRoutes.add(routeFromDocsFile(filePath, "/zhCN-docs"));
+  }
+
+  const validAssets = new Set(
+    listFiles(path.join(repoRoot, "public")).map((filePath) => `/${path.relative(path.join(repoRoot, "public"), filePath).split(path.sep).join("/")}`),
+  );
+
+  return { validRoutes, validAssets };
+}
+
+function normalizeInternalHref(href) {
+  if (!href || !href.startsWith("/")) {
+    return null;
+  }
+
+  const [withoutHash] = href.split("#");
+  const [pathname] = withoutHash.split("?");
+  return pathname || "/";
+}
+
+function normalizeSourceRelativePath(targetPath) {
+  const relativeToSrc = path.relative(path.join(repoRoot, "src"), targetPath).split(path.sep).join("/");
+  if (relativeToSrc.startsWith("..")) {
+    return null;
+  }
+
+  const withoutExtension = relativeToSrc.replace(/\.(md|mdx|ts|tsx|js|jsx|mjs)$/, "");
+  return withoutExtension.endsWith("/index")
+    ? `/${withoutExtension.slice(0, -"/index".length)}`
+    : `/${withoutExtension}`;
+}
+
+function resolveRelativeDocHref(filePath, href) {
+  if (!/\.(md|mdx)$/i.test(filePath) || !href || href.startsWith("#")) {
+    return null;
+  }
+
+  const [withoutHash] = href.split("#");
+  const [pathname] = withoutHash.split("?");
+  const resolvedPath = path.resolve(path.dirname(filePath), pathname);
+
+  if (resolvedPath.startsWith(path.join(repoRoot, "src", "docs") + path.sep)) {
+    return routeFromDocsFile(resolvedPath.replace(/\.(md|mdx)$/i, ".mdx"), "/docs");
+  }
+
+  if (resolvedPath.startsWith(path.join(repoRoot, "src", "zhCN-docs") + path.sep)) {
+    return routeFromDocsFile(resolvedPath.replace(/\.(md|mdx)$/i, ".mdx"), "/zhCN-docs");
+  }
+
+  return normalizeSourceRelativePath(resolvedPath);
+}
+
+function collectInternalLinksFromSource(source, filePath) {
+  const links = new Set();
+  const patterns = [
+    /\bhref\s*=\s*["'](\/[^"'#)\s}]*)[^"']*["']/g,
+    /\bhref\s*=\s*\{["'](\/[^"'#)\s}]*)[^"']*["']\}/g,
+    /\]\((\/[^)#\s]+(?:#[^)]+)?)\)/g,
+  ];
+  const relativeMarkdownLinkPattern = /\]\(((?:\.\.?\/)[^)#\s]+(?:#[^)]+)?)\)/g;
+
+  for (const pattern of patterns) {
+    for (const match of source.matchAll(pattern)) {
+      const normalized = normalizeInternalHref(match[1]);
+      if (normalized) {
+        links.add(normalized);
+      }
+    }
+  }
+
+  for (const match of source.matchAll(relativeMarkdownLinkPattern)) {
+    const normalized = resolveRelativeDocHref(filePath, match[1]);
+    if (normalized) {
+      links.add(normalized);
+    }
+  }
+
+  const relativePath = normalizeRelative(filePath);
+  if (
+    relativePath === "src/app/(docs)/docs/index.tsx" ||
+    relativePath === "src/app/(docs)/zhCN-docs/index.tsx"
+  ) {
+    for (const match of source.matchAll(/\[\s*"[^"]+",\s*"([^"]+)"/g)) {
+      const normalized = normalizeInternalHref(match[1]);
+      if (normalized) {
+        links.add(normalized);
+      }
+    }
+  }
+
+  return [...links];
+}
+
 test("pages router leftovers and old bootstrap configs are removed", () => {
   for (const relPath of [
     ["src", "pages"],
@@ -166,7 +309,8 @@ test("app router entrypoints still point at the active runtime", () => {
   assert.match(homePage, /@\/components\/home\/hero/);
 
   assert.match(rootLayout, /@\/components\/search/);
-  assert.match(rootLayout, /@\/components\/theme-toggle/);
+  assert.doesNotMatch(rootLayout, /@\/components\/theme-toggle/);
+  assert.doesNotMatch(rootLayout, /currentTheme|_updateTheme|darkModeScript/);
 
   assert.match(docsLayout, /@\/components\/header/);
   assert.match(docsLayout, /@\/components\/footer/);
@@ -179,6 +323,64 @@ test("tooling no longer carries pages-legacy default paths", () => {
 
   assert.doesNotMatch(convertMdxScript, /src\/pages-legacy/);
   assert.match(convertMdxScript, /Usage: node scripts\/convert-mdx\.mjs <source-root> \[target-root\]/);
+});
+
+test("tooling does not keep stale npm lockfiles or dead direct MDX helpers", () => {
+  const packageJson = JSON.parse(read("package.json"));
+
+  assert.equal(exists("package-lock.json"), false, "package-lock.json");
+  assert.equal(packageJson.devDependencies?.["hast-util-to-jsx-runtime"], undefined);
+});
+
+test("light-only runtime removes the theme toggle component", () => {
+  const footer = read("src", "components", "footer.tsx");
+  const packageJson = JSON.parse(read("package.json"));
+
+  assert.equal(exists("src", "components", "theme-toggle.tsx"), false, "src/components/theme-toggle.tsx");
+  assert.doesNotMatch(footer, /ThemeToggle/);
+  assert.equal(packageJson.dependencies?.["@headlessui/react"] !== undefined, true);
+});
+
+test("legacy blog-only helpers are removed", () => {
+  for (const relPath of [
+    "src/scripts/build-rss.js",
+    "src/utils/getAllPosts.js",
+  ]) {
+    assert.equal(exists(...relPath.split("/")), false, relPath);
+  }
+});
+
+test("active internal links resolve to real routes or static assets", () => {
+  const sourceFiles = [
+    ...listFiles(path.join(repoRoot, "src", "app")).filter((filePath) => isSourceFile(filePath)),
+    ...listFiles(path.join(repoRoot, "src", "components")).filter((filePath) => isSourceFile(filePath)),
+    ...listMdxFiles(path.join(repoRoot, "src", "docs")),
+    ...listMdxFiles(path.join(repoRoot, "src", "zhCN-docs")),
+    path.join(repoRoot, "mdx-components.tsx"),
+  ];
+  const { validRoutes, validAssets } = getValidInternalTargets();
+
+  const brokenLinks = sourceFiles.flatMap((filePath) => {
+    const source = fs.readFileSync(filePath, "utf8");
+    return collectInternalLinksFromSource(source, filePath)
+      .filter((href) => !validRoutes.has(href) && !validAssets.has(href))
+      .map((href) => `${normalizeRelative(filePath)} -> ${href}`);
+  });
+
+  assert.deepEqual(brokenLinks, [], brokenLinks.join("\n"));
+});
+
+test("github pages workflow matches the current pnpm static export pipeline", () => {
+  const workflow = read(".github", "workflows", "nextjs.yml");
+
+  assert.match(workflow, /uses:\s*pnpm\/action-setup@v4/);
+  assert.match(workflow, /cache:\s*pnpm/);
+  assert.match(workflow, /hashFiles\('\*\*\/pnpm-lock\.yaml'\)/);
+  assert.match(workflow, /run:\s*pnpm install --frozen-lockfile/);
+  assert.match(workflow, /run:\s*pnpm build/);
+  assert.doesNotMatch(workflow, /Detect package manager/);
+  assert.doesNotMatch(workflow, /manager=npm/);
+  assert.doesNotMatch(workflow, /npm ci/);
 });
 
 test("legacy duplicate components and home demo layer are removed", () => {

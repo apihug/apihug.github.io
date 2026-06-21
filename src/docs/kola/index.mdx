@@ -1,52 +1,40 @@
 export const title = "ApiHug Testing Framework Kola";
 export const description =
-  "Kola make your test life happier and colourful";
+  "Start using Kola for contract-first, DSL-based testing in ApiHug.";
 
-[About Kola](/docs/kola/001_what_is_kola)
+## What It Is
 
-## Latest
+Kola is ApiHug's DSL-based testing layer for contract-aware scenarios. It is designed to keep test intent close to the ApiHug contract model instead of scattering it across unrelated fixtures and handwritten test plumbing.
 
-⚠️Always keep your SDK & IDEA to latest version⚠️
+## When To Use It
 
-[Maven Central](https://search.maven.org/artifact/com.apihug/it-bom)
+Use Kola when you want to:
 
-[Install the IntelliJ plugin](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
+- express API scenarios in a BDD-style DSL
+- keep test cases close to the proto-driven project structure
+- generate and run contract-aware scenarios with the rest of the ApiHug toolchain
 
-## Timeline
+## Prerequisites
 
-Sine **ApiHug [1.0.0-RELEASE] -  2024-08-02**
+Before you start:
 
-### Features
+1. upgrade the project to a Kola-capable ApiHug SDK version
+2. use the current IntelliJ plugin version
+3. confirm the proto module build enables the Kola task in your project setup
 
-- DSL style BDD definition, follow consumer driven test - Contract test principle
-- introduce new task `kolaTest` during wire proto
-- Seamlessly integrates all existing testing solutions (JUnit5, AssertJ, etc.)
+## Steps
 
-### Upgrade steps
-
-Refer [apihug-demo/libs.versions.toml](https://github.com/apihug/apihug-demo/blob/main/gradle/libs.versions.toml)
-
-1. Upgrade ApiHug SDK: `{PROJECT_ROOT}/gradle/libs.versions.toml`  find  `apihug = "xxx"`  please upgrade to  `1.0.0-RELEASE`+
-2. Add new lib reference:  `springBootDependencies = { group = "org.springframework.boot", name = "spring-boot-dependencies", version.ref = "springBoot" }`
-
-⚠️ Add of `springBootDependencies` is **MUST**, otherwise the wire compile may report:
+1. Update the project dependencies to the required ApiHug version in `gradle/libs.versions.toml`.
+2. Enable Kola in the proto-module build configuration used by your project.
+3. Create the Kola test resources under the proto module test resources area.
+4. Add one feature file using the Kola DSL.
+5. Run the Kola task from the proto module:
 
 ```shell
-Could not get unknown property 'springBootDependencies' for extension 'libs' of type org.gradle.accessors.dm.LibrariesForLibs.
+./gradlew.bat {proto_module}:kolaTest --stacktrace
 ```
 
-Now by default, kola flag default as false, you need switch @ [build.gradle](https://github.com/apihug/apihug-demo/blob/main/apihug-demo-proto/build.gradle):
-
-```groovy
-hopeWire {
-    // others...
-    kola = true
-}
-```
-
-### Sample
-
-You can walk through the sample of [apihug-demo//apihug-demo-proto](https://github.com/apihug/apihug-demo/tree/main/apihug-demo-proto/src)
+## Example
 
 ```groovy
 package contracts
@@ -55,58 +43,31 @@ import hope.kola.contract.Feature
 
 Feature.make {
     priority 100
-    name("Customer login place order and check balance logic")
-    description("""Never judge the boss, as you may the real fool""")
-    Scenario "001 Try login ", {
+    name("Customer login, place order, and check balance")
+    Scenario "001 Try login", {
         Given {
             api("UserService", "Login")
         }
         When {
-            json("""
-                    
-            """)
             body {
                 set('name', "same")
-                set('student.name', "blue")
                 set('student.age', 22)
-                set('student.weight', 123.3d)
-                set('student.friends', "jake", "blue", "yellow")
-                set('student.bigBaby', {
-                    addStatement('res.setAge(12)')
-                    addStatement('res.setBlogs($T.asList($S,$S))', Arrays.class, 'jake', 'same')
-                })
-                set('student.soreList', 12, 123, 45, Mocker.numberBetween(12, 34))
-                set('json', Mocker.chineseName().name(), Mocker.cat().name(), Mocker.ip4(), regular("[a-z]"))
             }
         }
         And {
-            stringAssert("user.address.zipCode", {
-                isEqualTo("jake")
-                isBase64()
-                isAlphabetic()
-                startsWithIgnoringCase("json")
-            })
-            bigDecimalAssert("user.salary", {
-                isCloseTo(ofBigDecimal("1112.22"), offset(12))
-                isGreaterThanOrEqualTo(ofBigDecimal("231312"))
-            })
             booleanAssert("user.live", {
                 isTrue()
             })
-
         }
-
     }
-    Scenario "002 Place a order", {}
-    Scenario "003 Check balance", {}
 }
 ```
-### Task
 
-Kick `kolaTest` task:
+## Result
 
-```shell
+You get a contract-aware test entrypoint that fits the ApiHug workflow more naturally than a disconnected handwritten scenario suite.
 
-./gradlwe.bat {proto_module}:kolaTest --stacktrace
+## Related Pages
 
-```
+1. [What Kola Is](/docs/kola/001_what_is_kola)
+2. [Kola Tool Chain](/docs/kola/005_tool_chain)

@@ -1,7 +1,65 @@
-export const title = "How we design Kola";
+export const title = "Kola Principles";
 export const description =
-  "Kola background, Kola a consumer driver tester framework";
+  "The core principles Kola follows when it models contract-aware testing in ApiHug.";
 
-What principle we should follow?
+## What This Page Covers
 
-⚠️TBD⚠️
+This page explains the guiding principles behind Kola.
+
+Use it when you need to understand what Kola is trying to optimize for, and what it intentionally does not try to be.
+
+## Reuse Before Reinvention
+
+Kola prefers to reuse stable ecosystem capabilities instead of rebuilding every testing concept from scratch.
+
+That is why it leans on existing JVM tooling for assertions, execution, mocking, and build integration.
+
+## Modular by Default
+
+Kola works best when tests stay near the proto-driven module that owns the contract.
+
+This keeps:
+
+- contracts
+- generated artifacts
+- scenario DSL files
+- execution tasks
+
+in one coherent workflow instead of scattering them across unrelated modules.
+
+## Open to Existing Engineering Practice
+
+Kola is not designed as a sealed testing island. It should coexist with:
+
+- normal unit tests
+- Spring integration tests
+- existing Gradle tasks
+- team-specific runtime wiring
+
+The goal is to add a contract-aware layer, not force every test into one rigid format.
+
+## Optimize for Team Communication
+
+Kola values scenario readability because contract testing is usually collaborative.
+
+If only one implementation author can understand the scenario, the testing workflow loses much of its value. Kola therefore tries to keep scenarios understandable beyond the backend team alone.
+
+## What Kola Does Not Try To Do
+
+Kola is not trying to:
+
+- replace every testing style in the project
+- hide all build/runtime details from the team
+- become a generic business-process workflow engine
+
+It is a focused testing layer for contract-aware API scenarios.
+
+## Result
+
+These principles keep Kola aligned with the broader ApiHug philosophy: contract-first, collaboration-friendly, and integrated into normal engineering workflow instead of living beside it as a disconnected tool.
+
+## Related Pages
+
+1. [How Kola Is Designed](/docs/kola/002_design_of_kola)
+2. [Kola DSL](/docs/kola/003_dsl_contract)
+3. [Kola Tool Chain](/docs/kola/005_tool_chain)

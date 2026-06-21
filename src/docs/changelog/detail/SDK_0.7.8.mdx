@@ -1,30 +1,30 @@
-export const title = "SDK 0.7.8-RELEASE Big change";
+export const title = "SDK 0.7.8-RELEASE Repository Migration";
 export const description =
-  "0.7.8-RELEASE big change and migration steps";
+  "Migration guidance for the repository and trait split introduced in 0.7.8-RELEASE.";
 
 [English](/docs/changelog/detail/SDK_0.7.8)
 
-💁 If you never touch the `ApiHug` domain entity management, then this migration will never bother you. but better keep rolling release with us! :-)
+💁 If your project does not use ApiHug domain entity management, this migration will likely have limited impact on your project.
 
 Latest: [Maven Central](https://search.maven.org/artifact/com.apihug/it-bom)
 
-`0.7.8-RELEASE` Add features:
+`0.7.8-RELEASE` introduced:
 
-- Move the `Repository` `@Derived` maintain way to `Trait` separated location, make code clean;
-- `lite` as default model for the stub side, make it more swift;
+- Repository `@Derived` maintenance moved into a separate `trait` location.
+- `lite` became the default model for the stub side.
 
 <img src={require('@/img/framework/domain.jpg').default.src} alt="domain design" width={1326} height={577} className="rounded-lg" />
 
-## Repository migration
+## Repository Migration
 
-Target:
+Goal:
 
-1. make generated repository pure and straightforward.
-2. make repository derived api easy to maintain
+1. keep generated repositories clean and predictable
+2. move derived repository logic into a location that is easier to maintain
 
-Take an exist `repository`: `com.novel.book.wire.domain.book.repository.BookAuthorRepository` in your module `book-app` as example:
+Use an existing repository such as `com.novel.book.wire.domain.book.repository.BookAuthorRepository` in module `book-app` as the example below.
 
-**Exist logic**: in `book-app\src\main\stub\com\novel\book\wire\domain\book\repository\BookAuthorRepository`:
+**Current location**: `book-app\src\main\stub\com\novel\book\wire\domain\book\repository\BookAuthorRepository`
 
 ```java
 @Repository
@@ -43,13 +43,13 @@ public interface BookAuthorRepository
 }
 ```
 
-⚠️⚠️⚠️ You need to backup your `@Derived` method before run the `stub` command;
+⚠️ Back up your `@Derived` methods before running the `stub` command.
 
-As now the `stub` dir code is pure `generated`, that meaning it can be totally removed in next round `stub` command.
+The `stub` directory is fully generated after this change, which means it can be overwritten on the next `stub` run.
 
-### Step1
+### Step 1
 
-Run the `stub` command of your module after upgrade the SDK version in the `gradle\libs.versions.toml`:
+Update the SDK version in `gradle\libs.versions.toml`:
 
 ```toml
 [versions]
@@ -57,43 +57,43 @@ Run the `stub` command of your module after upgrade the SDK version in the `grad
 apihug = "0.7.8-RELEASE"
 ```
 
-Command line, check your project's `README.md`:
+Then run the module `stub` command. The exact command is usually documented in your project's `README.md`:
 
 ```shell
 ./gradlew.bat book-app:clean stub build -x test -x stubTest
 ```
 
-After run successfully you will got a new `sourceSet`: `book-app\src\main\trait`;
+After the command succeeds, you will see a new `sourceSet`: `book-app\src\main\trait`.
 
-💁‍♀️ you may need `Reload Gradle Project` from `Gradle` tool window, otherwise the `book-app\src\main\trait` may not be recognized as `sourceSet`
+💡 You may need to run `Reload Gradle Project` from the Gradle tool window. Otherwise, `book-app\src\main\trait` may not be recognized as a `sourceSet`.
 
-### Step2
+### Step 2
 
-1. Manually put the backup `@Derived` to the `_BookAuthorRepository`(trait dir) & `BookAuthorRepository`(stub dir)(only first time migration need this, to keep the old class compilable);
-2. Kick off the `stub` command again.
+1. Move the backed-up `@Derived` methods into `_BookAuthorRepository` under the `trait` directory and temporarily keep the old repository compilable during the first migration.
+2. Run the `stub` command again.
 
-Since now all the `@Derived` Repository methods, will be maintained separated at `book-app\src\main\trait`
+After that, all `@Derived` repository methods are maintained under `book-app\src\main\trait`.
 
-1. `stub` job will merger them back to the runtime `BookAuthorRepository` class
-2. Avoid any conflict in `BookAuthorRepository` during development(template code vs derived code), keep it pure and straightforward.
-3. Much easier way to derived our repository API, the `trait` for SQL logic;
+1. The `stub` job merges those methods back into the runtime `BookAuthorRepository`.
+2. `BookAuthorRepository` stays cleaner because generated template code and custom derived logic are separated.
+3. SQL-oriented trait logic becomes easier to maintain over time.
 
 ---
 
-### StepX
+### Manual Path
 
-This way migration need more manually job, but much clearly;
+This migration path involves more manual work, but it is still practical for smaller projects.
 
-1. create directory `book-app\src\main\trait`
-2. create package `t.com.novel.book.wire.domain.book.repository` that is prefix with `t.` of original `com.novel.book.wire.domain.book.repository`
-3. add trait `interface` class `_BookAuthorRepository` that is  prefix with  `_` of original  `BookAuthorRepository`
-4. make it `extends BookAuthorRepository`
-5. copy the `@Derived` method of `BookAuthorRepository` to `_BookAuthorRepository`
-6. run `stub` command
+1. Create directory `book-app\src\main\trait`
+2. Create package `t.com.novel.book.wire.domain.book.repository`, using `t.` as a prefix over the original package
+3. Add trait interface `_BookAuthorRepository`, using `_` as a prefix over the original `BookAuthorRepository`
+4. Make it `extends BookAuthorRepository`
+5. Copy the `@Derived` methods from `BookAuthorRepository` into `_BookAuthorRepository`
+6. Run the `stub` command
 
-This is a easier way for countable `repository` like less than 30 etc;
+This approach is still workable when the number of repositories is manageable, for example fewer than 30.
 
-**Real** Project dir structure:
+**Project directory structure**
 
 ```shell
 +---java
@@ -130,11 +130,11 @@ This is a easier way for countable `repository` like less than 30 etc;
                                 \---repository
 ```
 
-## PS
+## Later Improvement
 
-since SDK `0.8.5-RELEASE`, introduce more way to handle those easier;
+Since SDK `0.8.5-RELEASE`, later releases introduced an easier maintenance pattern.
 
-so after define a Entity in your `proto` and run `stub` command you will got a `trait` empty **Repository**:
+After you define an entity in your `proto` and run the `stub` command, you will also get an empty trait repository:
 
 ```java
 /**
@@ -154,7 +154,7 @@ interface _JobEntityRepository extends JobEntityRepository {
 }
 ```
 
-Then you can write a customized DAO api:
+Then you can add a customized DAO API:
 
 ```java
 @Overwrite
@@ -163,20 +163,20 @@ default void myDaoApi(){
 }
 ```
 
-remember to add `@Overwrite` to this method， then the IDEA will remind you to `Pull method 'myDaoApi' to 'JobEntityRepository'`
+Remember to add `@Overwrite` to this method. IDEA will then suggest `Pull method 'myDaoApi' to 'JobEntityRepository'`.
 
-Do as the IDEA suggest you, then this method will be pull to parent interface, this will avoid one round of `stub` command;
+Follow the IDEA action so the method moves to the parent interface and you can avoid an extra `stub` cycle.
 
-next time after kick off the `stub` command, you still get the exactly same code/logic.
+After the next `stub` run, the same logic remains in place.
 
 ## Best Tips
 
-You can consider the `_BookAuthorRepository` as Companion class of the `BookAuthorRepository`;
+You can think of `_BookAuthorRepository` as a companion interface for `BookAuthorRepository`.
 
-Only the `ApiHug` tool chain handle all those complexities for you!
+The ApiHug tool chain handles the merge workflow for you.
 
-Image the [Companion objects](https://docs.scala-lang.org/scala3/book/domain-modeling-tools.html#companion-objects) in Scala;
+See also [Companion objects](https://docs.scala-lang.org/scala3/book/domain-modeling-tools.html#companion-objects) in Scala.
 
-IF YOU meet any problem during upgrade, please contact us:
+If you run into upgrade issues, contact the ApiHug team:
 
 <img src={require('@/img/hug/apihug-contact.gif').default.src} alt="Apihug Contact QR Code" width={750} height={750} className="rounded-lg" />

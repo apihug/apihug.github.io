@@ -6,6 +6,11 @@ export const description =
 
 Spring extension package that includes basic shared classes and functions, aimed at facilitating faster development: [Maven Central](https://search.maven.org/artifact/com.apihug/it-common-spring)
 
+Source-of-truth note for this page:
+
+- `github.com/apihug/skills`
+- `skills/spring-extension`
+
 ## Features
 
 Not enumerating all; generally very intuitive and simple; you can directly refer to the source code during use.
@@ -95,13 +100,13 @@ The predefined roles include `PredefinedRoleCheckerType`:
 
 **Predefined roles** have limited configuration scope; they are suitable for coarse-grained roles involved in your platform. For finer-grained configuration, please use `RBAC`.
 
-Refer to: [ApiHug Spring Security Extensions](/zhCN-docs/framework/spring-security)
+Refer to: [ApiHug Spring Security Extensions](/docs/framework/spring-security)
 
 #### **checker**
 
-The **checker** package contains Authority & Role combination validation DSL definitions; it serves only as Java annotations and will not be read at runtime.
+The **checker** package defines the DSL used to express authority and role combinations, but it is not "compile-time only". At runtime, ApiHug loads generated authority metadata, maps it into `SecurityContext`, and `HopeSecurityManager` resolves the checker for the current service method before enforcing access rules.
 
-<TipInfo>Runtime implementation is achieved through wire `proto` with RBAC definitions!</TipInfo>
+<TipInfo>The checker DSL and the generated wire metadata work together. Define authorization in proto, then let the Spring runtime resolve and enforce it through `SecurityContext` and `HopeSecurityManager`.</TipInfo>
 
 #### **internal**
 

@@ -218,9 +218,32 @@ test("zhCN docs nav includes the expected changelog, kola, and milestone routes"
     "/zhCN-docs/changelog/detail/SDK_0.8.6_cn",
     "/zhCN-docs/kola/006_configurations",
     "/zhCN-docs/milestone/milestone-1.0.0-RELEASE",
+    "/zhCN-docs/spec/version",
   ]) {
     assert.match(zhNavIndex, new RegExp(route.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   }
+});
+
+test("zhCN nav and spec landing keep clean localized labels", () => {
+  const zhNavIndex = fs.readFileSync(
+    path.join(repoRoot, "src", "app", "(docs)", "zhCN-docs", "index.tsx"),
+    "utf8",
+  );
+  const zhSpecIndex = fs.readFileSync(path.join(zhDocsRoot, "spec", "index.mdx"), "utf8");
+  const zhVersionSpec = fs.readFileSync(path.join(zhDocsRoot, "spec", "version.mdx"), "utf8");
+
+  assert.match(zhNavIndex, /"快速开始":/);
+  assert.match(zhNavIndex, /"技能与规则":/);
+  assert.match(zhNavIndex, /"核心原则":/);
+  assert.match(zhNavIndex, /\/zhCN-docs\/spec\/version/);
+
+  assert.match(zhSpecIndex, /ApiHug 2\.0 LLM 优化规范/);
+  assert.match(zhSpecIndex, /规范文档/);
+  assert.match(zhSpecIndex, /\/zhCN-docs\/spec\/version/);
+
+  assert.match(zhVersionSpec, /31142/);
+  assert.match(zhVersionSpec, /31143/);
+  assert.match(zhVersionSpec, /deprecated/i);
 });
 
 test("zhCN docs nav exposes the curated skills and rules section", () => {
@@ -264,6 +287,12 @@ test("protobuf extension docs stay aligned with the current it-proto-extend surf
   const constantSpec = fs.readFileSync(path.join(docsRoot, "spec", "constant.mdx"), "utf8");
   const versionSpec = fs.readFileSync(path.join(docsRoot, "spec", "version.mdx"), "utf8");
   const specIndex = fs.readFileSync(path.join(docsRoot, "spec", "index.mdx"), "utf8");
+  const zhVersionSpec = fs.readFileSync(path.join(zhDocsRoot, "spec", "version.mdx"), "utf8");
+  const zhSpecIndex = fs.readFileSync(path.join(zhDocsRoot, "spec", "index.mdx"), "utf8");
+  const zhNavIndex = fs.readFileSync(
+    path.join(repoRoot, "src", "app", "(docs)", "zhCN-docs", "index.tsx"),
+    "utf8",
+  );
   const navIndex = fs.readFileSync(
     path.join(repoRoot, "src", "app", "(docs)", "docs", "index.tsx"),
     "utf8",
@@ -299,6 +328,11 @@ test("protobuf extension docs stay aligned with the current it-proto-extend surf
   assert.match(versionSpec, /31143/);
   assert.match(specIndex, /\/docs\/spec\/version/);
   assert.match(navIndex, /\/docs\/spec\/version/);
+  assert.match(zhVersionSpec, /31142/);
+  assert.match(zhVersionSpec, /31143/);
+  assert.match(zhVersionSpec, /deprecated/i);
+  assert.match(zhSpecIndex, /\/zhCN-docs\/spec\/version/);
+  assert.match(zhNavIndex, /\/zhCN-docs\/spec\/version/);
 });
 
 test("swagger docs cover the current ApiHug swagger extension surface", () => {
@@ -314,13 +348,18 @@ test("swagger docs cover the current ApiHug swagger extension surface", () => {
   assert.match(protoOas, /request_schema/);
   assert.match(protoOas, /response_schema/);
   assert.match(protoOas, /body_empty/);
+  assert.match(protoOas, /session/);
+  assert.match(protoOas, /path_param_name/);
   assert.match(protoOas, /internal/);
   assert.match(protoOas, /hide/);
 
   assert.match(swaggerSpec, /hope\.swagger\.svc/);
   assert.match(swaggerSpec, /response_media_type/);
+  assert.match(swaggerSpec, /APPLICATION_VND_OPEN_XML_FORMATS_XLSX/);
   assert.match(swaggerSpec, /input_repeated/);
   assert.match(swaggerSpec, /output_repeated/);
+  assert.match(swaggerSpec, /session/);
+  assert.match(swaggerSpec, /path_param_name/);
   assert.match(swaggerSpec, /request_schema/);
   assert.match(swaggerSpec, /response_schema/);
   assert.match(swaggerSpec, /body_empty/);
@@ -348,6 +387,22 @@ test("skills docs cover the curated ApiHug rules and workflow surface", () => {
   assert.match(devStory, /apihug-dev-story/i);
   assert.match(protoReview, /apihug-proto-review/i);
   assert.match(implReview, /apihug-impl-review/i);
+});
+
+test("skills source references stay visible in the migrated overview and rules docs", () => {
+  const overview = fs.readFileSync(path.join(docsRoot, "skills", "index.mdx"), "utf8");
+  const zhOverview = fs.readFileSync(path.join(zhDocsRoot, "skills", "index.mdx"), "utf8");
+  const rules = fs.readFileSync(path.join(docsRoot, "skills", "rules.mdx"), "utf8");
+  const zhRules = fs.readFileSync(path.join(zhDocsRoot, "skills", "rules.mdx"), "utf8");
+
+  assert.match(overview, /github\.com\/apihug\/skills/);
+  assert.match(overview, /spring-extension/);
+  assert.match(zhOverview, /github\.com\/apihug\/skills/);
+  assert.match(zhOverview, /spring-extension/);
+  assert.match(rules, /github\.com\/apihug\/skills/);
+  assert.match(rules, /skills\/rules/);
+  assert.match(zhRules, /github\.com\/apihug\/skills/);
+  assert.match(zhRules, /skills\/rules/);
 });
 
 test("what-is-apihug introduces the architecture diagram near the top of the page", () => {
@@ -411,14 +466,23 @@ test("zhCN skills docs localize the curated ApiHug rules and workflow surface", 
   assert.match(devStory, /apihug-dev-story/i);
   assert.match(protoReview, /apihug-proto-review/i);
   assert.match(implReview, /apihug-impl-review/i);
-  assert.match(overview, /技能|规则|工作流/);
+});
+
+test("zhCN skills overview stays readable Chinese instead of mojibake", () => {
+  const overview = fs.readFileSync(path.join(zhDocsRoot, "skills", "index.mdx"), "utf8");
+
+  assert.match(overview, /AI 工作流只有在边界清晰时才可靠/);
+  assert.match(overview, /工作流页面和规则页面必须配套阅读/);
+  assert.doesNotMatch(overview, /鎶€鑳戒笌瑙勫垯|杩欎竴缁勬枃妗?/);
 });
 
 test("app docs header exposes english and zhCN docs entry points", () => {
   const appHeader = fs.readFileSync(path.join(repoRoot, "src", "components", "header.tsx"), "utf8");
 
-  assert.match(appHeader, /English Docs/);
-  assert.match(appHeader, /中文文档/);
+  assert.match(appHeader, />\s*English\s*</);
+  assert.match(appHeader, />\s*中文\s*</);
+  assert.doesNotMatch(appHeader, /English Docs/);
+  assert.doesNotMatch(appHeader, /中文文档/);
   assert.match(appHeader, /href="\/docs"|href='\/docs'|href=\{["']\/docs["']\}/);
   assert.match(appHeader, /href="\/zhCN-docs"|href='\/zhCN-docs'|href=\{["']\/zhCN-docs["']\}/);
   assert.doesNotMatch(appHeader, /\/zhCN-docs\/start\.html/);
@@ -506,7 +570,9 @@ test("docs sidebar only highlights the exact current doc link", () => {
     "utf8",
   );
 
-  assert.match(docsSidebarLink, /aria-current=\{pathname === path \? "page" : undefined\}/);
+  assert.match(docsSidebarLink, /function normalizePath/);
+  assert.match(docsSidebarLink, /value\.replace\(\/\\\/\+\$\/, ""\)/);
+  assert.match(docsSidebarLink, /currentPath === targetPath \? "page" : undefined/);
   assert.doesNotMatch(docsSidebarLink, /startsWith\(`\$\{path\}\/`\)/);
 });
 
@@ -533,4 +599,277 @@ test("home link button lets page-level variants override the default light theme
   assert.match(linkButton, /clsx\(\s*"inline-block rounded-4xl bg-black px-4 py-2 text-sm\/6 font-semibold text-white hover:bg-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600",\s*className,\s*\)/);
   assert.match(enterpriseSection, /Learn more/);
   assert.match(enterpriseSection, /className="inline-block rounded-4xl !bg-white px-4 py-2 text-sm\/6 font-semibold !text-gray-950 inset-ring inset-ring-gray-950\/8 hover:!bg-gray-50 dark:!bg-gray-950 dark:!text-white dark:inset-ring-white\/15 dark:hover:!bg-gray-900"/);
+});
+
+test("spring and zhCN backend reference docs stay aligned with the current source-backed surface", () => {
+  const springMock = fs.readFileSync(path.join(docsRoot, "framework", "spring-mock.mdx"), "utf8");
+  const springCommon = fs.readFileSync(path.join(docsRoot, "framework", "spring-common.mdx"), "utf8");
+  const springApi = fs.readFileSync(path.join(docsRoot, "framework", "spring-api.mdx"), "utf8");
+  const zhSpringSecurity = fs.readFileSync(
+    path.join(zhDocsRoot, "framework", "spring-security.mdx"),
+    "utf8",
+  );
+  const zhSpringApi = fs.readFileSync(path.join(zhDocsRoot, "framework", "spring-api.mdx"), "utf8");
+  const zhSwagger = fs.readFileSync(path.join(zhDocsRoot, "spec", "swagger.mdx"), "utf8");
+  const zhDomain = fs.readFileSync(path.join(zhDocsRoot, "spec", "domain.mdx"), "utf8");
+  const zhAuthority = fs.readFileSync(
+    path.join(zhDocsRoot, "framework", "widget", "authority.mdx"),
+    "utf8",
+  );
+
+  assert.match(springMock, /AutoConfigureWireMock/);
+  assert.match(springMock, /wiremock\.server\.port/);
+  assert.match(springMock, /HopeContractConfiguration/);
+  assert.match(springMock, /WireMockStubCustomizer/);
+
+  assert.match(springCommon, /HopeSecurityManager/);
+  assert.match(springCommon, /SecurityContext/);
+  assert.doesNotMatch(springCommon, /will not be read at runtime/);
+
+  assert.match(springApi, /hope\.api/);
+  assert.match(springApi, /\/hope\/meta\/versions/);
+  assert.match(springApi, /OpenAPI 3/);
+  assert.doesNotMatch(springApi, /hope\.open\.api/);
+  assert.doesNotMatch(springApi, /Standard OAS \(Swagger 2\.0\)/);
+
+  assert.match(zhSpringSecurity, /Spring Security/);
+  assert.match(zhSpringSecurity, /JwtDecoder/);
+  assert.match(zhSpringSecurity, /SpringSecurityExceptionHandler/);
+  assert.doesNotMatch(zhSpringSecurity, /<artifactId>spring-boot-starter-security<\/artifactId>/);
+  assert.doesNotMatch(zhSpringSecurity, /SecurityAutoConfiguration/);
+
+  assert.match(zhSpringApi, /hope\.api/);
+  assert.match(zhSpringApi, /\/hope\/meta\/versions/);
+  assert.doesNotMatch(zhSpringApi, /`hope\.open\.api\./);
+  assert.doesNotMatch(zhSpringApi, /标准OAS\(Swagger2\.0\)/);
+
+  assert.match(zhSwagger, /APPLICATION_VND_OPEN_XML_FORMATS_XLSX/);
+  assert.match(zhSwagger, /is_repeated/);
+  assert.match(zhSwagger, /request_schema/);
+  assert.match(zhSwagger, /response_schema/);
+  assert.match(zhSwagger, /body_empty/);
+  assert.match(zhSwagger, /questions/);
+  assert.match(zhSwagger, /multipart/);
+  assert.match(zhSwagger, /internal/);
+  assert.match(zhSwagger, /hide/);
+  assert.match(zhSwagger, /path_param_name/);
+  assert.doesNotMatch(zhSwagger, /APPLICATION_XLSX/);
+  assert.match(zhSwagger, /input_repeated/);
+  assert.match(zhSwagger, /output_repeated/);
+  assert.match(zhSwagger, /max_length: 64;/);
+  assert.match(zhSwagger, /maximum: 12345;/);
+
+  assert.match(zhDomain, /persistence\.proto/);
+  assert.match(zhDomain, /nullable: false/);
+  assert.match(zhDomain, /TIME_WITH_TIMEZONE/);
+  assert.match(zhDomain, /TIMESTAMP_WITH_TIMEZONE/);
+  assert.match(zhDomain, /ROWID/);
+  assert.doesNotMatch(zhDomain, /nullable:\s*TRUE|nullable:\s*FALSE|unique:\s*TRUE|unique:\s*FALSE/);
+  assert.match(zhDomain, /length: 32;/);
+  assert.match(zhDomain, /precision: 10;/);
+  assert.match(zhDomain, /scale: 2;/);
+
+  assert.match(zhAuthority, /output_repeated/);
+  assert.match(zhAuthority, /authorities: \["BOOK_DELETE"\]/);
+  assert.doesNotMatch(zhAuthority, /out_plural:\s*true/);
+  assert.doesNotMatch(zhAuthority, /spring-boot-starter-security/);
+});
+
+test("spring common docs keep the source repository reference in both locales", () => {
+  const springCommon = fs.readFileSync(path.join(docsRoot, "framework", "spring-common.mdx"), "utf8");
+  const zhSpringCommon = fs.readFileSync(path.join(zhDocsRoot, "framework", "spring-common.mdx"), "utf8");
+
+  assert.match(springCommon, /github\.com\/apihug\/skills/);
+  assert.match(springCommon, /spring-extension/);
+  assert.match(springCommon, /skills\/spring-extension/);
+  assert.match(zhSpringCommon, /github\.com\/apihug\/skills/);
+  assert.match(zhSpringCommon, /spring-extension/);
+  assert.match(zhSpringCommon, /skills\/spring-extension/);
+});
+
+test("product usage docs use task-oriented structure in both locales", () => {
+  const ideaIndex = fs.readFileSync(path.join(docsRoot, "idea", "index.mdx"), "utf8");
+  const ideaStart = fs.readFileSync(path.join(docsRoot, "idea", "002-start-project.mdx"), "utf8");
+  const ideaEditor = fs.readFileSync(path.join(docsRoot, "idea", "015-editor.mdx"), "utf8");
+  const uiIndex = fs.readFileSync(path.join(docsRoot, "ui", "index.mdx"), "utf8");
+  const uiVue = fs.readFileSync(path.join(docsRoot, "ui", "002_vue.mdx"), "utf8");
+  const uiApp = fs.readFileSync(path.join(docsRoot, "ui", "003_app.mdx"), "utf8");
+  const uploadHow = fs.readFileSync(path.join(docsRoot, "how", "001_support_upload_file.mdx"), "utf8");
+  const kolaIndex = fs.readFileSync(path.join(docsRoot, "kola", "index.mdx"), "utf8");
+  const kolaWhat = fs.readFileSync(path.join(docsRoot, "kola", "001_what_is_kola.mdx"), "utf8");
+  const kolaDesign = fs.readFileSync(path.join(docsRoot, "kola", "002_design_of_kola.mdx"), "utf8");
+  const ideaComponents = fs.readFileSync(path.join(docsRoot, "idea", "006-components.mdx"), "utf8");
+  const ideaEntity = fs.readFileSync(path.join(docsRoot, "idea", "009-entity.mdx"), "utf8");
+  const howMinMax = fs.readFileSync(
+    path.join(docsRoot, "how", "006_understand_max_min_length_items_properties.mdx"),
+    "utf8",
+  );
+  const kolaPrinciples = fs.readFileSync(path.join(docsRoot, "kola", "004_principle.mdx"), "utf8");
+  const kolaToolChain = fs.readFileSync(path.join(docsRoot, "kola", "005_tool_chain.mdx"), "utf8");
+
+  const zhIdeaIndex = fs.readFileSync(path.join(zhDocsRoot, "idea", "index.mdx"), "utf8");
+  const zhIdeaStart = fs.readFileSync(path.join(zhDocsRoot, "idea", "002-start-project.mdx"), "utf8");
+  const zhIdeaEditor = fs.readFileSync(path.join(zhDocsRoot, "idea", "015-editor.mdx"), "utf8");
+  const zhUiIndex = fs.readFileSync(path.join(zhDocsRoot, "ui", "index.mdx"), "utf8");
+  const zhUiVue = fs.readFileSync(path.join(zhDocsRoot, "ui", "002_vue.mdx"), "utf8");
+  const zhUiApp = fs.readFileSync(path.join(zhDocsRoot, "ui", "003_app.mdx"), "utf8");
+  const zhUploadHow = fs.readFileSync(path.join(zhDocsRoot, "how", "001_support_upload_file.mdx"), "utf8");
+  const zhKolaIndex = fs.readFileSync(path.join(zhDocsRoot, "kola", "index.mdx"), "utf8");
+  const zhKolaWhat = fs.readFileSync(path.join(zhDocsRoot, "kola", "001_what_is_kola.mdx"), "utf8");
+  const zhKolaDesign = fs.readFileSync(path.join(zhDocsRoot, "kola", "002_design_of_kola.mdx"), "utf8");
+  const zhIdeaComponents = fs.readFileSync(path.join(zhDocsRoot, "idea", "006-components.mdx"), "utf8");
+  const zhIdeaEntity = fs.readFileSync(path.join(zhDocsRoot, "idea", "009-entity.mdx"), "utf8");
+  const zhHowMinMax = fs.readFileSync(
+    path.join(zhDocsRoot, "how", "006_understand_max_min_length_items_properties.mdx"),
+    "utf8",
+  );
+  const zhKolaPrinciples = fs.readFileSync(path.join(zhDocsRoot, "kola", "004_principle.mdx"), "utf8");
+  const zhKolaToolChain = fs.readFileSync(path.join(zhDocsRoot, "kola", "005_tool_chain.mdx"), "utf8");
+  const zhKolaConfig = fs.readFileSync(path.join(zhDocsRoot, "kola", "006_configurations.mdx"), "utf8");
+
+  assert.match(ideaIndex, /## What This Section Covers/);
+  assert.match(ideaIndex, /## Recommended Path/);
+  assert.match(ideaIndex, /## Key Tasks/);
+  assert.match(ideaStart, /## When To Use It/);
+  assert.match(ideaStart, /## Steps/);
+  assert.match(ideaStart, /## Result/);
+  assert.match(ideaEditor, /## When To Use It/);
+  assert.match(ideaEditor, /## Result/);
+
+  assert.match(uiIndex, /## When To Use It/);
+  assert.match(uiIndex, /## Recommended Path/);
+  assert.match(uiVue, /## When To Use It/);
+  assert.match(uiVue, /## Steps/);
+  assert.match(uiApp, /## When To Use It/);
+  assert.match(uiApp, /## Runtime Notes/);
+  assert.match(uiApp, /enableFrontVue = true/);
+
+  assert.match(uploadHow, /multipart: true;/);
+  assert.match(uploadHow, /empty: false;/);
+  assert.doesNotMatch(uploadHow, /\bFALSE\b/);
+  assert.doesNotMatch(uploadHow, /multiple:\s*true/);
+
+  assert.match(kolaIndex, /## When To Use It/);
+  assert.match(kolaIndex, /## Steps/);
+  assert.match(kolaIndex, /\.\/gradlew\.bat \{proto_module\}:kolaTest --stacktrace/);
+  assert.doesNotMatch(kolaIndex, /gradlwe\.bat/);
+  assert.match(kolaWhat, /## Why It Exists/);
+  assert.match(kolaDesign, /## The Problem Kola Tries To Solve/);
+  assert.match(kolaPrinciples, /## Reuse Before Reinvention/);
+  assert.match(kolaToolChain, /## Core Components/);
+  assert.match(kolaToolChain, /## How the Flow Works/);
+  assert.doesNotMatch(kolaDesign, /TBD/);
+  assert.doesNotMatch(kolaPrinciples, /TBD/);
+  assert.doesNotMatch(kolaToolChain, /TBD/);
+  assert.doesNotMatch(ideaComponents, /\bFALSE\b/);
+  assert.doesNotMatch(ideaEntity, /\bFALSE\b/);
+  assert.doesNotMatch(howMinMax, /\bFALSE\b/);
+
+  assert.match(zhIdeaIndex, /## 本节包含什么/);
+  assert.match(zhIdeaIndex, /## 推荐阅读顺序/);
+  assert.match(zhIdeaIndex, /## 常用任务/);
+  assert.match(zhIdeaStart, /## 适用场景/);
+  assert.match(zhIdeaStart, /## 操作步骤/);
+  assert.match(zhIdeaStart, /## 结果/);
+  assert.match(zhIdeaEditor, /## 适用场景/);
+  assert.match(zhIdeaEditor, /## 结果/);
+
+  assert.match(zhUiIndex, /## 适用场景/);
+  assert.match(zhUiIndex, /## 推荐阅读顺序/);
+  assert.match(zhUiVue, /## 适用场景/);
+  assert.match(zhUiVue, /## 操作步骤/);
+  assert.match(zhUiApp, /## 适用场景/);
+  assert.match(zhUiApp, /## 运行时说明/);
+  assert.match(zhUiApp, /enableFrontVue = true/);
+
+  assert.match(zhUploadHow, /multipart: true;/);
+  assert.match(zhUploadHow, /empty: false;/);
+  assert.doesNotMatch(zhUploadHow, /\bFALSE\b/);
+  assert.doesNotMatch(zhUploadHow, /multiple:\s*true/);
+
+  assert.match(zhKolaIndex, /## 适用场景/);
+  assert.match(zhKolaIndex, /## 操作步骤/);
+  assert.match(zhKolaIndex, /\.\/gradlew\.bat \{proto_module\}:kolaTest --stacktrace/);
+  assert.doesNotMatch(zhKolaIndex, /gradlwe\.bat/);
+  assert.match(zhKolaWhat, /## 为什么需要它/);
+  assert.match(zhKolaDesign, /## Kola 要解决什么问题/);
+  assert.match(zhKolaPrinciples, /## 先复用，再发明/);
+  assert.match(zhKolaToolChain, /## 核心组成/);
+  assert.match(zhKolaToolChain, /## 工作流如何串起来/);
+  assert.match(zhKolaConfig, /## 构建侧关注点/);
+  assert.doesNotMatch(zhKolaDesign, /TBD/);
+  assert.doesNotMatch(zhKolaPrinciples, /TBD/);
+  assert.doesNotMatch(zhKolaToolChain, /TBD/);
+  assert.doesNotMatch(zhKolaConfig, /TBD/);
+  assert.doesNotMatch(zhIdeaComponents, /\bFALSE\b/);
+  assert.doesNotMatch(zhIdeaEntity, /\bFALSE\b/);
+  assert.doesNotMatch(zhHowMinMax, /\bFALSE\b/);
+});
+
+test("principles docs use a consistent narrative structure in both locales", () => {
+  const englishPrinciples = [
+    path.join(docsRoot, "principles", "single-source-of-truth.mdx"),
+    path.join(docsRoot, "principles", "leverage-integration.mdx"),
+    path.join(docsRoot, "principles", "empathy-is-important.mdx"),
+    path.join(docsRoot, "principles", "common-language.mdx"),
+  ];
+  const zhPrinciples = [
+    path.join(zhDocsRoot, "principles", "single-source-of-truth.mdx"),
+    path.join(zhDocsRoot, "principles", "leverage-integration.mdx"),
+    path.join(zhDocsRoot, "principles", "empathy-is-important.mdx"),
+    path.join(zhDocsRoot, "principles", "common-language.mdx"),
+  ];
+
+  for (const filePath of englishPrinciples) {
+    const source = fs.readFileSync(filePath, "utf8");
+    assert.match(source, /## What It Means/);
+    assert.match(source, /## Why It Matters/);
+    assert.match(source, /## Result/);
+    assert.doesNotMatch(source, /TipInfo/);
+    assert.doesNotMatch(source, /To be done/i);
+  }
+
+  for (const filePath of zhPrinciples) {
+    const source = fs.readFileSync(filePath, "utf8");
+    assert.match(source, /## 它是什么/);
+    assert.match(source, /## 为什么重要/);
+    assert.match(source, /## 结果/);
+    assert.doesNotMatch(source, /TipInfo/);
+    assert.doesNotMatch(source, /To be done/i);
+  }
+});
+
+test("zhCN principles terminology and nav labels stay aligned", () => {
+  const zhPrinciplesNav = fs.readFileSync(
+    path.join(repoRoot, "src", "app", "(docs)", "zhCN-docs", "index.tsx"),
+    "utf8",
+  );
+  const zhSsot = fs.readFileSync(path.join(zhDocsRoot, "principles", "single-source-of-truth.mdx"), "utf8");
+  const zhEmpathy = fs.readFileSync(path.join(zhDocsRoot, "principles", "empathy-is-important.mdx"), "utf8");
+  const zhIntegration = fs.readFileSync(path.join(zhDocsRoot, "principles", "leverage-integration.mdx"), "utf8");
+  const zhCommonLanguage = fs.readFileSync(path.join(zhDocsRoot, "principles", "common-language.mdx"), "utf8");
+  const zhKolaWhat = fs.readFileSync(path.join(zhDocsRoot, "kola", "001_what_is_kola.mdx"), "utf8");
+
+  assert.match(zhPrinciplesNav, /工程中的共情/);
+  assert.match(zhPrinciplesNav, /单一可信源/);
+  assert.match(zhPrinciplesNav, /借力集成/);
+  assert.doesNotMatch(zhPrinciplesNav, /同理心很重要|单一信任源|集成和开放/);
+
+  assert.match(zhSsot, /单一可信源/);
+  assert.doesNotMatch(zhSsot, /payload/);
+  assert.match(zhSsot, /接口载荷/);
+  assert.match(zhSsot, /Specification First（规范优先）/);
+
+  assert.match(zhIntegration, /棕地项目/);
+  assert.match(zhIntegration, /Greenfield（全新开局）/);
+  assert.match(zhIntegration, /Brownfield（在现有系统上持续演进）/);
+
+  assert.doesNotMatch(zhCommonLanguage, /API 表面/);
+  assert.match(zhCommonLanguage, /API 结构/);
+
+  assert.doesNotMatch(zhEmpathy, /共享沟通面/);
+  assert.match(zhEmpathy, /共享协作界面/);
+
+  assert.doesNotMatch(zhKolaWhat, /单一信任源/);
+  assert.match(zhKolaWhat, /单一可信源/);
 });

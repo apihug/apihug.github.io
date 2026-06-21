@@ -91,9 +91,6 @@ importers:
       eslint-config-next:
         specifier: 16.2.6
         version: 16.2.6(@typescript-eslint/parser@8.61.1(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3)
-      hast-util-to-jsx-runtime:
-        specifier: ^2.3.6
-        version: 2.3.6
       prettier:
         specifier: ^3.4.0
         version: 3.8.4

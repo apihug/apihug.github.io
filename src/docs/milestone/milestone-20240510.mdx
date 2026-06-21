@@ -1,71 +1,55 @@
-export const title = "Milestone of 2024-05-10";
+export const title = "Milestone 2024-05-10";
 export const description =
-  "With SDK [0.9.9-RELEASE] and plugin  [0.4.0]";
+  "Upgrade notes for the 0.4.0 plugin and 0.9.8+ SDK changes that prepared the 1.0.0 release line.";
 
 <TipBad>
-  Since `2024-05-10`, this upgrade may introduce code broken!  
+  This milestone introduced compatibility changes. Review the migration steps before upgrading older projects.
 </TipBad>
 
-This milestone for the eventually SDK 1.0.0 release preparation;
+## What Changed
 
-## Rename  `cn_message` to `message2`
+This release prepared the later `1.0.0-RELEASE` line and introduced several breaking naming and generation updates.
 
-Remove the support for  `cn_message` use the `message2` instead for the constant option;
+The most important one was the move from `cn_message` to `message2` for second-language descriptions.
+
+## Rename `cn_message` to `message2`
+
+The old constant option:
 
 ```protobuf
-message Meta {
-
-  //this is the code of this constant, without the offset
-  //the framework will hand this stuff
-  int32 code = 1;
-
-  // this is the description of this constant
-  // this should be primary language supported(for example english)
-  string message = 2;
-
-  // Deprecated since 2024-05-08 from logic
-  // Then will be removed before 1.0.0 official version
-  // eventually use the i18n to solve this issue
-  string cn_message = 3 [deprecated = true];
-
-  // this is another description of this constant
-  // This will be the second language supported(for example chinese)
-  string message2 = 4;
-
-  // those for the error extension
-  // if this set then this will
-  Error error = 5;
-}
+string cn_message = 3 [deprecated = true];
 ```
 
-### Migration steps
+was replaced by:
 
-#### Prepare
+```protobuf
+string message2 = 4;
+```
 
-[Maven Central](https://search.maven.org/artifact/com.apihug/it-bom)
+The intent is to make the second-language field generic instead of hard-coding it to Chinese.
 
-[ApiHug - API design Copilot](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
+## Migration Steps
 
-1. upgrade the IDEA plugin to `0.4.0`+
-2. upgrade the SDK to `0.9.8-RELEASE`+
-1. open file: `{PROJECT}/gradle/libs.versions.toml`
-2. find and update: `apihug = "OLD_VERSION"` -> `0.9.8-RELEASE`+
+### Prepare
 
-#### Code change
+1. Upgrade the IntelliJ plugin to `0.4.0+`.
+2. Upgrade the SDK to `0.9.8-RELEASE` or later.
+3. Update `{PROJECT}/gradle/libs.versions.toml`:
 
-1. reload the gradle
-2. exist-enum wire class will report error `descriptionZhCN` overwrite illegal;
-3. try to find all the `setDescriptionZhCN` of the enum replace them with `setDescription2`; (for error description upgrade)
-4. try to find all the `descriptionZhCN` of the enum replace them with `description2`; (for enum description upgrade)
-5. change all the `cn_message` in `proto` to  `message2`, as the `cn_message` will be removed soon.
+```toml
+apihug = "0.9.8-RELEASE"
+```
 
-after all the error gone,  then rebuild, everything goes well again!
+### Update Existing Code
 
-## New Feature
+1. Reload the Gradle project.
+2. Replace enum and error usages of `descriptionZhCN` with `description2` or `setDescription2`.
+3. Replace `cn_message` with `message2` in proto files.
+4. Rebuild after errors are cleared.
 
-### Support Entity Column Name Customization
+## Entity Column Name Strategy
 
-in the `hope-wire.json` define:
+This milestone also introduced more explicit entity column naming controls in `hope-wire.json`:
 
 ```json
 {
@@ -78,71 +62,29 @@ in the `hope-wire.json` define:
 }
 ```
 
-**Format**:
-
-1. `DEFAULT`: as old framework, convert to `SNAKE` style
-2. `CAMEL`: `myVariableName`
-3. `SNAKE`: `my_variable_name`
-
-**Upper**:
-
-1. `DEFAULT`:as old framework, convert to `UPPER` style
-2. `UPPER`: `name` -> `NAME`
-3. `LOWER`: `NAME` -> `name`
-4. `CAPITALIZE`:  `userName` -> `UserName`
-5. Exception: if you set column name manually in the proto already, this will always be the highest priority!
-6. `hope.common.persistence.plugin.NameMappingStrategy` client plugin to rename the column name.
-
-case **3**, the column will always be `MY_USER_NAME` as manually set as: `name: "MY_USER_NAME"`;
+Example column option syntax should use the current scalar style:
 
 ```protobuf
-  string user_name = 1 [(hope.persistence.column) = {
-    name: "MY_USER_NAME",
-    description: "name of the account",
-    nullable: FALSE,
-    updatable: FALSE,
-    length: {
-      value: 32
-    },
-    type: VARCHAR
-  }];
-  ```
-
-### Support Only Proto Build Strategy
-
-Latest Plugin(since 0.4.0), project template will introduce build proto modules only flag.
-
-But if your project already exist please follow this to update to support, as this only some gradle tricky.
-
-open: `{PROJECT}/settings.gradle`:
-
-1. replace `YOUR_PROTO_MODULE` with your proto module;
-2. replace `YOUR_APP_MODULE` with your app module;
-
-```groovy
-def onlyProto = System.getProperty("onlyProto")?.toString();
-
-if(onlyProto ==null){
-    onlyProto = System.getenv('onlyProto')?.toString();
-}
-
-// If onlyProto property is not set or is not a valid boolean, default to false
-// `-DonlyProto=true` to enable this
-onlyProto = onlyProto != null ? onlyProto.toBoolean() : false
-
-// Include
-include('YOUR_PROTO_MODULE')
-
-if(!onlyProto) {
-    include('YOUR_APP_MODULE')
-}else{
-    logger.quiet "-DonlyProto=true so no app modules will be included"
-}
-
+string user_name = 1 [(hope.persistence.column) = {
+  name: "MY_USER_NAME",
+  description: "name of the account",
+  nullable: false,
+  updatable: false,
+  length: 32,
+  type: VARCHAR
+}];
 ```
 
-Then you can use this shell:  `gradlew clean build -x test -x wireTest -DonlyProto=true`，
+## Proto-Only Build Support
 
-to build your proto modules quickly, especially when you has broken update in the proto!
+The plugin template also introduced a proto-only build switch for faster recovery when a proto update temporarily breaks the full project.
 
-<img src={require('@/img/hug/apihug-contact.gif').default.src} alt="Apihug Contact QR Code" width={750} height={750} className="rounded-lg" />
+Example invocation:
+
+```shell
+gradlew clean build -x test -x wireTest -DonlyProto=true
+```
+
+## Result
+
+After this migration, older projects align with the naming and build conventions that later releases assume by default.

@@ -1,24 +1,25 @@
-export const title = "SDK 0.8.6-RELEASE Easy merger";
+export const title = "SDK 0.8.6-RELEASE Stable Generated Diffs";
 export const description =
-  "0.8.6-RELEASE, Code generate more sortable, relief from code merger effort";
+  "What changed in 0.8.6-RELEASE to make generated code diffs easier to review and merge.";
 
 [English](/docs/changelog/detail/SDK_0.8.6)
 
 ## Issue
 
-**ApiHug** spend a lot of effort to make automatically generate best-practice template code.
+ApiHug has always aimed to generate template code that is stable enough to keep in source control.
 
-But as the `stub` & `wire` store those AST mapping in the HashMap, some time the auto generated code may very different between versions even a tiny changes happen.
+Before `0.8.6-RELEASE`, parts of the `stub` and `wire` generation pipeline still depended on `HashMap` iteration order. That meant small schema or model updates could produce noisy diffs even when the real business change was tiny.
 
-This really make the code merger guy crazy!
+## What Changed
 
-so since this version of SDK **0.8.6-RELEASE**, we make you really relief from this boring crazy stuff. include [0.7.8](/docs/changelog/detail/SDK_0.7.8) re-design the repository maintain way;
+Starting with `0.8.6-RELEASE`, generated files are emitted in a more stable order. Review diffs are now easier to read, and routine SDK upgrades require less manual merge work.
+
+This release also builds on the repository-maintenance redesign introduced in [SDK 0.7.8](/docs/changelog/detail/SDK_0.7.8).
 
 Latest: [Maven Central](https://search.maven.org/artifact/com.apihug/it-bom)
 
 ---
 
-but we still keep track the last `compile/build` time in the meta file(json).
+The metadata file still records the latest `compile/build` timestamp in JSON:
 
 <img src={require('@/img/framework/version_meta_diff.png').default.src} alt="meta diff" width={1411} height={374} className="rounded-lg" />
-

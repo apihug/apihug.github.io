@@ -1,125 +1,83 @@
-export const title = "Why Empathy is important";
+export const title = "工程中的共情";
 export const description =
-  "Empathy is very important in start ApiHug";
+  "为什么共情会直接影响产品质量、团队协作和长期可维护性。";
 
+## 它是什么
 
-<TipInfo>To be done 🏗️</TipInfo>
+工程中的共情，指的是工程师有意识地从他人的位置理解系统，而不只从实现者自己的位置看问题。
 
-## Concept
+这里的“他人”包括用户、协作者、运维、评审者，以及未来接手这套代码和文档的人。
 
-Empathy is almost a must-have soft skill for every software engineer. Many people show empathy unconsciously. But if practiced positively, it has unlimited potential.
+## 为什么重要
 
-What are soft skills? Unlike hard skills like learning a language or framework, communication, logical thinking, problem-solving, teamwork, and empathy fall into this category; these skills may play a greater role throughout your career as a software engineer.
+很多软件问题并不是语法能力不够，而是沟通和视角切换能力不足。
 
-Forgetting these skills may be as difficult as learning them. Reading a book or watching a video doesn't necessarily immediately improve your communication skills. Some of these skills are innate, and others must be practiced and applied continuously.
+缺少共情时，团队很容易产出：
 
-> Empathy is seeing with the eyes of another, listening with the ears of another, and feeling with the heart of another. – Alfred Adler
+- 技术上成立但很难使用的 API
+- 现在能跑、以后很难维护的代码
+- 写给作者自己看的文档
+- 把成本转嫁给下一个角色的交付方式
 
-Empathy is a profound human emotion, the core of emotional intelligence. It can promote our understanding of personal emotions, deal with interpersonal relationships, and build stronger connections.
+## 对用户的共情
 
-### Empathy vs Sympathy
+用户视角会直接影响设计质量。
 
-Empathy (Empathy), Sympathy (Sympathy); although only one word difference, the difference is still very large.
+当工程师开始从用户角度思考，就会自然追问：
 
-**Sympathy** refers to understanding the pain of others, essentially more of a "cognitive ability," which actually maintains a certain distance from people. For example: "I'm sorry for your loss," "At least..."
+- 命名是否足够直观？
+- 文档是否能减少猜测？
+- 错误行为是否容易理解？
+- 这个流程是在降低摩擦，还是在增加摩擦？
 
-**Empathy** involves experiencing the feelings of others, requiring an emotional component of "truly feeling what the other person feels," "Empathetic Listening" and "Problem Solving."
+这些问题在后端 API 设计中同样成立，不只是 UI 设计才需要共情。
 
-> Empathy is sincerely visualizing yourself in the shoes of the person who has lost something.
+## 对团队成员的共情
 
-> Empathy is a choice, and it's a vulnerable choice. Because in order to connect with you, I have to connect with something in myself that knows that feeling. – Dr. Brené Brown
+共情会改善团队协作。
 
-[Brené Brown Youtube Explanation](https://www.youtube.com/watch?v=1Evwgu369Jw), the four qualities of empathy:
+它会帮助工程师意识到自己的决策会如何影响：
 
-1. Perspective taking, the ability to see the world as others do
-2. Staying out of judgment in these perspectives
-3. Recognizing the emotions in others and relating
-4. Communicating with that emotional understanding
+- 前端联调
+- 测试成本
+- 运维负担
+- 产品沟通
+- 代码评审效率
 
-## Software Development Empathy
+契约优先工作流的价值之一，就是让每个角色把下一个角色当作协作者，而不是问题接收方。
 
-### Users
+## 对未来维护者的共情
 
-Empathy can help you build a connection with your customers and assist you in delivering better products to them.
+代码本身也是沟通。
 
-It is not only used to concretize and strengthen your brand image among customers but also facilitates the transmission of other values and perspectives to customers.
+未来的维护者会继承：
 
-Moreover, when facing thorny customer disputes, product delays, online incidents, etc., it can resonate with customers and provide more buffer when dealing with these issues.
+- 命名
+- 结构
+- 注释
+- 测试
+- 文档
+- 约定
 
-When considering the needs and desires of users, empathy helps you to take their perspective and gives you a completely new and different vision.
+共情会推动作者把这些内容整理成别人能够理解的形态，而不是把真实意图埋进脑内上下文里。
 
-Not to mention the skills of UX/UI designers who use empathy, UX designers are almost always based on empathy, always keeping the user at the center of mind.
+## ApiHug 如何应用它
 
-> Collecting insights about the social and cultural backgrounds of the users, their psychological traits, their feelings of frustration, and their goals will help you develop a broad knowledge of the users.
+ApiHug 把共情看作工程质量的一部分，而不是附加的软性修养。
 
-For the front end, empathy and perspective-taking come more naturally, but empathy also applies to backend engineers.
+契约优先设计，本质上就是把共情落地到流程里：
 
-Imagine how you want to store data and how secure you want that information to be. How detailed do you want the documentation to be to save valuable time in the future, or which parts might have security vulnerabilities in the future?
+- 产品和工程围绕同一份契约讨论
+- 前后端减少翻译损耗
+- 文档与生成结果更贴近真实设计意图
 
-What kind of documentation and conventions do you want your **API** to have, to facilitate understanding and reduce errors for users, and for future maintainers to expand?
+这就是把“态度上的共情”变成“流程上的共情”。
 
-All of this comes down to perspective-taking. Just like actors must have extraordinary empathy! Acting is about pleasing the audience, not yourself!
+## 结果
 
-### Colleagues
+共情会让系统更容易被理解、更容易协作，也更容易维护。在 ApiHug 里，这正是为什么契约要被当成共享协作界面，而不是后端私有的实现细节。
 
-Teamwork and empathy are complementary. Solid relationships are built on listening and understanding, not on judging and blaming.
+## 参考
 
-Empathy with teammates helps the team grow together. Even if venting to a teammate doesn't help solve the problem, you can listen (without judgment).
-
-Using empathy to sense others' feelings. Imagine a teammate being harshly criticized for making a mistake. How would you feel if it were you?
-
-Having empathy allows you to communicate better with them. Lend a helping hand when they urgently need support.
-
-Empathy can also greatly assist you in dealing with complex interpersonal relationships among colleagues. Try to observe some anomalies from different perspectives, which may be due to anger, fear, or sadness.
-
-Perspective-taking (using empathy) is one of the best ways to resolve work disputes.
-
-Empathy is about talking to you in the way you would like others to talk to you. It requires mindfulness. The next time you encounter a difficult situation at work or in daily conversation, consider empathy as an effective approach.
-
-Most software projects have a very long lifecycle and involve a large number of roles, with individuals often taking on multiple roles. Under modern division of labor, most people only have one role.
-
-Developers are accustomed to throwing problems to QA, operations, or customer support departments, thinking that their work is done after the code is submitted and merged.
-
-Empathy can help you better understand the work of your team members, to think about the difficulties and chaos caused by your own negligence for other colleagues; thus, to polish your own design and implementation from multiple aspects and with greater responsibility.
-
-### Future Engineers
-
-Code is another form of communication. We should strive to reduce the difficulty for people who interact with the code. Empathy can help us put ourselves in their shoes.
-
-Most engineers have the experience of taking over legacy projects or other people's projects, like entering a secret realm, brand new code, architecture, logic; no way to start, no way to adapt.
-
-If you were the original project leader, imagine someone taking over your project in the future, what would you like to leave for them?
-
-You would want your code to be more readable, avoid complex logic, avoid excessive abstraction, and have good naming conventions.
-
-Better organize your file directories, keep the code clean; keep the documentation synchronized, write a good **README**, single **how-to**; meaningful comments, complete unit tests.
-
-With empathy, you are more likely to build maintainable code. When a developer does not pay attention to empathy, he will soon sacrifice maintainability for speed. He will not consider other developers or his future self in the design of the system. Inject empathy into every bit of your daily development work, and you will write more complete documentation and clearer code.
-
-> A good heart begets all good things; an evil heart begets all disasters.
-
-## Empathy-Driven
-
-Programming languages are not only a means of communication between humans and machines but also a tool for communication between people, for team members, for future selves, and for other successors; in this sense, programming is very similar to writing.
-
-Programming is a form of communication, and the essence of communication lies in empathy, so once a software engineer masters empathy, they will benefit greatly.
-
-Goulet from [corgibytes](https://corgibytes.com/about/) (specializing in system refactoring) has even embedded empathy into the core culture of the company. `Empathy-Driven Development` is a new development concept that combines theory and practice for engineers.
-
-From the perspective of engineers, some misunderstandings about empathy need to be corrected:
-
-1. Empathy is not an abstract, emotional, metaphysical concept. It is our daily practice, thinking from another's perspective, solving problems; it is continuous training every day.
-2. Empathy is beyond the existence of software engineering. Writing code, submitting PRs, designing tests are the daily tasks of software engineers. Engineers are experts in problem-solving, but first and foremost, they must be excellent communicators. Code is a means of interaction with machines, but more importantly, it is also a way of communication with people, which is also necessary to maintain team diversity and inclusiveness.
-3. Empathy can be cultivated, just like learning a programming language or framework. Training in empathy can also be broken down into steps and cultivated step by step.
-
-Most technical gaps can be made up through learning, and most developers can agree with this fact. In return, think about how most software engineers are underdeveloped in communication and empathy: how to cooperate, how to create better products.
-
-### Exercise to Obtain
-
-Just like learning a programming language or a sport, training empathy also has a systematic approach and progresses step by step.
-
-#### Stop Complaining and Learn to Be Grateful
-
-Such a scene is not unfamiliar to most programmers: when you take over an old project and see a pile of 'bad' code, with confusing logic, mysterious naming, even misleading comments, meaningless commit descriptions, and even cursed remarks; you might secretly curse.
-
-But please hold your anger for a moment, put yourself in their shoes, and think about the situation at the time when the first line of code was written. No one is born wanting to write 'bad' code. You can imagine the situation at the time
+- [Brene Brown on empathy](https://www.youtube.com/watch?v=1Evwgu369Jw)
+- [Empathy-Driven Development](https://corgibytes.com/about/)

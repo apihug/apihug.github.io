@@ -1,67 +1,113 @@
-export const title = "015 Editor Assistant";
+export const title = "Use the Editor Assistant";
 export const description =
-  "Menu context to help edit easier.";
+  "Use the ApiHug editor context menu to create and edit proto files faster inside IntelliJ IDEA.";
 
-How to use the edit context menu to code smarter and quicker by ApiHug Api design Copilot
+## What This Page Covers
 
-Also refer to the [Shortcuts](/docs/idea/000-shortcut)
+This page explains the editor-side context actions provided by the ApiHug IntelliJ plugin.
 
-## Add File
+Use these actions when you want to create or edit proto structures directly from the IDE instead of writing every block by hand.
 
-1. Select `proto` module's `src>main>proto`
-2. Right click
-3. Select `Add Proto File`
-4. Select right type proto file
+Also see the [Shortcut Cheatsheet](/docs/idea/000-shortcut).
 
-<img src={require('@/img/plugin/115_menu_add_file.gif').default.src} alt="ApiHug Add file" width={2334} height={1768} className="rounded-lg" />
+## When To Use It
 
-## Edit Message
+Use the editor assistant when you need to:
 
-1. Select `option (hope.domain.kind) = BEAN;` kind proto file
-2. right click(shortcut), show up `ApiHug` menu context
-3. `Add Message`: Add a new Message
-4. `Add Field`: Add a primitive type field
-5. `Add Field(Reference)`: Add field reference to another proto object(Message/Enum)
+- create a new proto file quickly
+- add messages, fields, services, enums, errors, or entities with the correct structure
+- keep editing flow inside the IDE without switching to external generators or templates
 
-<img src={require('@/img/plugin/116_menu_add_message.gif').default.src} alt="ApiHug Add Message" width={2334} height={1768} className="rounded-lg" />
+## Add a Proto File
 
-## Edit Service
+1. Open the `proto` module and locate `src/main/proto`.
+2. Right-click the target directory.
+3. Choose `Add Proto File`.
+4. Select the correct proto file type for the document you want to create.
 
-1. Select `option (hope.domain.kind) = IDL;` kind proto file
-2. right click(shortcut), show up `ApiHug` menu context
-3. `Add Service`: Add a new Service
-4. `Add Method`: Add a new method to Service
+<img src={require('@/img/plugin/115_menu_add_file.gif').default.src} alt="ApiHug editor assistant add file" width={2334} height={1768} className="rounded-lg" />
 
-<img src={require('@/img/plugin/117_menu_add_service.gif').default.src} alt="ApiHug Add Service" width={2334} height={1768} className="rounded-lg" />
+## Edit a Message File
 
-## Edit Enum
+Use this flow in files that declare a bean-style document such as:
 
-1. Select `option (hope.domain.kind) = ENUM;` kind proto file
-2. right click(shortcut), show up `ApiHug` menu context
-3. `Add Enum`: Add a new Enum
-4. `Add Enum Item`: Add a Enum Item
+```proto
+option (hope.domain.kind) = BEAN;
+```
 
-<img src={require('@/img/plugin/118_menu_add_enum.gif').default.src} alt="ApiHug Add Enum" width={2334} height={1768} className="rounded-lg" />
+Available actions include:
 
-## Edit Error
+- `Add Message`
+- `Add Field`
+- `Add Field(Reference)`
 
-1. Select `option (hope.domain.kind) = ERROR;` kind proto file
-2. right click(shortcut), show up `ApiHug` menu context
-3. `Add Error`: Add a new Error
-4. `Add Error Item`: Add a Error Item
+<img src={require('@/img/plugin/116_menu_add_message.gif').default.src} alt="ApiHug editor assistant add message" width={2334} height={1768} className="rounded-lg" />
 
-<img src={require('@/img/plugin/119_menu_add_error.gif').default.src} alt="ApiHug Add Error" width={2334} height={1768} className="rounded-lg" />
+## Edit a Service File
 
-## Edit Entity
+Use this flow in files that declare an IDL-style document such as:
 
-1. Select `option (hope.domain.kind) = ENTITY;` kind proto file
-2. right click(shortcut), show up `ApiHug` menu context
-3. `Add Entity`: Add a new Entity
-4. `Add Column`: Add a new Column
+```proto
+option (hope.domain.kind) = IDL;
+```
 
-<img src={require('@/img/plugin/120_menu_add_entity.gif').default.src} alt="ApiHug Add Entity" width={2334} height={1768} className="rounded-lg" />
+Available actions include:
 
-## Reference
+- `Add Service`
+- `Add Method`
 
-1. [ApiHug101-Bilibili](https://space.bilibili.com/666522636)
-2. [ApiHug101-Youtube](https://youtube.com/@ApiHug?si=C1yw0poHA01zbmyj)
+<img src={require('@/img/plugin/117_menu_add_service.gif').default.src} alt="ApiHug editor assistant add service" width={2334} height={1768} className="rounded-lg" />
+
+## Edit an Enum File
+
+Use this flow in files that declare an enum document such as:
+
+```proto
+option (hope.domain.kind) = ENUM;
+```
+
+Available actions include:
+
+- `Add Enum`
+- `Add Enum Item`
+
+<img src={require('@/img/plugin/118_menu_add_enum.gif').default.src} alt="ApiHug editor assistant add enum" width={2334} height={1768} className="rounded-lg" />
+
+## Edit an Error File
+
+Use this flow in files that declare an error document such as:
+
+```proto
+option (hope.domain.kind) = ERROR;
+```
+
+Available actions include:
+
+- `Add Error`
+- `Add Error Item`
+
+<img src={require('@/img/plugin/119_menu_add_error.gif').default.src} alt="ApiHug editor assistant add error" width={2334} height={1768} className="rounded-lg" />
+
+## Edit an Entity File
+
+Use this flow in files that declare an entity document such as:
+
+```proto
+option (hope.domain.kind) = ENTITY;
+```
+
+Available actions include:
+
+- `Add Entity`
+- `Add Column`
+
+<img src={require('@/img/plugin/120_menu_add_entity.gif').default.src} alt="ApiHug editor assistant add entity" width={2334} height={1768} className="rounded-lg" />
+
+## Result
+
+The editor assistant removes a large amount of repetitive proto scaffolding work and helps keep document structure consistent while you are designing contracts.
+
+## References
+
+1. [ApiHug101 on Bilibili](https://space.bilibili.com/666522636)
+2. [ApiHug101 on YouTube](https://youtube.com/@ApiHug?si=C1yw0poHA01zbmyj)

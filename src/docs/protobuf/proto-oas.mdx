@@ -1,77 +1,371 @@
-export const title = "Protocol Buffers AS OAS DSL";
+export const title = "Protocol Buffers As OAS DSL";
 export const description =
-  "Use Protocol Buffers as DSL to define OAS(Open API Specification";
+  "Use ApiHug swagger extensions to map protobuf services to HTTP APIs and OpenAPI documentation.";
 
 ## Basic
 
-[The OpenAPI Specification](https://github.com/OAI/OpenAPI-Specification) target for:
+[The OpenAPI Specification](https://github.com/OAI/OpenAPI-Specification) provides a standard, language-agnostic way to describe HTTP APIs. Protocol Buffers already act as an **IDL** for typed contracts, so ApiHug extends protobuf with swagger-specific metadata and uses that single definition to generate:
 
-> The OpenAPI Specification (OAS) defines a standard, programming language-agnostic interface description for HTTP APIs. This allows both humans and computers to discover and understand the capabilities of a service without requiring access to source code, additional documentation, or inspection of network traffic.
+- HTTP routing
+- OpenAPI / Swagger documents
+- validation metadata
+- frontend/backend integration contracts
+- AI-friendly API descriptions
 
-Similar to what interface descriptions have done for **lower-level programming**, the OpenAPI Specification removes guesswork in calling a service.
+ApiHug does this through the `apihug/protobuf/swagger/annotations.proto` extension points:
 
-When it comes to interface descriptions for lower-level programming, we use a concept called **IDL** (Interface Definition Language). For example, Protocol Buffers and Apache Thrift fall into the category of IDL.
+| Level | Proto element | Extension |
+| --- | --- | --- |
+| Service | `service` | `(hope.swagger.svc)` |
+| Method | `rpc` | `(hope.swagger.operation)` |
+| Message | `message` | `(hope.swagger.schema)` |
+| Field | `field` | `(hope.swagger.field)` |
+| Enum | `enum` | `(hope.swagger.enm)` |
 
-To establish a common language for OpenAPI definition, we can combine DSL and IDL, enabling concise syntax and language-agnostic interfaces for interoperability across programming languages and frameworks. This fosters collaboration and seamless API design and consumption.
+## Import
 
-## ApiHug
+```proto
+import "apihug/protobuf/swagger/annotations.proto";
+```
 
-ApiHug has made further advancements in integration and innovation, making the entire process more robust and easily adaptable for engineering purposes. It offers a comprehensive DSL design specifically catering to OpenAPI, a complete toolchain, and seamless integration with modern enterprise development, resulting in efficient and streamlined API development.
+If you use mock rules in swagger field or response customization, also import:
 
-[ApiHug Proto for OAS](https://github.com/apihug/apihug-proto/) define extension to support OAS standard.
+```proto
+import "apihug/protobuf/mock/mock.proto";
+```
 
-Example [API Definition](https://github.com/apihug/apihug-full-demo/blob/main/demo-user-proto/src/main/proto/com/apihug/demo/user/proto/api/admin/api.proto):
+## Service-level Mapping
 
-```protobuf
+`hope.swagger.svc` defines the service base path and service description.
+
+```proto
 service UserAdminService {
   option (hope.swagger.svc) = {
     path: "/user/admin";
     description: "User admin server";
   };
-
-  rpc SayHello (google.protobuf.Empty) returns (google.protobuf.Empty) {
-    option (hope.swagger.operation) = {
-      get: "/say-hello";
-      description: "Hello from the user admin server";
-      tags: "project";
-      priority: MIDDLE;
-      authorization:{
-        low_limit_risky_mode: ANONYMOUS
-      }
-    };
-  };
-
-  rpc RegisterCustomer (com.apihug.demo.user.proto.api.admin.request.RegisterRequest) returns (com.apihug.demo.user.proto.api.admin.response.CustomerRegisteredResponse) {
-    option (hope.swagger.operation) = {
-      post: "/register";
-      description: "admin try to register a new customer";
-      priority: CRITICAL;
-      authorization:{
-        rbac:{
-          authorities: ["USER_ADD"];
-        }
-      }
-    };
-  }
-  
-  rpc ChangePassword (com.apihug.demo.user.proto.api.admin.request.ChangePasswordRequest) returns (com.apihug.demo.user.proto.api.admin.response.CustomerPasswordUpdatedResponse) {
-    option (hope.swagger.operation) = {
-      post: "/change-password";
-      description: "use to reset the password after password forgot";
-      priority: HIGH;
-      authorization:{
-        rbac:{
-          authorities: ["USER_ADD", "USER_DELETE"];
-        }
-      }
-    };
-  }
 }
 ```
 
-## Refer
+Use this to keep the service-level route prefix and human-readable description in one place.
 
-1. [gRPC-Gateway](https://github.com/grpc-ecosystem/grpc-gateway) is a plugin of protoc. It reads a gRPC service definition and generates a reverse-proxy server which translates a RESTful JSON API into gRPC.
-2. [Google Open API Protos](https://github.com/googleapis/googleapis/tree/master/google/api)  public Google APIs that support both REST and gRPC protocols.
-3. [The OpenAPI Specification](https://github.com/OAI/OpenAPI-Specification)
-4. [Apihug full demo](https://github.com/apihug/apihug-full-demo)
+## Operation-level Mapping
+
+`hope.swagger.operation` is the core extension. It maps one RPC to one HTTP-facing operation.
+
+```proto
+rpc RegisterCustomer (RegisterRequest) returns (CustomerRegisteredResponse) {
+  option (hope.swagger.operation) = {
+    post: "/register";
+    description: "Admin registers a new customer";
+    tags: "user";
+    priority: CRITICAL;
+    group: TENANT;
+    authorization: {
+      rbac: {
+        authorities: ["USER_ADD"];
+      }
+    };
+  };
+}
+```
+
+The common pieces are:
+
+- HTTP method pattern: `get`, `post`, `put`, `patch`, `delete`
+- business description: `description`, `summary`
+- grouping: `tags`, `group`
+- security: `authorization`
+- lifecycle / visibility: `deprecated`, `internal`, `hide`
+- AI hints: `questions`
+
+## Pageable And Repeated Collections
+
+ApiHug distinguishes between **pageable results** and **plain repeated collections**.
+
+### Pageable
+
+`pageable: true` means the operation should behave like a paginated query:
+
+- request side gets pageable conventions such as `page`, `size`, `sort`
+- response side is wrapped as pageable output rather than a plain list
+
+```proto
+rpc SearchPets (PetQueryRequest) returns (Pet) {
+  option (hope.swagger.operation) = {
+    post: "/pets/search";
+    pageable: true;
+    description: "Paginated pet query";
+  };
+}
+```
+
+### Repeated Input And Output
+
+Use `input_repeated` and `output_repeated` when the API is list-style but **not** pageable.
+
+```proto
+rpc BatchCreateUsers (CreateUserRequest) returns (UserResponse) {
+  option (hope.swagger.operation) = {
+    post: "/users/batch";
+    input_repeated: true;
+    output_repeated: true;
+    description: "Batch create users";
+  };
+}
+```
+
+Deprecated compatibility fields still exist in the source proto:
+
+- `input_plural`
+- `out_plural`
+
+New definitions should use:
+
+- `input_repeated`
+- `output_repeated`
+
+## Raw Responses
+
+By default, ApiHug may wrap responses according to the framework conventions. `raw: true` tells the toolchain to preserve the response shape directly instead of applying the normal wrapper.
+
+```proto
+rpc Healthz (google.protobuf.Empty) returns (google.protobuf.Empty) {
+  option (hope.swagger.operation) = {
+    get: "/healthz";
+    raw: true;
+    description: "Raw health response";
+  };
+}
+```
+
+## Runtime Request Objects
+
+Some operation flags are for controller/runtime integration rather than schema shape.
+
+### Session
+
+`session: true` tells the Java runtime that the controller method needs access to `HttpSession`.
+
+```proto
+rpc UpdateWizardState (WizardStateRequest) returns (google.protobuf.Empty) {
+  option (hope.swagger.operation) = {
+    post: "/wizard/state";
+    session: true;
+    description: "Update state backed by HttpSession";
+  };
+}
+```
+
+Use this only when the generated controller really needs the servlet session object. It is not a replacement for ordinary query, header, or cookie parameters.
+
+## Parameters
+
+Use `parameters` to describe path/query/header/cookie/session style inputs explicitly. This is especially important when the transport-level parameters are not fully expressed by the request message shape alone.
+
+```proto
+rpc GetPetById (google.protobuf.Empty) returns (Pet) {
+  option (hope.swagger.operation) = {
+    get: "/pets/{id}";
+    parameters: {
+      parameter: {
+        name: "id";
+        in: PATH;
+        schema: {
+          format: LONG;
+          minimum: 1;
+        };
+      };
+      parameter: {
+        name: "include-deleted";
+        in: QUERY;
+        schema: {
+          format: BOOLEAN;
+        };
+      };
+    };
+  };
+}
+```
+
+For list-style query/path/header inputs, the parameter-level repeated flag is `is_repeated`.
+
+## Path Parameter Name Overrides
+
+When one field may be rendered into overlapping path templates, use `field_configuration.path_param_name` to force the exact path variable name.
+
+```proto
+string owner_id = 1 [(hope.swagger.field) = {
+  description: "Owner id";
+  field_configuration: {
+    path_param_name: "owner-id";
+  };
+}];
+```
+
+This is especially useful for generated OpenAPI output where the default derived field name would create an awkward or conflicting path placeholder.
+
+## Media Types And Multipart
+
+### Response Media Type
+
+`response_media_type` customizes the declared output media type when JSON is not the right contract.
+
+```proto
+rpc ExportPdf (google.protobuf.Empty) returns (google.protobuf.Empty) {
+  option (hope.swagger.operation) = {
+    get: "/export/pdf";
+    response_media_type: APPLICATION_PDF;
+    raw: true;
+  };
+}
+```
+
+### Multipart
+
+For upload-style APIs, use multipart-related configuration.
+
+```proto
+rpc UploadMeta (OpenApiMetaUploadRequest) returns (google.protobuf.Empty) {
+  option (hope.swagger.operation) = {
+    post: "/upload-meta";
+    consumes: "multipart/form-data";
+    multipart: true;
+    description: "Upload API metadata";
+  };
+}
+```
+
+The old `multiple` flag still exists in the proto as a deprecated compatibility alias. Prefer `multipart`.
+
+## Request And Response Schema Customization
+
+ApiHug can enrich request and response definitions beyond the raw message field types.
+
+### Request Schema
+
+`request_schema` adds JSON-schema-like request payload metadata and validation hints.
+
+```proto
+option (hope.swagger.operation) = {
+  post: "/register";
+  request_schema: {
+    title: "RegisterCustomerPayload";
+    description: "Validated customer registration body";
+  };
+};
+```
+
+### Response Schema
+
+`response_schema` customizes the shape and metadata of a primitive or custom response payload.
+
+```proto
+option (hope.swagger.operation) = {
+  get: "/ping";
+  response_schema: {
+    title: "PingResponse";
+    description: "Simple primitive response";
+  };
+};
+```
+
+### Empty Body
+
+`body_empty` allows an intentionally empty response body when that is part of the contract.
+
+```proto
+option (hope.swagger.operation) = {
+  delete: "/pets/{id}";
+  body_empty: true;
+};
+```
+
+### Mock
+
+For primitive response customization, `mock` can be attached at the response customization level, and field-level `mock` can still be used through `hope.swagger.field`.
+
+## Visibility And Grouping
+
+### Group
+
+`group` marks the operation audience:
+
+- `CUSTOMER`
+- `TENANT`
+- `PLATFORM`
+
+This is useful when one proto surface feeds multiple consumer-facing contexts.
+
+### Internal And Hide
+
+- `internal: true` marks the operation as internal-only
+- `hide: true` suppresses it from external-facing documentation views
+
+```proto
+option (hope.swagger.operation) = {
+  post: "/internal/rebuild-cache";
+  internal: true;
+  hide: true;
+};
+```
+
+## AI-facing Questions
+
+`questions` is a repeated natural-language hint field for AI/LLM usage. It helps make the API easier for agents to discover semantically, not just structurally.
+
+```proto
+option (hope.swagger.operation) = {
+  post: "/orders/search";
+  questions: "How do I search recent orders?";
+  questions: "Query paged order data for a customer";
+};
+```
+
+This is especially useful when the generated contract is consumed by MCP/tooling or other agent-facing layers.
+
+## One Practical Example
+
+```proto
+service PetService {
+  option (hope.swagger.svc) = {
+    path: "/pet";
+    description: "Pet manager service";
+  };
+
+  rpc ListPets (PetQueryRequest) returns (Pet) {
+    option (hope.swagger.operation) = {
+      post: "/list";
+      pageable: true;
+      description: "Paginated pet list";
+      tags: "pet";
+      group: TENANT;
+      questions: "How do I list pets with paging?";
+      authorization: {
+        rbac: {
+          authorities: ["PET_VIEW"];
+        }
+      };
+    };
+  };
+
+  rpc UploadPhoto (UploadRequest) returns (google.protobuf.Empty) {
+    option (hope.swagger.operation) = {
+      post: "/upload";
+      consumes: "multipart/form-data";
+      multipart: true;
+      body_empty: true;
+      description: "Upload pet photo";
+    };
+  };
+}
+```
+
+## Reference
+
+Use this page as the practical overview. For the field-level reference of every swagger extension message and operation option, see:
+
+- [Swagger Specification](/docs/spec/swagger)
+- [Mock Specification](/docs/spec/mock)
+- [OpenAPI Specification](https://github.com/OAI/OpenAPI-Specification)
+- [gRPC-Gateway](https://github.com/grpc-ecosystem/grpc-gateway)

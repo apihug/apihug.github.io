@@ -4,16 +4,37 @@ import mainLogo from "@/img/hug/main-logo.png";
 export function Logo({ className, ...props }: { className?: string } & React.ComponentProps<"span">) {
   return (
     <span className={`inline-flex ${className ?? ""}`} {...props}>
-      <img
-        src={stickyLogo.src}
-        alt="ApiHug"
-        className="h-7 w-auto dark:hidden"
-      />
-      <img
-        src={mainLogo.src}
-        alt="ApiHug"
-        className="hidden h-7 w-auto dark:block"
-      />
+      <span className="inline-flex md:hidden">
+        <img
+          src={stickyLogo.src}
+          alt="ApiHug"
+          className="h-7 w-auto dark:hidden"
+        />
+        <img
+          src={mainLogo.src}
+          alt="ApiHug"
+          className="hidden h-7 w-auto dark:block"
+        />
+      </span>
+      <span className="hidden items-center gap-3 md:flex">
+        <span className="inline-flex">
+          <img
+            src={stickyLogo.src}
+            alt="ApiHug"
+            className="h-7 w-auto dark:hidden"
+          />
+          <img
+            src={mainLogo.src}
+            alt="ApiHug"
+            className="hidden h-7 w-auto dark:block"
+          />
+        </span>
+        <span className="flex flex-col leading-none">
+          <span className="font-mono text-[11px]/4 tracking-[0.24em] text-gray-500 uppercase dark:text-gray-400">
+            API as Architecture
+          </span>
+        </span>
+      </span>
     </span>
   );
 }

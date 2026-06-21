@@ -120,7 +120,7 @@ export default function ProtoSemanticSection() {
         <div className="grid w-full grid-flow-dense grid-cols-6 gap-2 bg-gray-950/5 p-2 dark:bg-white/10 sm:grid-cols-12">
           {[
             { name: "swagger", desc: "API & OpenAPI routing", mono: "hope.swagger" },
-            { name: "persistence", desc: "JPA entities & Liquibase", mono: "hope.persistence" },
+            { name: "persistence", desc: "Domain entities & Liquibase", mono: "hope.persistence" },
             { name: "constant", desc: "Enum constants & errors", mono: "hope.constant" },
             { name: "mock", desc: "40+ nature type generators", mono: "hope.mock" },
             { name: "domain", desc: "Views & query objects", mono: "hope.domain" },

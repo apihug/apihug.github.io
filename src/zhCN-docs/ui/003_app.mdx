@@ -1,29 +1,22 @@
-export const title = "ApiHug 应用UI配置";
+export const title = "配置 ApiHug 应用侧 UI 模块";
 export const description =
-  "前后分离后端架构设计调整和说明";
+  "配置应用模块中的前端开关、UI 工作目录与运行时承载方式。";
 
+## 本页说明
 
-[Maven Central](https://search.maven.org/artifact/com.apihug/it-bom)
+这一页介绍的是应用模块如何连接 ApiHug 生成的 Vue UI 模块。
 
-[JetBrains Marketplace](https://plugins.jetbrains.com/plugin/23534-apihug--api-design-copilot)
+当你已经理解 Vue UI 输出结构，并且需要把应用模块、UI 工程和运行时打通时，请阅读这一页。
 
-## 配置
+## 适用场景
 
-角色定义：
+当你的项目采用前后端分模块结构，同时又希望由 ApiHug 统一协调前端生成、静态资源复制和运行时入口时，就应该配置这一层。
 
-1. proto 定义标准
-2. app 定义应用
-3. ui 定义交互
+## 操作步骤
 
-源泉均来自 `proto`生成的协议，然后具由此生成应用基础，应用再链接 `ui`; 所以一般流程：
+### 1. 在应用模块开启 Vue 生成
 
-1. 编译 proto 生成协议
-2. 通过协议 stub 生成 应用
-3. 生成应用过程中选择是否生成 ui
-
-UI 的生成规则，需要配置给 app, app触发UI生成;
-
-打开 vue 生成标志， `{app}/build.gradle`:
+在 `{app}/build.gradle` 中启用前端生成：
 
 ```groovy
 hopeStub {
@@ -31,7 +24,9 @@ hopeStub {
 }
 ```
 
-`{app}/ui.json`:
+### 2. 指定真实 UI 工程目录
+
+创建或更新 `{app}/ui.json`：
 
 ```json
 {
@@ -39,151 +34,85 @@ hopeStub {
 }
 ```
 
-最后更新：  `1.3.9-M2` (2025-05-27 前端架构一致在快速变动，一些变量也在改变，谨慎使用)
-`auto router` 移如内置plugin, 不再走 app 走， router 为纯前端工作！
+这个文件告诉应用模块：实际的 UI 工程位于哪里。
 
-| Property       | Comment                                                      |
-|----------------|--------------------------------------------------------------|
-| uiModuleDir    | UI 模块相对路径                                                    |
-| httpVendor     | `../http`, `useGet`/`Post` 供应                                |
-| apiDir         | `packages/service/src`, API输出目录(相对`uiModuleDir`)             |
-| requestType    | `RequestItem` form 类型                                        |
-| requestModule  | `../types`     form 类型引用路径                                   |
-| responseType   | `ResponseItem`  column 类型                                    |
-| responseModule | `../types`       column 类型引用路径                               |
-| pathToUrl      | `import { pathToUrl } from '../utils'`  path 路径解析帮助函数        |
-| langDir        | `packages/common/locales/src/langs` 国际化输出路径(相对`uiModuleDir`) |
-| firstLanguage  | `zh-CN`  国际化，第一语言                                            |
-| secondLanguage | `en-US`  国际化，第二语言                                            |
-| typesDir       | `src/types` 类型输出路径(相对`uiModuleDir`)                          |
-| authSplit      | 授权分隔符，用来组装树结构, 默认 `:`                                        |
-| noMerger       | `false` 预留，未用                                                |
-| alwaysEraseOld | `false` 预留，未用                                                |
+### 3. 理解生成边界
 
-**Router**
+在 ApiHug 工作流中：
 
-项目内置 plugin 自动扫描页面，按照文件目录结构生成路由规则。
+1. `proto` 定义契约
+2. 应用模块消费契约生成结果
+3. UI 模块接收服务层、模型、i18n 和页面辅助代码
 
-`router.json` 配置在 `{module}-ui` 模块下, 用于配置 ui 模块下应用的自动路由生成规则。
+所以应用模块是契约输出与前端生成策略之间的桥梁。
 
-支持多模块， 比如 `apps` 下面有 `web1`, `web2`, 可以进行独立配置，互相隔离。
+### 4. 执行生成流程
+
+完成上述配置后，可以从应用模块执行：
+
+```shell
+./gradlew.bat {app}:clean stub build -x test -x stubTest
+```
+
+常见生成结果包括：
+
+- i18n 语言包
+- API service stub
+- request / response model
+- form / table 支撑类型
+- 公共类型声明
+
+## 关键文件
+
+| 文件 | 作用 |
+| --- | --- |
+| `{app}/build.gradle` | 打开 Vue 生成开关 |
+| `{app}/ui.json` | 指向真实 UI 工程 |
+| `{ui}/router.json` | 配置 UI 模块内部的自动路由生成规则 |
+
+## 路由说明
+
+ApiHug 的 UI 工作流默认认为：路由生成发生在 UI 模块内部，而不是后端运行时内部。
+
+一个典型的 `router.json` 结构如下：
 
 ```json
 {
   "items": [
-      {
-          "moduleDir": "apps/web1"
-      },{
-          "moduleDir": "apps/web2"
-      }
+    {
+      "moduleDir": "apps/web1"
+    },
+    {
+      "moduleDir": "apps/web2"
+    }
   ]
 }
 ```
 
-| Property       | Comment                    |
-|----------------|----------------------------|
-| moduleDir      | ui 模块下子模块目录，如 `apps/web`   |
-| pagesDir       | `src/pages` 该模块页面目录相对路径    |
-| pagesPath      | `@/pages` 页面module 路径      |
-| routerOutDir   | `src/router/auto` 自动路由输出目录 |
-| menuItem       | `MenuItem` 菜单类名            |
-| menuItemImport | `./types` 菜单类路径            |
-| disable        | `false` 是否disable          |
-| firstLanguage  | 第一语言                       |
-| secondLanguage | 第二语言                       |
-| langDir        | `src/locales/langs` 语言输出目录 |
+当一个 UI 仓库中包含多个独立应用入口时，可以用这种方式分别配置。
 
+## 运行时说明
 
-## 编译
+运行时通常有两个关键点：
 
-普通执行 `stub` 命令即可生成 UI 内容:
+1. 把 UI 的 `dist` 复制到后端静态资源目录
+2. 把非 API 路径转发到 SPA 的 `index.html`
 
-`./gradlew.bat {app}:clean stub build -x test -x stubTest`
-
-1. 国际化
-2. Api Stub
-3. Api Model
-4. form/table Stub
-5. type
-6. 其他
-
-```
-├─assets
-│....
-├─locales
-│  │  
-│  └─langs
-│      ├─en-US
-│      │      app.json
-│      │
-│      └─zh-CN
-│              app.json
-├─service
-│  │  http.ts
-│  │  index.ts
-│  │  type.ts
-│  │  utils.ts
-│  │
-│  ├─api
-│  │      api-example-api.ts
-│  │      api-system-system.ts
-│  │      index.ts
-│  │
-│  ├─form
-│  │      TemplateExampleRequest.ts
-│  │      UploadBookCoverToLocalRequest.ts
-│  │
-│  ├─model
-│  │      api-example-request-example.ts
-│  │      api-example-response-example.ts
-│  │      index.ts
-│  │
-│  └─table
-│          TemplateExampleResponse.ts
-├─types
-│      api.d.ts
-│      app.d.ts
-│      auth.d.ts
-
-```
-
-
-## 运行
-
-由于现代的框架都是SPA(Single Page Application)架构，给前后协同都带来了挑战，ApiHug试图减少多人在前后协同带来的理解难度，和同步的滞后性。 
-所以采用了：
-
-1. 前后项目在同工程中不同子模块
-2. 工具链上融合， `gradle` +  `vite`, 无缝集成，互相可以调用任务
-3. 运行时，java application 静态代理 + vue 端 proxy
-
-以实现前后端人员协同最大化，上下文切换最低化，开发效率最大化！
-
-### App Build Hook
-
-打包资源依赖 UI 项目打包，同时copy UI 资源 `dist` 到运行时静态文件目录：
+静态资源复制示例：
 
 ```groovy
-    //Really Static resource of the UI to Output Dir
-    tasks.register('copyUIResources', Copy) {
-        dependsOn project(':good-app-ui').tasks.named('build')
-        from project(':good-app-ui').layout.projectDirectory.dir('dist')
-        into "${layout.buildDirectory.get()}/resources/main/static"
-    }
+tasks.register('copyUIResources', Copy) {
+    dependsOn project(':good-app-ui').tasks.named('build')
+    from project(':good-app-ui').layout.projectDirectory.dir('dist')
+    into "${layout.buildDirectory.get()}/resources/main/static"
+}
 
-    tasks.named('processResources') {
-        dependsOn 'copyUIResources'
-    }
+tasks.named('processResources') {
+    dependsOn 'copyUIResources'
+}
 ```
 
-### SPA Filter
-
-`hope.open.api.spa` 标志是否开启：
-
-1. `hope.common.spring.api.spa.wbmvc.SpaMvcConfiguration` 在 `SERVLET` 模式下控制 SPA 配置
-2. `hope.common.spring.api.spa.webflux.SpaFluxConfiguration` 在 `REACTIVE` 模式下控制 SPA 配置
-
-URL 反向代理规则配置在 `SpaPathChecker` 中：
+SPA 转发规则示例：
 
 ```java
 SpaPathChecker DEFAULT =
@@ -195,27 +124,20 @@ SpaPathChecker DEFAULT =
               && !path.startsWith("/h2-console")
               && !path.contains(".")
               && path.matches("/(.*)");
-
-if (checker.passToSpa(path)) {
-      request.getRequestDispatcher("/index.html").forward(request, response);
-      return;
-}
 ```
 
-默认规则：
+这样可以保证：
 
-1. 不以 `/api` 开头
-2. 不以 `/management` 开头
-3. 不以 `/v3/api-docs` 开头
-4. 不以 `/h2-console` 开头
-5. 路径中不包含点号（`.`）
-6. 匹配表达式 "`/(.*)`"
+- `/api/...` 继续走后端接口
+- 普通页面路由继续走前端 SPA
+- 静态文件路径仍然按资源方式返回
 
-举个例子：
+## 结果
 
-1. 如果有人访问 `/api/users` → 请求会转发到后端
-2. 如果有人访问 `/about` → 请求会被转发到 `index.html`
-3. 如果有人访问 `/static/image.jpg` → 请求将直接由服务器返回文件内容
+完成这一步后，应用模块会成为 ApiHug 契约生成与真实 Vue UI 工程之间的稳定衔接点，而不是靠人工临时拼接前后端流程。
 
-然后你就可以尽情享受和前端一样丝滑的便捷和体验！
+## 相关页面
 
+1. [UI 手册](/zhCN-docs/ui)
+2. [组织 Vue UI 模块](/zhCN-docs/ui/002_vue)
+3. [UI 工具链](/zhCN-docs/ui/004_tool_chain)
