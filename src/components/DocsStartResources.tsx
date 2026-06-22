@@ -29,12 +29,12 @@ export function DocsMavenCentralBadge({
     return badge;
   }
 
-  return <div className="not-prose">{badge}</div>;
+  return <div className="not-prose my-6">{badge}</div>;
 }
 
 export function DocsJetBrainsMarketplaceCard() {
   return (
-    <div className="not-prose">
+    <div className="not-prose my-6">
       <iframe
         src="https://plugins.jetbrains.com/embeddable/card/23534"
         title="JetBrains Marketplace card for ApiHug - API design Copilot"

@@ -84,6 +84,8 @@ test("docs MDX pipeline supports GFM tables and constrained code blocks", () => 
   assert.match(docsStartResources, /height="319px"/);
   assert.match(docsStartResources, /width="384px"/);
   assert.match(docsStartResources, /allowFullScreen/);
+  assert.match(docsStartResources, /return <div className="not-prose my-6">\{badge\}<\/div>;/);
+  assert.match(docsStartResources, /<div className="not-prose my-6">/);
   assert.doesNotMatch(docsStartResources, /rounded-xl|shadow-sm|max-w-\[384px\]|w-full/);
 });
 
@@ -565,7 +567,7 @@ test("app docs header locale panel avoids a hover gap under the docs trigger", (
 test("desktop logo adds a subtitle lockup without changing mobile behavior", () => {
   const logo = fs.readFileSync(path.join(repoRoot, "src", "components", "logo.tsx"), "utf8");
 
-  assert.match(logo, /API as Architecture/);
+  assert.match(logo, /AI-native Enterprise Architecture Factory/);
   assert.match(logo, /hidden[\s\S]*md:flex/);
   assert.match(logo, /md:hidden/);
   assert.match(logo, /font-mono/);
