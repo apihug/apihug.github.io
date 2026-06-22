@@ -16,7 +16,7 @@ export function Logo({ className, ...props }: { className?: string } & React.Com
           className="hidden h-7 w-auto dark:block"
         />
       </span>
-      <span className="hidden items-center gap-3 md:flex">
+      <span className="hidden items-end gap-3 md:flex">
         <span className="inline-flex">
           <img
             src={stickyLogo.src}

@@ -378,7 +378,7 @@ function QuickStart() {
           Quick start
         </span>
       </div>
-      <div className="rounded-xl bg-gray-950 p-1 sm:max-w-xl dark:inset-ring dark:inset-ring-white/10">
+      <div className="rounded-xl bg-gray-950 p-1 lg:w-1/2 dark:inset-ring dark:inset-ring-white/10">
         {/* Platform tabs */}
         <div className="flex items-center gap-1 px-2 pt-1 pb-0">
           {(Object.keys(PLATFORMS) as PlatformKey[]).map((key) => (
