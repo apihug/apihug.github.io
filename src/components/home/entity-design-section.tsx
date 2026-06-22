@@ -21,15 +21,15 @@ type TabKey = "proto" | "liquibase" | "entity";
 const TABS: Record<TabKey, { label: string; description: string }> = {
   proto: {
     label: "entity.proto",
-    description: "Column types, lengths, constraints, and table wiring — declared directly in protobuf.",
+    description: "Columns, lengths, constraints, and table mapping declared in protobuf.",
   },
   liquibase: {
     label: "changelog.xml",
-    description: "Liquibase migration changelogs auto-generated from your entities. No manual DDL.",
+    description: "Liquibase changelogs generated from entity definitions. No hand-written DDL.",
   },
   entity: {
     label: "Movie.java",
-    description: "Domain entities with annotations, relationships, and audit fields — generated from your proto.",
+    description: "Entities, relationships, and audit fields generated from the same contract.",
   },
 };
 
@@ -44,13 +44,13 @@ export default function EntityDesignSection() {
 
       <GridContainer>
         <h2 className="max-w-lg px-2 text-[2.5rem]/10 font-medium tracking-tighter text-balance max-sm:px-4 2xl:mt-0">
-          From proto to database, automatically.
+          From proto to persistence, automatically.
         </h2>
       </GridContainer>
 
       <GridContainer className="mt-4">
         <p className="max-w-(--breakpoint-md) px-2 text-base/7 text-gray-600 max-sm:px-4 dark:text-gray-400">
-          Define your domain model in protobuf. ApiHug generates entities, migrations, and CRUD — schema, code, and API always in sync.
+          Define entity structure in protobuf. ApiHug generates entities, migrations, and CRUD so schema, code, and API stay aligned.
         </p>
       </GridContainer>
 
@@ -85,7 +85,7 @@ export default function EntityDesignSection() {
             </div>
           </div>
 
-          {/* Code — all blocks stacked, only active one visible. Prevents layout shift on tab switch */}
+          {/* Code - all blocks stacked, only active one visible. Prevents layout shift on tab switch */}
           <div className="relative h-[38rem] lg:col-span-3">
             <div className={clsx("absolute inset-0", activeTab !== "proto" && "invisible")}>
               <ProtoCode />

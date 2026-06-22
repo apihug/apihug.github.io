@@ -72,16 +72,28 @@ const Hero: React.FC = () => {
           API as Architecture
         </p>
         <h1 className="mt-2 px-2 text-4xl/11 font-medium tracking-tight text-balance max-sm:px-4 sm:text-5xl/[1.05] lg:text-6xl/[1.02]">
-          Embrace AI with every API.
+          One contract for{" "}
+          <span className="inline-block pb-[0.08em] bg-linear-to-r from-sky-500 to-cyan-400 bg-clip-text text-transparent dark:from-sky-300 dark:to-cyan-200">
+            APIs
+          </span>
+          ,{" "}
+          <span className="inline-block pb-[0.08em] bg-linear-to-r from-emerald-500 to-teal-400 bg-clip-text text-transparent dark:from-emerald-300 dark:to-teal-200">
+            systems
+          </span>
+          , and{" "}
+          <span className="inline-block pb-[0.08em] bg-linear-to-r from-violet-500 to-fuchsia-400 bg-clip-text text-transparent dark:from-violet-300 dark:to-fuchsia-200">
+            agents
+          </span>
+          .
         </h1>
       </GridContainer>
       <GridContainer className="mt-4">
         <p className="max-w-(--breakpoint-md) px-2 text-lg/7 font-medium text-gray-600 max-sm:px-4 dark:text-gray-400">
-          One contract. Your{" "}
+          Define{" "}
           <span className="font-mono text-[1.0625rem] text-sky-500 dark:text-sky-400">APIs</span>,{" "}
           <span className="font-mono text-[1.0625rem] text-sky-500 dark:text-sky-400">services</span>,{" "}
-          <span className="font-mono text-[1.0625rem] text-sky-500 dark:text-sky-400">databases</span> — a design language that embraces both engineers and{" "}
-          <span className="font-mono text-[1.0625rem] text-sky-500 dark:text-sky-400">AI agents</span>.
+          <span className="font-mono text-[1.0625rem] text-sky-500 dark:text-sky-400">databases</span>, and{" "}
+          <span className="font-mono text-[1.0625rem] text-sky-500 dark:text-sky-400">AI tools</span> from one protobuf contract. ApiHug keeps engineers and agents on the same system model.
         </p>
       </GridContainer>
       <GridContainer className="mt-8 sm:mt-10 sm:px-2">
@@ -193,7 +205,7 @@ const Hero: React.FC = () => {
               </div>
             </Editor>
           </div>
-          {/* Java editor — generated output */}
+          {/* Java editor - generated output */}
           <div className="relative flex flex-col border-(--pattern-fg) bg-[image:repeating-linear-gradient(315deg,_var(--pattern-fg)_0,_var(--pattern-fg)_1px,_transparent_0,_transparent_50%)] bg-[size:10px_10px] bg-fixed [--pattern-fg:var(--color-black)]/5 p-2 dark:[--pattern-fg:var(--color-white)]/10">
             <div className="mb-2 px-3 pt-1">
               <div className="font-mono text-xs text-gray-500 dark:text-gray-400">OrderController.java</div>

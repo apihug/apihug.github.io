@@ -6,7 +6,7 @@ const FLOW_STEPS = [
   {
     label: "Define",
     title: "Protobuf Contract",
-    description: "Describe your API in Protocol Buffers — structured, typed, machine-readable.",
+    description: "Describe the API in Protocol Buffers: structured, typed, and machine-readable.",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" className="size-6">
         <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -17,7 +17,7 @@ const FLOW_STEPS = [
   {
     label: "Generate",
     title: "Spring Boot Services",
-    description: "Controllers, DTOs, and service stubs — production-ready, zero boilerplate.",
+    description: "Controllers, DTOs, and service stubs generated with minimal manual wiring.",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" className="size-6">
         <path d="M16 18l6-6-6-6M8 6l-6 6 6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -27,7 +27,7 @@ const FLOW_STEPS = [
   {
     label: "Persist",
     title: "Database Schema",
-    description: "Tables, indexes, and migrations — generated from your entity annotations.",
+    description: "Tables, indexes, and migrations generated from entity metadata.",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" className="size-6">
         <ellipse cx="12" cy="5" rx="9" ry="3" stroke="currentColor" strokeWidth="1.5" />
@@ -39,7 +39,7 @@ const FLOW_STEPS = [
   {
     label: "Connect",
     title: "MCP & Agent Tools",
-    description: "MCP servers and tool schemas so AI agents can invoke your APIs safely.",
+    description: "MCP servers and typed tools so agents can call your APIs safely.",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" className="size-6">
         <path d="M12 2a3 3 0 00-3 3v4a3 3 0 006 0V5a3 3 0 00-3-3zM19 10a3 3 0 00-3 3v4a3 3 0 006 0v-4a3 3 0 00-3-3zM5 10a3 3 0 00-3 3v4a3 3 0 006 0v-4a3 3 0 00-3-3z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -63,7 +63,7 @@ export default function EnterpriseFactorySection() {
 
       <GridContainer className="mt-4">
         <p className="max-w-(--breakpoint-md) px-2 text-base/7 text-gray-600 max-sm:px-4 dark:text-gray-400">
-          No more hand-wiring layers. One proto contract generates services, database, SDKs, testing, and AI tooling — the same definition powers both human engineers and machine agents.
+          One proto contract generates services, database artifacts, SDKs, tests, and AI tooling. The same definition serves engineers, clients, and agents.
         </p>
       </GridContainer>
 

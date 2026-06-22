@@ -5,27 +5,27 @@ import CategoryHeader from "./category-header";
 const CAPABILITIES = [
   {
     title: "MCP Server Generation",
-    description: "Auto-generate MCP servers from your API contracts. AI agents discover and invoke services without custom integration.",
+    description: "Generate MCP servers from API contracts so agents can discover and invoke services without custom glue.",
   },
   {
     title: "Tool Schema & Catalog",
-    description: "Every endpoint becomes a typed tool definition with input, output, and pagination — exactly what LLMs need.",
+    description: "Turn endpoints into typed tools with clear inputs, outputs, and pagination.",
   },
   {
     title: "Agent Permission Model",
-    description: "RBAC and audit trails keep AI agents operating within safe enterprise boundaries.",
+    description: "Apply RBAC and audit trails so agent actions stay within enterprise boundaries.",
   },
   {
     title: "Semantic API Contracts",
-    description: "Protobuf eliminates ambiguity. LLMs reason best against structured, typed definitions with clear semantics.",
+    description: "Use structured protobuf contracts that reduce ambiguity for both humans and LLMs.",
   },
   {
     title: "SDK & Language Bindings",
-    description: "Client SDKs for any language from one contract — Java, TypeScript, Python, Go.",
+    description: "Generate client bindings from one contract for Java, TypeScript, Python, and Go.",
   },
   {
     title: "Enterprise Governance",
-    description: "Observability, tracing, and compliance built into every generated artifact.",
+    description: "Carry observability, tracing, and compliance through generated artifacts.",
   },
 ];
 
@@ -38,13 +38,13 @@ export default function AgentVisionSection() {
 
       <GridContainer>
         <h2 className="max-w-lg px-2 text-[2.5rem]/10 font-medium tracking-tighter text-balance max-sm:px-4 2xl:mt-0">
-          Embrace the age of AI agents.
+          Make your APIs ready for AI agents.
         </h2>
       </GridContainer>
 
       <GridContainer className="mt-4">
         <p className="max-w-(--breakpoint-md) px-2 text-base/7 text-gray-600 max-sm:px-4 dark:text-gray-400">
-          In the AI era, your API consumers are agents — not just developers. ApiHug hugs both: giving humans clean contracts and LLMs the structured semantics they need to understand — not guess at — your enterprise.
+          Agents are now API consumers. ApiHug gives them typed tools, governed access, and the same contract model your engineers already use.
         </p>
       </GridContainer>
 
@@ -67,7 +67,7 @@ export default function AgentVisionSection() {
                 Enterprise Intent Compiler
               </h3>
               <p className="max-w-(--breakpoint-sm) text-sm/6 text-gray-400">
-                From business intent to deployed systems. ApiHug hugs both humans and AI agents into a shared, unambiguous contract — the foundation for the entire enterprise lifecycle.
+                From business intent to deployed systems. ApiHug gives humans and AI agents one unambiguous contract across the delivery lifecycle.
               </p>
             </div>
             <LinkButton

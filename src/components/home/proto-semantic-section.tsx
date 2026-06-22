@@ -22,25 +22,25 @@ const TABS: Record<TabKey, { label: string; title: string; description: string }
     label: "Service & RPC",
     title: "hope.swagger.operation",
     description:
-      "HTTP routes, methods, pagination — declared on your RPCs. Generates OpenAPI specs, Spring controllers, and client SDKs automatically.",
+      "Routes, methods, and pagination declared on RPCs. Generates OpenAPI, Spring controllers, and client SDKs.",
   },
   field: {
     label: "Field Validation",
     title: "hope.swagger.field",
     description:
-      "Descriptions, examples, validation rules, and mock data — all embedded as field-level metadata in your protobuf contract.",
+      "Descriptions, examples, validation, and mock rules defined as field metadata in the contract.",
   },
   constant: {
     label: "Enum Constants",
     title: "hope.constant.field",
     description:
-      "Codes, i18n messages, error mappings on every enum value. Generates type-safe constant classes with built-in error handling.",
+      "Codes, i18n messages, and error mappings on enum values. Generates type-safe constants.",
   },
   mock: {
     label: "Mock Generation",
     title: "hope.mock",
     description:
-      "40+ nature types — MOVIE, BOOK, EMAIL, PHONE, and more. Realistic test data generated directly from your proto definitions.",
+      "Built-in nature types such as MOVIE, BOOK, EMAIL, and PHONE for realistic test data.",
   },
 };
 
@@ -55,14 +55,13 @@ export default function ProtoSemanticSection() {
 
       <GridContainer>
         <h2 className="max-w-lg px-2 text-[2.5rem]/10 font-medium tracking-tighter text-balance max-sm:px-4 2xl:mt-0">
-          Protobuf is AI-native by design.
+          Protobuf with execution semantics.
         </h2>
       </GridContainer>
 
       <GridContainer className="mt-4">
         <p className="max-w-(--breakpoint-md) px-2 text-base/7 text-gray-600 max-sm:px-4 dark:text-gray-400">
-          ApiHug extends protobuf with a rich semantic layer — routing, validation, persistence, mocking — all declared in your{" "}
-          <span className="font-mono text-[1.0625rem] text-sky-500 dark:text-sky-400">.proto</span> files. Typed fields, pagination, repeated inputs — structured semantics that LLMs understand without hallucinating.
+          ApiHug extends protobuf with routing, validation, persistence, mocking, and versioning. Structured semantics stay in the contract, where engineers and LLMs can use them reliably.
         </p>
       </GridContainer>
 
@@ -97,7 +96,7 @@ export default function ProtoSemanticSection() {
             </div>
           </div>
 
-          {/* Code — all blocks stacked, only active one visible. Prevents layout shift on tab switch */}
+          {/* Code - all blocks stacked, only active one visible. Prevents layout shift on tab switch */}
           <div className="relative h-[38rem]">
             <div className={clsx("absolute inset-0", activeTab !== "service" && "invisible")}>
               <ServiceCode />
@@ -115,7 +114,7 @@ export default function ProtoSemanticSection() {
         </div>
       </GridContainer>
 
-      {/* Extension diagram — Bento grid like why-tailwind-css-section */}
+      {/* Extension diagram - Bento grid like why-tailwind-css-section */}
       <GridContainer className="mt-16">
         <div className="grid w-full grid-flow-dense grid-cols-6 gap-2 bg-gray-950/5 p-2 dark:bg-white/10 sm:grid-cols-12">
           {[
@@ -125,7 +124,7 @@ export default function ProtoSemanticSection() {
             { name: "mock", desc: "40+ nature type generators", mono: "hope.mock" },
             { name: "domain", desc: "Views & query objects", mono: "hope.domain" },
             { name: "version", desc: "API versioning strategy", mono: "hope.version" },
-          ].map((ext, i) => (
+          ].map((ext) => (
             <BentoItem key={ext.name} className={clsx("col-span-3 sm:col-span-4 lg:col-span-2")}>
               <div className="flex flex-col gap-1 p-4">
                 <span className="font-mono text-xs/5 font-bold text-gray-950 dark:text-white">{ext.mono}</span>
