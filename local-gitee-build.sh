@@ -1,13 +1,4 @@
-set -e
+#!/usr/bin/env sh
+set -eu
 
-
-pnpm build
-cd  out/
-
-git init
-git add -A
-git commit  -m "deploy of apihug.com static build"
-
-git push -f git@gitee.com:apihugcom/apihugcom-build.git master
-
-cd -
+node scripts/local-gitee-build.mjs "$@"

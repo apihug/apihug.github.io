@@ -30,8 +30,8 @@ export function Logo({ className, ...props }: { className?: string } & React.Com
           />
         </span>
         <span className="flex flex-col leading-none">
-          <span className="font-mono text-[11px]/4 tracking-[0.24em] text-gray-500 uppercase dark:text-gray-400">
-            API as Architecture
+          <span className="font-mono text-[11px]/4 tracking-[0.24em] text-gray-500 dark:text-gray-400">
+            AI-native Enterprise Architecture Factory
           </span>
         </span>
       </span>

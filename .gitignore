@@ -45,3 +45,7 @@ out/
 temp/
 .worktrees/
 .codegraph/
+/docs/superpowers/
+.tmp/
+.qoder
+new-brand.md
