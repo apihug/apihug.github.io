@@ -347,11 +347,8 @@ function FieldCode() {
               <span className="line">
                 <span>{"    "}</span>
                 <span style={KEYWORD}>max_length</span>
-                <span style={SYMBOL}>: &#123; </span>
-                <span style={KEYWORD}>value</span>
                 <span style={SYMBOL}>: </span>
                 <span style={ANNOTATION}>64</span>
-                <span style={SYMBOL}> &#125;</span>
               </span>
               <span className="line">
                 <span>{"  "}</span>

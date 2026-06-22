@@ -434,9 +434,6 @@ function EntityCode() {
                 <span style={SYMBOL}>)</span>
               </span>
               <span className="line">
-                <span style={ANNOTATION}>@Auditable</span>
-              </span>
-              <span className="line">
                 <span style={KEYWORD}>public class </span>
                 <span style={TYPE}>Movie </span>
                 <span style={KEYWORD}>implements </span>
