@@ -19,7 +19,7 @@ In a typical first run, you will:
 1. initialize an ApiHug workspace
 2. generate a demo project from the IntelliJ wizard
 3. understand the `-proto` and application module split
-4. run `wire`, `stub`, and the application
+4. run `wire`, then the application (bootRun)
 5. open the generated OAS document
 
 ## Before You Start
@@ -392,17 +392,7 @@ hopeWire {
 
 <img src="/img/editor/006_wire.gif" alt="ApiHug Wire Project" width={2316} height={1768} className="rounded-lg" />
 
-### 2. Run Stub
-
-`stub` generates the application-side scaffolding from the contract module.
-
-1. Open `README.md > 2. Build Stub (Individual)`
-2. Run the command, for example `gradlew.bat demo-app:clean stub build -x test -x stubTest`
-3. Review the generated output under `demo-app`
-
-<img src="/img/editor/007_stub.gif" alt="ApiHug Stub Project" width={2316} height={1768} className="rounded-lg" />
-
-### 3. Run the Application
+### 2. Run the Application
 
 1. Open `README.md > 3. Run Application`
 2. Run `gradlew demo-app:bootRun`
@@ -422,7 +412,7 @@ Api-Authorities                   http://localhost:18089/hope/meta/authorities
 Profile(s)                        dev
 ```
 
-### 4. Check the OAS Output
+### 3. Check the OAS Output
 
 Copy the `/v3/api-docs` URL from the console, open it in your browser, and verify the generated contract surface.
 

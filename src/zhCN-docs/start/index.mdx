@@ -6,7 +6,7 @@ import { DocsCodeBlock } from '@/components/DocsCodeBlock'
 import { DocsJetBrainsMarketplaceCard, DocsMavenCentralBadge } from '@/components/DocsStartResources'
 import { SnippetGroup } from '@/components/SnippetGroup'
 
-这一页带你从空目录走到一个可运行的 ApiHug 演示项目。路径很直接：先准备环境，再生成项目，接着跑通 `wire`、`stub` 和应用启动，最后检查生成出来的 OAS 接口文档。
+这一页带你从空目录走到一个可运行的 ApiHug 演示项目。路径很直接：先准备环境，再生成项目，接着跑通 `wire`、和应用启动，最后检查生成出来的 OAS 接口文档。
 
 <TipGood>
   ApiHug 3.x 面向 Spring Boot 4.0 及以上版本。升级老项目之前，建议先阅读 Spring Boot 4.0 迁移指南。
@@ -19,7 +19,7 @@ import { SnippetGroup } from '@/components/SnippetGroup'
 1. 初始化一个 ApiHug 工作目录
 2. 通过 IntelliJ 向导生成一个演示项目
 3. 理解 `-proto` 模块与应用模块的分工
-4. 依次执行 `wire`、`stub` 和应用启动
+4. 执行 `wire`、然后应用启动
 5. 打开生成出来的 OAS 文档
 
 ## 开始之前
@@ -392,17 +392,8 @@ hopeWire {
 
 <img src="/img/editor/006_wire.gif" alt="ApiHug Wire 项目" width={2316} height={1768} className="rounded-lg" />
 
-### 2. 执行 Stub
 
-`stub` 会基于契约模块生成应用侧脚手架。
-
-1. 打开 `README.md > 2. Build Stub (Individual)`
-2. 执行命令，例如 `gradlew.bat demo-app:clean stub build -x test -x stubTest`
-3. 查看 `demo-app` 下的生成结果
-
-<img src="/img/editor/007_stub.gif" alt="ApiHug Stub 项目" width={2316} height={1768} className="rounded-lg" />
-
-### 3. 启动应用
+### 2. 启动应用
 
 1. 打开 `README.md > 3. Run Application`
 2. 执行 `gradlew demo-app:bootRun`
@@ -422,7 +413,7 @@ Api-Authorities                   http://localhost:18089/hope/meta/authorities
 Profile(s)                        dev
 ```
 
-### 4. 检查 OAS 输出
+### 3. 检查 OAS 输出
 
 把控制台里的 `/v3/api-docs` 地址复制到浏览器，确认生成出来的接口面没有问题。
 
